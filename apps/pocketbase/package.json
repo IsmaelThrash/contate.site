@@ -1,0 +1,12 @@
+{
+	"name": "pocketbase-app",
+	"type": "module",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "./pocketbase serve --http=0.0.0.0:8090 --hooksWatch=false",
+		"start": "./pocketbase serve --http=0.0.0.0:8090 --encryptionEnv=PB_ENCRYPTION_KEY --dir=/data --migrationsDir=./pb_migrations --hooksDir=./pb_hooks --hooksWatch=false",
+		"migrations:up": "./pocketbase migrate up --encryptionEnv=PB_ENCRYPTION_KEY --dir=/data --migrationsDir=./pb_migrations --hooksDir=./pb_hooks --hooksWatch=false",
+		"migrations:revert": "./pocketbase horizons migrations:revert --encryptionEnv=PB_ENCRYPTION_KEY --dir=/data --migrationsDir=./pb_migrations --hooksDir=./pb_hooks --hooksWatch=false"
+	}
+}

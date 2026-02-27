@@ -1,0 +1,91 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 250 10% 98%;
+    --foreground: 220 13% 20%;
+    --primary: 280 85% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 180 70% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 40 95% 55%;
+    --accent-foreground: 220 13% 20%;
+    --card: 250 5% 95%;
+    --card-foreground: 220 13% 20%;
+    --border: 220 13% 85%;
+    --input: 250 5% 92%;
+    --muted: 220 10% 70%;
+    --muted-foreground: 220 13% 40%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --ring: 280 85% 55%;
+    --radius: 0.75rem;
+    --popover: 250 5% 95%;
+    --popover-foreground: 220 13% 20%;
+  }
+  .dark {
+    --background: 15 20% 8%;
+    --foreground: 220 13% 95%;
+    --primary: 280 90% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 180 75% 60%;
+    --secondary-foreground: 0 0% 100%;
+    --accent: 40 100% 65%;
+    --accent-foreground: 15 20% 8%;
+    --card: 220 15% 15%;
+    --card-foreground: 220 13% 95%;
+    --border: 220 13% 25%;
+    --input: 220 15% 20%;
+    --muted: 220 10% 40%;
+    --muted-foreground: 220 13% 70%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --ring: 280 90% 65%;
+    --popover: 220 15% 15%;
+    --popover-foreground: 220 13% 95%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased selection:bg-primary/30 selection:text-primary;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold tracking-tight;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .glass-card {
+    @apply bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
+  }
+
+  .mesh-bg {
+    background-color: hsl(var(--background));
+    background-image: 
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"),
+      radial-gradient(at 0% 0%, hsla(var(--primary)/0.2) 0px, transparent 55%),
+      radial-gradient(at 100% 0%, hsla(var(--secondary)/0.2) 0px, transparent 55%),
+      radial-gradient(at 100% 100%, hsla(var(--accent)/0.2) 0px, transparent 55%),
+      radial-gradient(at 0% 100%, hsla(var(--primary)/0.2) 0px, transparent 55%);
+    background-blend-mode: overlay, normal, normal, normal, normal;
+  }
+}
