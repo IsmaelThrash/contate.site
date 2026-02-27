@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import pb from '@/lib/pocketbaseClient.js';
 import LinkForm from '@/components/LinkForm.jsx';
 import Header from '@/components/Header.jsx';
+import ProfileSettings from '@/components/ProfileSettings.jsx';
 
 const DashboardPage = () => {
   const { currentUser, logout, updateUserColor } = useAuth();
@@ -74,7 +75,7 @@ const DashboardPage = () => {
   const handleColorChange = async (e) => {
     const newColor = e.target.value;
     setCorFundo(newColor);
-    
+
     const result = await updateUserColor(newColor);
     if (result.success) {
       toast({
@@ -108,12 +109,12 @@ const DashboardPage = () => {
 
       <div className="min-h-screen mesh-bg">
         <Header />
-        
+
         <div className="container mx-auto px-4 py-24">
           <div className="grid lg:grid-cols-12 gap-8">
             {/* Sidebar */}
             <div className="lg:col-span-4 xl:col-span-3">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="glass-card rounded-3xl p-6 sticky top-28"
@@ -195,7 +196,9 @@ const DashboardPage = () => {
 
             {/* Main Content */}
             <div className="lg:col-span-8 xl:col-span-9">
-              <motion.div 
+              <ProfileSettings />
+
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="glass-card rounded-3xl p-6 md:p-10"
@@ -258,7 +261,7 @@ const DashboardPage = () => {
                             <div className="cursor-grab active:cursor-grabbing p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
                               <GripVertical className="h-5 w-5" />
                             </div>
-                            
+
                             <div className="flex-1 min-w-0">
                               <h3 className="font-heading font-bold text-lg mb-1 truncate text-foreground">
                                 {link.titulo}

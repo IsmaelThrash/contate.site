@@ -59,13 +59,13 @@ export const AuthProvider = ({ children }) => {
         cor_fundo: '#000000',
         status: 1
       };
-      
+
       await pb.collection('usuarios').create(data, { $autoCancel: false });
       return { success: true };
     } catch (error) {
       console.error('Signup error:', error);
       let errorMessage = 'Falha ao criar conta. Tente novamente.';
-      
+
       // Handle specific PocketBase validation errors
       if (error.response?.data) {
         const errData = error.response.data;
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
           errorMessage = `Confirmação de senha: ${errData.passwordConfirm.message}`;
         }
       }
-      
+
       return { success: false, error: errorMessage };
     }
   };
@@ -93,8 +93,8 @@ export const AuthProvider = ({ children }) => {
     if (!currentUser) return { success: false };
     try {
       const updated = await pb.collection('usuarios').update(
-        currentUser.id, 
-        { cor_fundo: color }, 
+        currentUser.id,
+        { cor_fundo: color },
         { $autoCancel: false }
       );
       setCurrentUser(updated);
@@ -105,13 +105,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateProfile = async (data) => {
+    if (!currentUser) return { success: false };
+    try {
+      const updated = await pb.collection('usuarios').update(
+        currentUser.id,
+        data,
+        { $autoCancel: false }
+      );
+      setCurrentUser(updated);
+      return { success: true };
+    } catch (error) {
+      console.error('Update profile error:', error);
+      return { success: false, error: 'Falha ao atualizar perfil.' };
+    }
+  };
+
   const value = {
     currentUser,
     isAuthenticated: !!currentUser,
     login,
     signup,
     logout,
-    updateUserColor
+    updateUserColor,
+    updateProfile
   };
 
   return (
