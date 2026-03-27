@@ -9,6 +9,7 @@ import SignupPage from '@/pages/SignupPage.jsx';
 import LoginPage from '@/pages/LoginPage.jsx';
 import DashboardPage from '@/pages/DashboardPage.jsx';
 import ProfilePage from '@/pages/ProfilePage.jsx';
+import OnboardingPage from '@/pages/OnboardingPage.jsx';
 import { Toaster } from '@/components/ui/toaster';
 
 function App() {
@@ -26,6 +27,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/onboarding"
+              element={
+                <ProtectedRoute>
+                  <OnboardingPage />
                 </ProtectedRoute>
               }
             />

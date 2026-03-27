@@ -107,7 +107,10 @@ const DashboardPage = () => {
         <meta name="description" content="Gerencie seus links e personalize sua página no contate.site." />
       </Helmet>
 
-      <div className="min-h-screen mesh-bg">
+      <div 
+        className="min-h-screen mesh-bg transition-colors duration-500"
+        style={{ backgroundColor: corFundo || 'hsl(var(--background))' }}
+      >
         <Header />
 
         <div className="container mx-auto px-4 py-24">
@@ -121,8 +124,16 @@ const DashboardPage = () => {
               >
                 <div className="text-center mb-8">
                   <div className="bg-gradient-to-br from-primary to-secondary p-1 rounded-full w-24 h-24 mx-auto mb-4 shadow-lg">
-                    <div className="bg-card w-full h-full rounded-full flex items-center justify-center">
-                      <User className="h-10 w-10 text-primary" />
+                    <div className="bg-card w-full h-full rounded-full overflow-hidden flex items-center justify-center">
+                      {currentUser?.avatar ? (
+                        <img 
+                          src={`${import.meta.env.VITE_POCKETBASE_URL || 'http://localhost:8090'}/api/files/usuarios/${currentUser.id}/${currentUser.avatar}`} 
+                          alt="Avatar" 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="h-10 w-10 text-primary" />
+                      )}
                     </div>
                   </div>
                   <h2 className="font-heading font-bold text-xl mb-1 truncate">{currentUser?.email}</h2>

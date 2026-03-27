@@ -125,6 +125,7 @@ const ProfilePage = () => {
 
       <div
         className="min-h-screen py-20 px-4 relative overflow-hidden mesh-bg"
+        style={{ backgroundColor: user.cor_fundo || 'hsl(var(--background))' }}
       >
 
         <div className="max-w-2xl mx-auto relative z-10">
@@ -138,10 +139,18 @@ const ProfilePage = () => {
             <div className="relative inline-block">
               <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"></div>
               <div className="bg-white/10 dark:bg-black/20 backdrop-blur-xl p-3 rounded-full w-36 h-36 mx-auto mb-8 shadow-2xl border border-white/20 relative z-10">
-                <div className="bg-gradient-to-br from-primary via-accent to-secondary w-full h-full rounded-full flex items-center justify-center shadow-inner">
-                  <span className="text-5xl font-heading font-black text-white drop-shadow-md">
-                    {(user.nome_exibicao || user.slug).charAt(0).toUpperCase()}
-                  </span>
+                <div className="bg-gradient-to-br from-primary via-accent to-secondary w-full h-full rounded-full flex items-center justify-center shadow-inner overflow-hidden border border-white/10">
+                  {user.avatar ? (
+                    <img 
+                      src={`${import.meta.env.VITE_POCKETBASE_URL || 'http://localhost:8090'}/api/files/usuarios/${user.id}/${user.avatar}`} 
+                      alt={user.nome_exibicao || user.slug} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-5xl font-heading font-black text-white drop-shadow-md">
+                      {(user.nome_exibicao || user.slug).charAt(0).toUpperCase()}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

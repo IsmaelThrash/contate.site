@@ -84,6 +84,31 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async () => {
+    try {
+      const authData = await pb.collection('usuarios').authWithOAuth2({ 
+        provider: 'google',
+        createData: {
+          slug: `user-${Math.random().toString(36).substring(2, 9)}`,
+          cor_fundo: '#000000',
+          status: 1
+        }
+      });
+      
+      // If the user was just created, flag it so the UI can redirect to onboarding
+      if (authData.meta?.isNew || !authData.record.slug || authData.record.slug.startsWith('user-')) {
+        setCurrentUser(authData.record);
+        return { success: true, isNew: true };
+      } else {
+        setCurrentUser(authData.record);
+        return { success: true, isNew: false };
+      }
+    } catch (error) {
+      console.error('Google Auth error:', error);
+      return { success: false, error: 'Falha ao autenticar com o Google.' };
+    }
+  };
+
   const logout = () => {
     pb.authStore.clear();
     setCurrentUser(null);
@@ -126,6 +151,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!currentUser,
     login,
     signup,
+    loginWithGoogle,
     logout,
     updateUserColor,
     updateProfile

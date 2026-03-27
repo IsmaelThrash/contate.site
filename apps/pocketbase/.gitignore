@@ -1,0 +1,9 @@
+pb_data/
+pocketbase.exe
+pocketbase
+*.zip
+*.log
+.version
+.pocketbase-version
+CHANGELOG.md
+LICENSE.md
