@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useToast } from '@/hooks/use-toast';
 import { AtSign, Loader2, Link2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import pb from '@/lib/pocketbaseClient.js';
+import { supabase } from '@/lib/supabaseClient.js';
 import { isReservedSlug } from '@/lib/constants.js';
 
 const OnboardingPage = () => {
@@ -53,12 +52,17 @@ const OnboardingPage = () => {
 
     try {
       // Check if slug already exists and belongs to someone else
-      const existingSlug = await pb.collection('usuarios').getList(1, 1, {
-        filter: `slug="${slug}" && id!="${currentUser.id}"`,
-        $autoCancel: false
-      });
+      const { data: existingSlugs, error: searchError } = await supabase
+        .from('usuarios')
+        .select('id')
+        .eq('slug', slug);
 
-      if (existingSlug.items.length > 0) {
+      if (searchError) throw searchError;
+
+      // Filter out our own ID just in case
+      const isTaken = existingSlugs.some(row => row.id !== currentUser.id);
+
+      if (isTaken) {
         toast({
           title: 'Link indisponível',
           description: 'Este link já está em uso. Por favor, escolha outro.',
@@ -68,7 +72,7 @@ const OnboardingPage = () => {
         return;
       }
 
-      const result = await updateProfile({ slug });
+      const result = await updateProfile({ slug, status: 1 });
 
       if (result.success) {
         toast({
@@ -109,7 +113,6 @@ const OnboardingPage = () => {
           className="w-full max-w-lg"
         >
           <div className="glass-card rounded-3xl p-8 md:p-12 relative overflow-hidden text-center shadow-2xl">
-            {/* Decorative gradient blob */}
             <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
             <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-secondary/20 rounded-full blur-3xl"></div>
 
@@ -119,7 +122,7 @@ const OnboardingPage = () => {
               </div>
               <h1 className="text-3xl md:text-4xl font-heading font-bold mb-4 tracking-tight">Crie sua Identidade</h1>
               <p className="text-muted-foreground text-lg">
-                Sua conta foi criada com sucesso pelo Google! 🎉 <br/> 
+                Sua conta foi autenticada com sucesso! 🎉 <br/> 
                 Agora, escolha qual será o link profissional da sua página:
               </p>
             </div>

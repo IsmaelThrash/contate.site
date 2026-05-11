@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Clock, Loader2 } from 'lucide-react';
+import { ExternalLink, Clock, Loader2, Instagram, Youtube, Twitter, Linkedin, Facebook, Github, MessageCircle, Music, Twitch } from 'lucide-react';
 import { motion } from 'framer-motion';
-import pb from '@/lib/pocketbaseClient.js';
+import { supabase } from '@/lib/supabaseClient.js';
+import VideoEmbed from '@/components/VideoEmbed.jsx';
 
 const ProfilePage = () => {
   const { slug } = useParams();
@@ -22,20 +23,25 @@ const ProfilePage = () => {
     try {
       setLoading(true);
       setError(null);
+      const { data: userRecord, error: userError } = await supabase
+        .from('usuarios')
+        .select('*')
+        .eq('slug', slug)
+        .single();
 
-      const userRecord = await pb.collection('usuarios').getFirstListItem(
-        `slug="${slug}"`,
-        { $autoCancel: false }
-      );
+      if (userError) throw userError;
       setUser(userRecord);
 
       if (userRecord.status === 1) {
-        const linksRecords = await pb.collection('links').getList(1, 100, {
-          filter: `usuario_id="${userRecord.id}"`,
-          sort: 'ordem',
-          $autoCancel: false
-        });
-        setLinks(linksRecords.items);
+        const { data: linksRecords, error: linksError } = await supabase
+          .from('blocos_links')
+          .select('*')
+          .eq('usuario_id', userRecord.id)
+          .eq('ativo', true)
+          .order('ordem', { ascending: true });
+          
+        if (linksError) throw linksError;
+        setLinks(linksRecords || []);
       }
     } catch (err) {
       console.error('Error fetching profile:', err);
@@ -115,12 +121,45 @@ const ProfilePage = () => {
     );
   }
 
+  // Helper for Social Icons
+  const getSocialIcon = (url) => {
+    if (!url) return <ExternalLink className="h-6 w-6" />;
+    const lowerUrl = url.toLowerCase();
+    if (lowerUrl.includes('instagram.com')) return <Instagram className="h-6 w-6" />;
+    if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) return <Youtube className="h-6 w-6" />;
+    if (lowerUrl.includes('twitter.com') || lowerUrl.includes('x.com')) return <Twitter className="h-6 w-6" />;
+    if (lowerUrl.includes('linkedin.com')) return <Linkedin className="h-6 w-6" />;
+    if (lowerUrl.includes('facebook.com')) return <Facebook className="h-6 w-6" />;
+    if (lowerUrl.includes('github.com')) return <Github className="h-6 w-6" />;
+    if (lowerUrl.includes('whatsapp.com') || lowerUrl.includes('wa.me')) return <MessageCircle className="h-6 w-6" />;
+    if (lowerUrl.includes('tiktok.com')) return <Music className="h-6 w-6" />;
+    if (lowerUrl.includes('twitch.tv')) return <Twitch className="h-6 w-6" />;
+    return <ExternalLink className="h-6 w-6" />;
+  };
+
   // User is active - show profile with links
+  
+  // JSON-LD Generation
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "mainEntity": {
+      "@type": "Person",
+      "name": user.nome_exibicao || user.slug,
+      "description": user.bio || `Perfil de ${user.slug} no contate.site`,
+      "url": `${window.location.origin}/${user.slug}`,
+      "image": user.avatar ? `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/avatars/${user.id}/${user.avatar}` : undefined,
+      "sameAs": links.map(l => l.url)
+    }
+  };
   return (
     <>
       <Helmet>
         <title>{user.meta_titulo || `@${user.slug} - contate.site`}</title>
         <meta name="description" content={user.meta_descricao || `Confira todos os links de ${user.slug} em um só lugar`} />
+        <script type="application/ld+json">
+          {JSON.stringify(jsonLd)}
+        </script>
       </Helmet>
 
       <div
@@ -142,7 +181,7 @@ const ProfilePage = () => {
                 <div className="bg-gradient-to-br from-primary via-accent to-secondary w-full h-full rounded-full flex items-center justify-center shadow-inner overflow-hidden border border-white/10">
                   {user.avatar ? (
                     <img 
-                      src={`${import.meta.env.VITE_POCKETBASE_URL || 'http://localhost:8090'}/api/files/usuarios/${user.id}/${user.avatar}`} 
+                      src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/avatars/${user.id}/${user.avatar}`} 
                       alt={user.nome_exibicao || user.slug} 
                       className="w-full h-full object-cover"
                     />
@@ -178,36 +217,54 @@ const ProfilePage = () => {
             </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {links.map((link, index) => (
-                <motion.a
-                  key={link.id}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{
-                    duration: 0.5,
-                    delay: index * 0.1,
-                    ease: [0.23, 1, 0.32, 1]
-                  }}
-                  className={`block group ${index % 3 === 0 ? 'md:col-span-2' : ''}`}
-                >
-                  <div className="h-full flex items-center justify-between py-8 px-10 bg-white/10 dark:bg-black/30 backdrop-blur-xl border border-white/20 dark:border-white/5 text-foreground rounded-[1.5rem] shadow-xl hover:shadow-primary/20 hover:scale-[1.02] hover:bg-white/20 dark:hover:bg-white/5 transition-all duration-300 relative overflow-hidden">
-                    {/* Subtle hover splash */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+              {links.map((link, index) => {
+                const isWide = index % 3 === 0;
+                
+                if (link.tipo === 'video') {
+                  return (
+                    <motion.div
+                      key={link.id}
+                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.5, delay: index * 0.1, ease: [0.23, 1, 0.32, 1] }}
+                      className={`block w-full ${isWide ? 'md:col-span-2' : ''}`}
+                    >
+                      <VideoEmbed url={link.url} title={link.titulo} />
+                    </motion.div>
+                  );
+                }
 
-                    <div className="flex flex-col relative z-10">
-                      <span className="text-2xl font-bold tracking-tight group-hover:text-primary transition-colors">{link.titulo}</span>
-                      <span className="text-sm opacity-50 font-medium truncate max-w-[200px] mt-1">{link.url.replace(/^https?:\/\/(www\.)?/, '')}</span>
-                    </div>
+                return (
+                  <motion.a
+                    key={link.id}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: index * 0.1,
+                      ease: [0.23, 1, 0.32, 1]
+                    }}
+                    className={`block group ${isWide ? 'md:col-span-2' : ''}`}
+                  >
+                    <div className="h-full flex items-center justify-between py-8 px-10 bg-white/10 dark:bg-black/30 backdrop-blur-xl border border-white/20 dark:border-white/5 text-foreground rounded-[1.5rem] shadow-xl hover:shadow-primary/20 hover:scale-[1.02] hover:bg-white/20 dark:hover:bg-white/5 transition-all duration-300 relative overflow-hidden">
+                      {/* Subtle hover splash */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
-                    <div className="bg-white/10 p-3 rounded-xl group-hover:bg-primary group-hover:text-white transition-all duration-300 relative z-10 shadow-lg">
-                      <ExternalLink className="h-6 w-6" />
+                      <div className="flex flex-col relative z-10">
+                        <span className="text-2xl font-bold tracking-tight group-hover:text-primary transition-colors">{link.titulo}</span>
+                        <span className="text-sm opacity-50 font-medium truncate max-w-[200px] mt-1">{link.url ? link.url.replace(/^https?:\/\/(www\.)?/, '') : ''}</span>
+                      </div>
+
+                      <div className="bg-white/10 p-3 rounded-xl group-hover:bg-primary group-hover:text-white transition-all duration-300 relative z-10 shadow-lg">
+                        {getSocialIcon(link.url)}
+                      </div>
                     </div>
-                  </div>
-                </motion.a>
-              ))}
+                  </motion.a>
+                );
+              })}
             </div>
           )}
 

@@ -1,17 +1,17 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import pb from '@/lib/pocketbaseClient.js';
+import { supabase } from '@/lib/supabaseClient.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Link2, Type } from 'lucide-react';
 
 const LinkForm = ({ open, onOpenChange, link, onSuccess }) => {
   const [titulo, setTitulo] = useState('');
   const [url, setUrl] = useState('');
+  const [tipo, setTipo] = useState('link');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { currentUser } = useAuth();
@@ -20,9 +20,11 @@ const LinkForm = ({ open, onOpenChange, link, onSuccess }) => {
     if (link) {
       setTitulo(link.titulo || '');
       setUrl(link.url || '');
+      setTipo(link.tipo || 'link');
     } else {
       setTitulo('');
       setUrl('');
+      setTipo('link');
     }
   }, [link, open]);
 
@@ -42,30 +44,41 @@ const LinkForm = ({ open, onOpenChange, link, onSuccess }) => {
 
     try {
       if (link) {
-        await pb.collection('links').update(
-          link.id,
-          { titulo, url },
-          { $autoCancel: false }
-        );
+        const { error } = await supabase
+          .from('blocos_links')
+          .update({ titulo, url, tipo })
+          .eq('id', link.id);
+          
+        if (error) throw error;
+        
         toast({
           title: 'Sucesso!',
           description: 'Link atualizado com sucesso.'
         });
       } else {
-        const existingLinks = await pb.collection('links').getList(1, 1, {
-          filter: `usuario_id="${currentUser.id}"`,
-          sort: '-ordem',
-          $autoCancel: false
-        });
+        const { data: existingLinks, error: fetchError } = await supabase
+          .from('blocos_links')
+          .select('ordem')
+          .eq('usuario_id', currentUser.id)
+          .order('ordem', { ascending: false })
+          .limit(1);
+          
+        if (fetchError) throw fetchError;
         
-        const maxOrdem = existingLinks.items.length > 0 ? existingLinks.items[0].ordem : 0;
+        const maxOrdem = existingLinks && existingLinks.length > 0 ? existingLinks[0].ordem : 0;
         
-        await pb.collection('links').create({
-          usuario_id: currentUser.id,
-          titulo,
-          url,
-          ordem: maxOrdem + 1
-        }, { $autoCancel: false });
+        const { error: createError } = await supabase
+          .from('blocos_links')
+          .insert({
+            usuario_id: currentUser.id,
+            tipo,
+            titulo,
+            url,
+            ordem: maxOrdem + 1,
+            ativo: true
+          });
+          
+        if (createError) throw createError;
         
         toast({
           title: 'Sucesso!',
@@ -97,6 +110,36 @@ const LinkForm = ({ open, onOpenChange, link, onSuccess }) => {
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6 py-2">
+          <div className="space-y-3">
+            <Label className="flex items-center gap-2">
+              Tipo de Bloco
+            </Label>
+            <div className="flex gap-4 p-1">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="radio" 
+                  name="tipo" 
+                  value="link" 
+                  checked={tipo === 'link'} 
+                  onChange={() => setTipo('link')} 
+                  className="accent-primary w-4 h-4"
+                />
+                <span className="text-sm font-medium">Botão de Link</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="radio" 
+                  name="tipo" 
+                  value="video" 
+                  checked={tipo === 'video'} 
+                  onChange={() => setTipo('video')} 
+                  className="accent-primary w-4 h-4"
+                />
+                <span className="text-sm font-medium">Vídeo Embed</span>
+              </label>
+            </div>
+          </div>
+
           <div className="space-y-3">
             <Label htmlFor="titulo" className="flex items-center gap-2">
               <Type className="h-4 w-4 text-primary" />

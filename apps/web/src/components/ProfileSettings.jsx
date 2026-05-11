@@ -54,17 +54,20 @@ const ProfileSettings = () => {
         e.preventDefault();
         setLoading(true);
 
-        const formDataToSend = new FormData();
-        formDataToSend.append('nome_exibicao', formData.nome_exibicao);
-        formDataToSend.append('bio', formData.bio);
-        formDataToSend.append('meta_titulo', formData.meta_titulo);
-        formDataToSend.append('meta_descricao', formData.meta_descricao);
+        const profileData = {
+            nome_exibicao: formData.nome_exibicao,
+            bio: formData.bio,
+            meta_titulo: formData.meta_titulo,
+            meta_descricao: formData.meta_descricao
+        };
         
-        if (avatarFile) {
-            formDataToSend.append('avatar', avatarFile);
-        }
+        // TODO: Avatar upload via Supabase Storage
+        // if (avatarFile) {
+        //     const avatarUrl = await uploadAvatarToSupabase(avatarFile);
+        //     profileData.avatar_url = avatarUrl;
+        // }
 
-        const result = await updateProfile(formDataToSend);
+        const result = await updateProfile(profileData);
 
         if (result.success) {
             toast({

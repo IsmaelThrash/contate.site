@@ -1,332 +1,361 @@
-
-import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, GripVertical, ExternalLink, Copy, Palette, User, LogOut, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import pb from '@/lib/pocketbaseClient.js';
+import { Plus, LayoutDashboard, Share2, Copy, Check, ExternalLink, Loader2 } from 'lucide-react';
 import LinkForm from '@/components/LinkForm.jsx';
-import Header from '@/components/Header.jsx';
 import ProfileSettings from '@/components/ProfileSettings.jsx';
+import { useToast } from '@/hooks/use-toast';
+import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '@/lib/supabaseClient.js';
+import { SortableLink } from '@/components/SortableLink.jsx';
+
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
 const DashboardPage = () => {
   const { currentUser, logout, updateUserColor } = useAuth();
   const [links, setLinks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showLinkForm, setShowLinkForm] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingLink, setEditingLink] = useState(null);
-  const [corFundo, setCorFundo] = useState('#ffffff');
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (currentUser) {
-      setCorFundo(currentUser.cor_fundo || '#ffffff');
-      fetchLinks();
-    }
-  }, [currentUser]);
+  const publicUrl = `${window.location.origin}/${currentUser?.slug}`;
 
-  const fetchLinks = async () => {
+  const fetchLinks = useCallback(async () => {
+    if (!currentUser?.id) return;
     try {
       setLoading(true);
-      const records = await pb.collection('links').getList(1, 100, {
-        filter: `usuario_id="${currentUser.id}"`,
-        sort: 'ordem',
-        $autoCancel: false
-      });
-      setLinks(records.items);
+      const { data, error } = await supabase
+        .from('blocos_links')
+        .select('*')
+        .eq('usuario_id', currentUser.id)
+        .order('ordem', { ascending: true });
+        
+      if (error) throw error;
+      setLinks(data || []);
     } catch (error) {
       console.error('Error fetching links:', error);
       toast({
         title: 'Erro',
-        description: 'Falha ao carregar links.',
+        description: 'Não foi possível carregar seus links.',
         variant: 'destructive'
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser, toast]);
 
-  const handleDeleteLink = async (linkId) => {
-    if (!window.confirm('Tem certeza que deseja excluir este link?')) {
-      return;
-    }
+  useEffect(() => {
+    fetchLinks();
+  }, [fetchLinks]);
 
+  const handleDeleteLink = useCallback(async (id) => {
+    if (!window.confirm('Tem certeza que deseja deletar este link?')) return;
     try {
-      await pb.collection('links').delete(linkId, { $autoCancel: false });
+      const { error } = await supabase
+        .from('blocos_links')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      
       toast({
         title: 'Sucesso!',
-        description: 'Link excluído com sucesso.'
+        description: 'Link removido.'
       });
       fetchLinks();
     } catch (error) {
       console.error('Error deleting link:', error);
       toast({
         title: 'Erro',
-        description: 'Falha ao excluir link.',
+        description: 'Não foi possível remover o link.',
         variant: 'destructive'
       });
     }
-  };
+  }, [fetchLinks, toast]);
 
-  const handleColorChange = async (e) => {
-    const newColor = e.target.value;
-    setCorFundo(newColor);
+  const handleEditLink = useCallback((l) => {
+    setEditingLink(l);
+    setIsFormOpen(true);
+  }, []);
 
-    const result = await updateUserColor(newColor);
-    if (result.success) {
-      toast({
-        title: 'Sucesso!',
-        description: 'Cor de fundo atualizada.'
-      });
-    } else {
-      toast({
-        title: 'Erro',
-        description: 'Falha ao atualizar cor.',
-        variant: 'destructive'
-      });
-    }
-  };
-
-  const copyProfileUrl = () => {
-    const url = `contate.site/${currentUser.slug}`;
-    navigator.clipboard.writeText(url);
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(publicUrl);
+    setCopied(true);
     toast({
-      title: 'Copiado!',
-      description: 'URL do perfil copiado para a área de transferência.'
+      title: 'Link copiado!',
+      description: 'O link do seu perfil foi copiado para a área de transferência.'
     });
+    setTimeout(() => setCopied(false), 2000);
   };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      let newOrder = [];
+      setLinks((items) => {
+        const oldIndex = items.findIndex(item => item.id === active.id);
+        const newIndex = items.findIndex(item => item.id === over.id);
+        const reordered = arrayMove(items, oldIndex, newIndex);
+        
+        // Update ordem locally
+        newOrder = reordered.map((item, index) => ({
+          ...item,
+          ordem: index + 1
+        }));
+        
+        return newOrder;
+      });
+
+      // Save new order to Supabase
+      if (newOrder.length > 0) {
+        setSavingOrder(true);
+        try {
+          const updates = newOrder.map(link => ({
+            id: link.id,
+            ordem: link.ordem,
+            usuario_id: currentUser.id,
+            titulo: link.titulo,
+            url: link.url,
+            tipo: link.tipo,
+            ativo: link.ativo
+          }));
+
+          const { error } = await supabase
+            .from('blocos_links')
+            .upsert(updates);
+
+          if (error) throw error;
+        } catch (error) {
+          console.error('Error updating order:', error);
+          toast({
+            title: 'Erro ao reordenar',
+            description: 'Não foi possível salvar a nova ordem dos links.',
+            variant: 'destructive'
+          });
+          // Revert on error
+          fetchLinks();
+        } finally {
+          setSavingOrder(false);
+        }
+      }
+    }
+  };
+
+  const THEME_COLORS = [
+    { id: 'zinc', value: '240 5.9% 10%', label: 'Dark Zinc' },
+    { id: 'slate', value: '222.2 84% 4.9%', label: 'Deep Blue' },
+    { id: 'emerald', value: '160 50% 15%', label: 'Forest' },
+    { id: 'rose', value: '346 45% 15%', label: 'Crimson' },
+    { id: 'amber', value: '30 60% 15%', label: 'Sunset' },
+  ];
 
   return (
-    <>
-      <Helmet>
-        <title>Dashboard - contate.site</title>
-        <meta name="description" content="Gerencie seus links e personalize sua página no contate.site." />
-      </Helmet>
-
-      <div 
-        className="min-h-screen mesh-bg transition-colors duration-500"
-        style={{ backgroundColor: corFundo || 'hsl(var(--background))' }}
-      >
-        <Header />
-
-        <div className="container mx-auto px-4 py-24">
-          <div className="grid lg:grid-cols-12 gap-8">
-            {/* Sidebar */}
-            <div className="lg:col-span-4 xl:col-span-3">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="glass-card rounded-3xl p-6 sticky top-28"
-              >
-                <div className="text-center mb-8">
-                  <div className="bg-gradient-to-br from-primary to-secondary p-1 rounded-full w-24 h-24 mx-auto mb-4 shadow-lg">
-                    <div className="bg-card w-full h-full rounded-full overflow-hidden flex items-center justify-center">
-                      {currentUser?.avatar ? (
-                        <img 
-                          src={`${import.meta.env.VITE_POCKETBASE_URL || 'http://localhost:8090'}/api/files/usuarios/${currentUser.id}/${currentUser.avatar}`} 
-                          alt="Avatar" 
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <User className="h-10 w-10 text-primary" />
-                      )}
-                    </div>
-                  </div>
-                  <h2 className="font-heading font-bold text-xl mb-1 truncate">{currentUser?.email}</h2>
-                  <p className="text-primary font-medium">@{currentUser?.slug}</p>
-                </div>
-
-                <div className="space-y-6 mb-8">
-                  <div className="space-y-3">
-                    <Label className="flex items-center gap-2 text-muted-foreground">
-                      <ExternalLink className="h-4 w-4" />
-                      Seu Link
-                    </Label>
-                    <div className="flex gap-2">
-                      <Input
-                        value={`contate.site/${currentUser?.slug}`}
-                        readOnly
-                        className="bg-background/50 text-sm font-medium"
-                      />
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={copyProfileUrl}
-                        className="shrink-0 rounded-xl"
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label htmlFor="corFundo" className="flex items-center gap-2 text-muted-foreground">
-                      <Palette className="h-4 w-4" />
-                      Cor de Fundo
-                    </Label>
-                    <div className="flex gap-3 items-center bg-background/50 p-2 rounded-xl border border-input/50">
-                      <div className="relative w-10 h-10 rounded-lg overflow-hidden shadow-inner border border-border">
-                        <input
-                          id="corFundo"
-                          type="color"
-                          value={corFundo}
-                          onChange={handleColorChange}
-                          className="absolute -top-2 -left-2 w-16 h-16 cursor-pointer"
-                        />
-                      </div>
-                      <span className="text-sm font-mono font-medium uppercase">
-                        {corFundo}
-                      </span>
-                    </div>
-                  </div>
-
-                  {currentUser?.status === 0 && (
-                    <div className="bg-accent/10 border border-accent/20 rounded-xl p-4">
-                      <p className="text-sm text-accent font-semibold flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Conta aguardando ativação
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <Button
-                  variant="outline"
-                  className="w-full gap-2 text-destructive hover:bg-destructive hover:text-white hover:border-destructive"
-                  onClick={logout}
-                >
-                  <LogOut className="h-4 w-4" />
-                  Sair da Conta
-                </Button>
-              </motion.div>
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
+        <div className="container max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="bg-primary p-2 rounded-xl">
+              <LayoutDashboard className="h-5 w-5 text-primary-foreground" />
             </div>
+            <span className="font-heading font-bold text-xl tracking-tight">Painel</span>
+          </div>
+          
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Button 
+              variant="outline" 
+              className="hidden sm:flex rounded-xl gap-2 font-medium"
+              onClick={handleCopyLink}
+            >
+              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              Copiar Link
+            </Button>
+            <Button 
+              variant="ghost" 
+              onClick={logout}
+              className="rounded-xl hover:bg-destructive/10 hover:text-destructive"
+            >
+              Sair
+            </Button>
+          </div>
+        </div>
+      </header>
 
-            {/* Main Content */}
-            <div className="lg:col-span-8 xl:col-span-9">
-              <ProfileSettings />
+      <main className="container max-w-5xl mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-[1fr_350px] gap-8">
+          <div className="space-y-8">
+            <ProfileSettings />
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass-card rounded-3xl p-6 md:p-10"
-              >
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
-                  <div>
-                    <h1 className="text-3xl font-heading font-bold mb-2">Meus Links</h1>
-                    <p className="text-muted-foreground">Gerencie os links que aparecem no seu perfil</p>
+            <div className="glass-card rounded-3xl p-6 md:p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div>
+                  <h2 className="text-2xl font-heading font-bold flex items-center gap-2">
+                    Meus Links
+                    {savingOrder && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                  </h2>
+                  <p className="text-muted-foreground">Gerencie o conteúdo da sua página</p>
+                </div>
+                
+                <Button 
+                  onClick={() => {
+                    setEditingLink(null);
+                    setIsFormOpen(true);
+                  }}
+                  className="rounded-xl gap-2 shadow-lg shadow-primary/20"
+                >
+                  <Plus className="h-4 w-4" />
+                  Adicionar Link
+                </Button>
+              </div>
+
+              {loading ? (
+                <div className="py-20 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p>Carregando seus links...</p>
+                </div>
+              ) : links.length === 0 ? (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center py-16 px-4 bg-muted/30 rounded-2xl border border-dashed border-border"
+                >
+                  <div className="bg-background w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                    <Share2 className="h-8 w-8 text-primary" />
                   </div>
-                  <Button
+                  <h3 className="text-xl font-bold mb-2">Nenhum link ainda</h3>
+                  <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+                    Crie seu primeiro link e comece a compartilhar seu conteúdo com o mundo.
+                  </p>
+                  <Button 
+                    variant="outline"
                     onClick={() => {
                       setEditingLink(null);
-                      setShowLinkForm(true);
+                      setIsFormOpen(true);
                     }}
-                    className="shadow-primary/25"
+                    className="rounded-xl"
                   >
-                    <Plus className="mr-2 h-5 w-5" />
-                    Adicionar Link
+                    Criar meu primeiro link
                   </Button>
-                </div>
-
-                {loading ? (
-                  <div className="text-center py-20">
-                    <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto mb-4" />
-                    <p className="text-muted-foreground font-medium">Carregando seus links...</p>
-                  </div>
-                ) : links.length === 0 ? (
-                  <div className="text-center py-20 bg-background/30 rounded-3xl border border-dashed border-border">
-                    <div className="bg-primary/10 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-                      <Plus className="h-10 w-10 text-primary" />
-                    </div>
-                    <h3 className="text-2xl font-heading font-bold mb-3">Nenhum link ainda</h3>
-                    <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                      Comece adicionando seu primeiro link para construir sua página personalizada.
-                    </p>
-                    <Button
-                      onClick={() => {
-                        setEditingLink(null);
-                        setShowLinkForm(true);
-                      }}
-                      size="lg"
+                </motion.div>
+              ) : (
+                <div className="space-y-3">
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={links.map(l => l.id)}
+                      strategy={verticalListSortingStrategy}
                     >
-                      <Plus className="mr-2 h-5 w-5" />
-                      Adicionar Primeiro Link
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <AnimatePresence>
-                      {links.map((link, index) => (
-                        <motion.div
-                          key={link.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.95 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="bg-background/60 backdrop-blur-sm border border-border rounded-2xl p-5 hover:shadow-lg hover:border-primary/30 transition-all duration-300 group"
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className="cursor-grab active:cursor-grabbing p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
-                              <GripVertical className="h-5 w-5" />
-                            </div>
+                      <AnimatePresence>
+                        {links.map((link) => (
+                          <SortableLink
+                            key={link.id}
+                            link={link}
+                            onEdit={handleEditLink}
+                            onDelete={handleDeleteLink}
+                          />
+                        ))}
+                      </AnimatePresence>
+                    </SortableContext>
+                  </DndContext>
+                </div>
+              )}
+            </div>
+          </div>
 
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-heading font-bold text-lg mb-1 truncate text-foreground">
-                                {link.titulo}
-                              </h3>
-                              <a
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-sm text-muted-foreground hover:text-primary hover:underline truncate block transition-colors"
-                              >
-                                {link.url}
-                              </a>
-                            </div>
+          <div className="space-y-6">
+            <div className="glass-card rounded-3xl p-6 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <h3 className="font-heading font-bold text-lg mb-2">Seu Link Público</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Compartilhe este link na bio do seu Instagram, TikTok e outras redes.
+              </p>
+              
+              <div className="flex items-center gap-2 bg-background/50 border border-border p-3 rounded-xl mb-4">
+                <span className="text-sm font-medium truncate flex-1 text-primary">
+                  contate.site/{currentUser?.slug}
+                </span>
+                <Button 
+                  size="icon" 
+                  variant="ghost" 
+                  onClick={handleCopyLink}
+                  className="h-8 w-8 rounded-lg"
+                >
+                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
 
-                            <div className="flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                              <Button
-                                size="icon"
-                                variant="outline"
-                                onClick={() => {
-                                  setEditingLink(link);
-                                  setShowLinkForm(true);
-                                }}
-                                className="rounded-xl hover:bg-primary hover:text-primary-foreground hover:border-primary"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="icon"
-                                variant="outline"
-                                onClick={() => handleDeleteLink(link.id)}
-                                className="rounded-xl hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
+              <Button 
+                variant="default" 
+                className="w-full rounded-xl gap-2"
+                onClick={() => window.open(publicUrl, '_blank')}
+              >
+                Ver minha página
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="glass-card rounded-3xl p-6">
+              <h3 className="font-heading font-bold text-lg mb-4">Aparência Básica</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Cor de Fundo Principal</label>
+                  <div className="flex flex-wrap gap-3">
+                    {THEME_COLORS.map(color => (
+                      <button
+                        key={color.id}
+                        onClick={() => updateUserColor(color.value)}
+                        className={`w-10 h-10 rounded-full border-2 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${
+                          currentUser?.cor_fundo === color.value ? 'border-white scale-110 shadow-lg' : 'border-transparent'
+                        }`}
+                        style={{ backgroundColor: `hsl(${color.value})` }}
+                        title={color.label}
+                      />
+                    ))}
                   </div>
-                )}
-              </motion.div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
-      <LinkForm
-        open={showLinkForm}
-        onOpenChange={setShowLinkForm}
+      <LinkForm 
+        open={isFormOpen} 
+        onOpenChange={setIsFormOpen}
         link={editingLink}
         onSuccess={fetchLinks}
       />
-    </>
+    </div>
   );
 };
 

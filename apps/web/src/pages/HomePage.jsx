@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Link2, Sparkles, Zap, CheckCircle2, XCircle, Loader2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header.jsx';
-import pb from '@/lib/pocketbaseClient.js';
+import { supabase } from '@/lib/supabaseClient.js';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -23,11 +23,14 @@ const HomePage = () => {
     const checkSlug = async () => {
       setIsChecking(true);
       try {
-        const result = await pb.collection('usuarios').getList(1, 1, {
-          filter: `slug="${slugCheck}"`,
-          $autoCancel: false
-        });
-        setIsAvailable(result.items.length === 0);
+        const { data, error } = await supabase
+          .from('usuarios')
+          .select('id')
+          .eq('slug', slugCheck)
+          .limit(1);
+        
+        if (error) throw error;
+        setIsAvailable(data.length === 0);
       } catch (error) {
         console.error('Error checking slug:', error);
         setIsAvailable(null);
