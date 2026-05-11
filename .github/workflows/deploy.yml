@@ -34,7 +34,13 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Verify build output
-        run: ls -la apps/web/dist/
+        run: |
+          echo "Conteúdo da pasta dist:"
+          ls -la apps/web/dist/
+          if [ ! -f apps/web/dist/index.html ]; then
+            echo "ERRO: index.html não encontrado no build!"
+            exit 1
+          fi
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -43,5 +49,5 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./apps/web/dist/
-          server-dir: ./
+          server-dir: public_html/
           dangerous-clean-slate: true
