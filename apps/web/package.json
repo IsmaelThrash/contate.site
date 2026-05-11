@@ -5,8 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "vite --host :: --port 3000",
-    "build": "node tools/generate-llms.js || true && vite build --outDir ../../dist/apps/web",
-    "start": "vite preview --outDir ../../dist/apps/web --host :: --port 3000",
+    "build": "node tools/generate-llms.js || true && vite build",
+    "start": "vite preview --host :: --port 3000",
     "lint": "eslint . --quiet",
     "lint:warn": "eslint ."
   },
