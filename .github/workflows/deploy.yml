@@ -27,11 +27,14 @@ jobs:
         working-directory: apps/web
 
       - name: Build
-        run: npx vite build --outDir ../../dist/apps/web
+        run: npx vite build --outDir $GITHUB_WORKSPACE/dist
         working-directory: apps/web
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Verify build output
+        run: ls -la dist/
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -39,6 +42,6 @@ jobs:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/apps/web/
+          local-dir: ./dist/
           server-dir: public_html/
-          dangerous-clean-slate: false
+          dangerous-clean-slate: true
