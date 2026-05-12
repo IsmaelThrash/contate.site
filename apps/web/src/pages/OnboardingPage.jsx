@@ -13,7 +13,7 @@ import { supabase } from '@/lib/supabaseClient.js';
 const OnboardingPage = () => {
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
-  const { currentUser } = useAuth();
+  const { currentUser, updateProfile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -84,31 +84,11 @@ const OnboardingPage = () => {
         return;
       }
 
-      const payload = {
-        id: userId,
-        slug: slug,
-        status: 1
-      };
-
-      // We must extract the token from localstorage to bypass the lock
-      const storageKey = Object.keys(window.localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
-      const tokenObj = storageKey ? JSON.parse(window.localStorage.getItem(storageKey)) : null;
-      const accessToken = tokenObj?.access_token || supabaseKey;
-
-      const finalUpdateRes = await fetch(`${supabaseUrl}/rest/v1/usuarios`, {
-        method: 'POST', // POST with resolution=merge-duplicates acts as UPSERT
-        headers: {
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'resolution=merge-duplicates,return=representation'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!finalUpdateRes.ok) {
-        const errData = await finalUpdateRes.json();
-        throw new Error(errData.message || 'Falha ao atualizar perfil.');
+      // Atualizar o perfil usando o contexto para não perder o estado local
+      const result = await updateProfile({ slug: slug, status: 1 });
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Falha ao atualizar perfil.');
       }
 
       toast({
@@ -116,8 +96,8 @@ const OnboardingPage = () => {
         description: 'Bem-vindo ao contate.site. Seu link está pronto.'
       });
       
-      // Force reload to dashboard so AuthContext catches the new slug
-      window.location.href = '/dashboard';
+      // Use client-side routing to avoid hard refresh and state loss
+      navigate('/dashboard', { replace: true });
       
     } catch (error) {
       console.error("Onboarding error:", error);
