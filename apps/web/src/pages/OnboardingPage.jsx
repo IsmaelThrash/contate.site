@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AtSign, Loader2, Link2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { isReservedSlug } from '@/lib/constants.js';
+import { supabase } from '@/lib/supabaseClient.js';
 
 const OnboardingPage = () => {
   const [slug, setSlug] = useState('');
@@ -50,14 +51,20 @@ const OnboardingPage = () => {
     setLoading(true);
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       
+      const userId = currentUser?.id || session?.user?.id;
+      if (!userId) {
+        throw new Error("Sessão expirada. Por favor, faça login novamente.");
+      }
+
       // Check if slug already exists and belongs to someone else using native fetch
       const searchRes = await fetch(`${supabaseUrl}/rest/v1/usuarios?select=id&slug=eq.${slug}`, {
         headers: {
           'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`
+          'Authorization': `Bearer ${session?.access_token || supabaseKey}`
         }
       });
       
@@ -65,7 +72,7 @@ const OnboardingPage = () => {
       const existingSlugs = await searchRes.json();
 
       // Filter out our own ID just in case
-      const isTaken = existingSlugs.some(row => row.id !== currentUser.id);
+      const isTaken = existingSlugs.some(row => row.id !== userId);
 
       if (isTaken) {
         toast({
@@ -78,7 +85,7 @@ const OnboardingPage = () => {
       }
 
       const payload = {
-        id: currentUser.id,
+        id: userId,
         slug: slug,
         status: 1
       };

@@ -87,13 +87,22 @@ export const AuthProvider = ({ children }) => {
         
         try {
           if (session?.user) {
-            const profile = await fetchProfile(session.user.id, session.access_token);
-            if (mounted) setCurrentUser({ ...session.user, ...profile });
+            // Optimistic update: set the user immediately so the app doesn't crash if fetchProfile hangs
+            if (mounted) setCurrentUser(session.user);
+            
+            // Then attempt to fetch the profile in the background
+            fetchProfile(session.user.id, session.access_token).then(profile => {
+              if (mounted && profile) {
+                setCurrentUser(prev => ({ ...prev, ...profile }));
+              }
+            }).catch(err => {
+              console.error('[Auth] Background profile fetch failed:', err);
+            });
           } else {
             if (mounted) setCurrentUser(null);
           }
         } catch (err) {
-          console.error('[Auth] Profile fetch error in listener:', err);
+          console.error('[Auth] Profile listener error:', err);
         } finally {
           if (mounted && !initialLoadComplete) {
             setLoading(false);
