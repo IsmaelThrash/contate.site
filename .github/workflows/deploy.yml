@@ -40,15 +40,6 @@ jobs:
             exit 1
           fi
 
-      - name: Debug FTP Structure
-        run: |
-          echo "Listando raiz do FTP ( / ):"
-          curl -s -l ftp://${{ secrets.FTP_HOST }}/ --user ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }} || echo "Falha ao listar raiz"
-          
-          echo "-----------------------------------"
-          echo "Listando pasta public_html ( /public_html/ ):"
-          curl -s -l ftp://${{ secrets.FTP_HOST }}/public_html/ --user ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }} || echo "Pasta public_html não encontrada ou vazia"
-
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
