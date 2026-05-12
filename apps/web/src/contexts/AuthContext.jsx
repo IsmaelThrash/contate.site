@@ -47,57 +47,64 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     let mounted = true;
+    let initialLoadComplete = false;
 
-    const setupAuth = async () => {
-      // 1. Process PKCE code if present (from magic link)
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
-      if (code) {
-        try {
+    // Trava de segurança: se o Supabase não responder em 3s, força a abertura do site
+    const timeoutId = setTimeout(() => {
+      if (mounted && !initialLoadComplete) {
+        console.warn('[Auth] Fallback timeout triggered: forcing loading to false');
+        setLoading(false);
+        initialLoadComplete = true;
+      }
+    }, 3000);
+
+    const initializeAuth = async () => {
+      try {
+        // 1. Process PKCE code if present (from magic link)
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        if (code) {
           await supabase.auth.exchangeCodeForSession(code);
           window.history.replaceState({}, '', window.location.pathname);
-        } catch (err) {
-          console.error('[Auth] Code exchange exception:', err);
-        }
-      }
-
-      // 2. Get initial session safely
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!mounted) return;
-        
-        setSession(session);
-        if (session?.user) {
-          const profile = await fetchProfile(session.user.id);
-          if (mounted) setCurrentUser({ ...session.user, ...profile });
         }
       } catch (err) {
-        console.error('[Auth] Session fetch error:', err);
-      } finally {
-        if (mounted) setLoading(false);
+        console.error('[Auth] Code exchange error:', err);
       }
+
+      // 2. Set up listener - this fires immediately with INITIAL_SESSION or current state
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (!mounted) return;
+        
+        console.log('[Auth] Event:', event);
+        setSession(session);
+        
+        try {
+          if (session?.user) {
+            const profile = await fetchProfile(session.user.id);
+            if (mounted) setCurrentUser({ ...session.user, ...profile });
+          } else {
+            if (mounted) setCurrentUser(null);
+          }
+        } catch (err) {
+          console.error('[Auth] Profile fetch error in listener:', err);
+        } finally {
+          if (mounted && !initialLoadComplete) {
+            setLoading(false);
+            initialLoadComplete = true;
+            clearTimeout(timeoutId);
+          }
+        }
+      });
+
+      return subscription;
     };
 
-    setupAuth();
-
-    // 3. Listen for future auth changes asynchronously
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!mounted) return;
-      if (event === 'INITIAL_SESSION') return; // Handled by getSession
-      
-      console.log('[Auth] Event:', event);
-      setSession(session);
-      
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id);
-        if (mounted) setCurrentUser({ ...session.user, ...profile });
-      } else {
-        if (mounted) setCurrentUser(null);
-      }
-    });
+    let subscription;
+    initializeAuth().then(sub => { subscription = sub; });
 
     return () => {
       mounted = false;
+      clearTimeout(timeoutId);
       subscription?.unsubscribe();
     };
   }, []);
