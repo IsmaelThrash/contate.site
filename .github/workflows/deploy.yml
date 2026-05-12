@@ -35,10 +35,8 @@ jobs:
 
       - name: Verify build output
         run: |
-          echo "Conteúdo da pasta dist:"
           ls -la apps/web/dist/
           if [ ! -f apps/web/dist/index.html ]; then
-            echo "ERRO: index.html não encontrado no build!"
             exit 1
           fi
 
@@ -49,5 +47,5 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./apps/web/dist/
-          server-dir: public_html/
+          server-dir: domains/contate.site/public_html/
           dangerous-clean-slate: true
