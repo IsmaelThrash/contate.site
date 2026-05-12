@@ -7,13 +7,12 @@ import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useToast } from '@/hooks/use-toast';
 import { AtSign, Loader2, Link2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabaseClient.js';
 import { isReservedSlug } from '@/lib/constants.js';
 
 const OnboardingPage = () => {
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
-  const { currentUser, updateProfile } = useAuth();
+  const { currentUser } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -51,13 +50,19 @@ const OnboardingPage = () => {
     setLoading(true);
 
     try {
-      // Check if slug already exists and belongs to someone else
-      const { data: existingSlugs, error: searchError } = await supabase
-        .from('usuarios')
-        .select('id')
-        .eq('slug', slug);
-
-      if (searchError) throw searchError;
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      // Check if slug already exists and belongs to someone else using native fetch
+      const searchRes = await fetch(`${supabaseUrl}/rest/v1/usuarios?select=id&slug=eq.${slug}`, {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`
+        }
+      });
+      
+      if (!searchRes.ok) throw new Error('Erro ao buscar disponibilidade do link.');
+      const existingSlugs = await searchRes.json();
 
       // Filter out our own ID just in case
       const isTaken = existingSlugs.some(row => row.id !== currentUser.id);
@@ -72,21 +77,41 @@ const OnboardingPage = () => {
         return;
       }
 
-      const result = await updateProfile({ slug, status: 1 });
+      const payload = {
+        id: currentUser.id,
+        slug: slug,
+        status: 1
+      };
 
-      if (result.success) {
-        toast({
-          title: 'Link garantido!',
-          description: 'Bem-vindo ao contate.site. Seu link está pronto.'
-        });
-        navigate('/dashboard');
-      } else {
-        toast({
-          title: 'Erro ao salvar',
-          description: result.error,
-          variant: 'destructive'
-        });
+      // We must extract the token from localstorage to bypass the lock
+      const storageKey = Object.keys(window.localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+      const tokenObj = storageKey ? JSON.parse(window.localStorage.getItem(storageKey)) : null;
+      const accessToken = tokenObj?.access_token || supabaseKey;
+
+      const finalUpdateRes = await fetch(`${supabaseUrl}/rest/v1/usuarios`, {
+        method: 'POST', // POST with resolution=merge-duplicates acts as UPSERT
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates,return=representation'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!finalUpdateRes.ok) {
+        const errData = await finalUpdateRes.json();
+        throw new Error(errData.message || 'Falha ao atualizar perfil.');
       }
+
+      toast({
+        title: 'Link garantido!',
+        description: 'Bem-vindo ao contate.site. Seu link está pronto.'
+      });
+      
+      // Force reload to dashboard so AuthContext catches the new slug
+      window.location.href = '/dashboard';
+      
     } catch (error) {
       console.error("Onboarding error:", error);
       toast({
