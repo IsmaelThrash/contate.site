@@ -108,9 +108,18 @@ export const AuthProvider = ({ children }) => {
 
     let subscription;
     setupAuth().then(sub => { subscription = sub; });
+    
+    // Fallback: force loading to false after 3 seconds if Supabase hangs
+    const timeoutId = setTimeout(() => {
+      if (mounted) {
+        console.warn('[Auth] Forcing loading to false due to timeout!');
+        setLoading(false);
+      }
+    }, 3000);
 
     return () => {
       mounted = false;
+      clearTimeout(timeoutId);
       subscription?.unsubscribe();
     };
   }, []);
