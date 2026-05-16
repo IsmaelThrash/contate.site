@@ -138,14 +138,11 @@ const DashboardPage = () => {
       if (newOrder.length > 0) {
         setSavingOrder(true);
         try {
+          // Envia apenas id + ordem — nunca dados completos do link
+          // O banco valida via RLS que o usuário só pode alterar seus próprios links
           const updates = newOrder.map(link => ({
             id: link.id,
             ordem: link.ordem,
-            usuario_id: currentUser.id,
-            titulo: link.titulo,
-            url: link.url,
-            tipo: link.tipo,
-            ativo: link.ativo
           }));
 
           const { error } = await supabase

@@ -56,14 +56,17 @@ export const AuthProvider = ({ children }) => {
     let mounted = true;
     let initialLoadComplete = false;
 
-    // Trava de segurança: se o Supabase não responder em 3s, força a abertura do site
+    // Trava de segurança: se o Supabase não responder em 8s, redireciona para login
+    // Evita renderizar rotas protegidas com currentUser = null em redes lentas
     const timeoutId = setTimeout(() => {
       if (mounted && !initialLoadComplete) {
-        console.warn('[Auth] Fallback timeout triggered: forcing loading to false');
+        console.warn('[Auth] Fallback timeout triggered: forcing logout state');
+        setCurrentUser(null);
+        setSession(null);
         setLoading(false);
         initialLoadComplete = true;
       }
-    }, 3000);
+    }, 8000);
 
     const initializeAuth = async () => {
       try {
