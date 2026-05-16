@@ -7,6 +7,10 @@ import { ExternalLink, Clock, Loader2, Instagram, Youtube, Twitter, Linkedin, Fa
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabaseClient.js';
 import VideoEmbed from '@/components/VideoEmbed.jsx';
+import DOMPurify from 'dompurify';
+
+// Sanitiza para texto puro — sem HTML, sem XSS
+const safe = (str) => DOMPurify.sanitize(str || '', { ALLOWED_TAGS: [] });
 
 const ProfilePage = () => {
   const { slug } = useParams();
@@ -155,8 +159,8 @@ const ProfilePage = () => {
   return (
     <>
       <Helmet>
-        <title>{user.meta_titulo || `@${user.slug} - contate.site`}</title>
-        <meta name="description" content={user.meta_descricao || `Confira todos os links de ${user.slug} em um só lugar`} />
+        <title>{safe(user.meta_titulo) || `@${safe(user.slug)} - contate.site`}</title>
+        <meta name="description" content={safe(user.meta_descricao) || `Confira todos os links de ${safe(user.slug)} em um só lugar`} />
         <script type="application/ld+json">
           {JSON.stringify(jsonLd)}
         </script>
@@ -195,10 +199,10 @@ const ProfilePage = () => {
             </div>
 
             <h1 className="text-5xl md:text-6xl font-heading font-black mb-4 text-foreground tracking-tight">
-              {user.nome_exibicao || `@${user.slug}`}
+              {safe(user.nome_exibicao) || `@${safe(user.slug)}`}
             </h1>
             <p className="text-foreground/70 text-xl font-medium max-w-lg mx-auto leading-relaxed">
-              {user.bio || "Explore meu ecossistema de links e redes sociais."}
+              {safe(user.bio) || "Explore meu ecossistema de links e redes sociais."}
             </p>
           </motion.div>
 

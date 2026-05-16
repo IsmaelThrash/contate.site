@@ -36,6 +36,7 @@ const VideoEmbed = ({ url, title }) => {
           src={`https://www.youtube.com/embed/${youtubeId}?autoplay=0`}
           title={title || "YouTube video player"}
           frameBorder="0"
+          sandbox="allow-scripts allow-same-origin allow-presentation"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           className="w-full h-full"
@@ -52,6 +53,7 @@ const VideoEmbed = ({ url, title }) => {
           src={`https://player.vimeo.com/video/${vimeoId}`}
           title={title || "Vimeo video player"}
           frameBorder="0"
+          sandbox="allow-scripts allow-same-origin allow-presentation"
           allow="autoplay; fullscreen; picture-in-picture"
           allowFullScreen
           className="w-full h-full"
@@ -68,20 +70,24 @@ const VideoEmbed = ({ url, title }) => {
         <iframe
           src={`https://www.tiktok.com/embed/v2/${tiktokId}`}
           className="w-full h-full"
+          sandbox="allow-scripts allow-same-origin allow-presentation"
           allowFullScreen
           scrolling="no"
           allow="encrypted-media;"
           loading="lazy"
+          title={title || "TikTok video player"}
         ></iframe>
       </div>
     );
   }
 
-  // Fallback if URL is not a recognized video format, render a simple clickable card
+  // Fallback: URL não reconhecida como vídeo — renderiza card de link simples
+  // Valida protocolo antes de usar como href
+  const urlSegura = url && /^https?:\/\//i.test(url) ? url : '#';
   return (
-    <a 
-      href={url} 
-      target="_blank" 
+    <a
+      href={urlSegura}
+      target="_blank"
       rel="noopener noreferrer"
       className="block w-full"
     >
