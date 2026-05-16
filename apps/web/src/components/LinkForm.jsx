@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabaseClient.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Link2, Type } from 'lucide-react';
+import { logger } from '@/lib/logger.js';
 
 const LinkForm = ({ open, onOpenChange, link, onSuccess }) => {
 
@@ -109,7 +110,7 @@ const LinkForm = ({ open, onOpenChange, link, onSuccess }) => {
       onSuccess();
       onOpenChange(false);
     } catch (error) {
-      console.error('Error saving link:', error);
+      logger.error('Error saving link:', error);
       toast({
         title: 'Erro',
         description: error.message || 'Falha ao salvar link. Tente novamente.',

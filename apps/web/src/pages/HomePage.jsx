@@ -7,6 +7,7 @@ import { Link2, Sparkles, Zap, CheckCircle2, XCircle, Loader2, ArrowRight } from
 import { motion } from 'framer-motion';
 import Header from '@/components/Header.jsx';
 import { supabase } from '@/lib/supabaseClient.js';
+import { logger } from '@/lib/logger.js';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const HomePage = () => {
         if (error) throw error;
         setIsAvailable(data.length === 0);
       } catch (error) {
-        console.error('Error checking slug:', error);
+        logger.error('Error checking slug:', error);
         setIsAvailable(null);
       } finally {
         setIsChecking(false);

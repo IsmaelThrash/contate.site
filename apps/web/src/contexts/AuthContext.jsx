@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient.js';
+import { logger } from '@/lib/logger.js';
 
 const AuthContext = createContext(null);
 
@@ -47,7 +48,7 @@ export const AuthProvider = ({ children }) => {
       
       return await response.json();
     } catch (err) {
-      console.error('Unexpected error fetching profile:', err);
+      logger.error('Unexpected error fetching profile:', err);
       return null;
     }
   };
@@ -60,7 +61,7 @@ export const AuthProvider = ({ children }) => {
     // Evita renderizar rotas protegidas com currentUser = null em redes lentas
     const timeoutId = setTimeout(() => {
       if (mounted && !initialLoadComplete) {
-        console.warn('[Auth] Fallback timeout triggered: forcing logout state');
+        logger.warn('[Auth] Fallback timeout triggered: forcing logout state');
         setCurrentUser(null);
         setSession(null);
         setLoading(false);
@@ -78,14 +79,14 @@ export const AuthProvider = ({ children }) => {
           window.history.replaceState({}, '', window.location.pathname);
         }
       } catch (err) {
-        console.error('[Auth] Code exchange error:', err);
+        logger.error('[Auth] Code exchange error:', err);
       }
 
       // 2. Set up listener - this fires immediately with INITIAL_SESSION or current state
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (!mounted) return;
         
-        console.log('[Auth] Event:', event);
+        logger.log('[Auth] Event:', event);
         setSession(session);
         
         try {
@@ -99,13 +100,13 @@ export const AuthProvider = ({ children }) => {
                 setCurrentUser(prev => ({ ...prev, ...profile }));
               }
             }).catch(err => {
-              console.error('[Auth] Background profile fetch failed:', err);
+              logger.error('[Auth] Background profile fetch failed:', err);
             });
           } else {
             if (mounted) setCurrentUser(null);
           }
         } catch (err) {
-          console.error('[Auth] Profile listener error:', err);
+          logger.error('[Auth] Profile listener error:', err);
         } finally {
           if (mounted && !initialLoadComplete) {
             setLoading(false);
@@ -140,7 +141,7 @@ export const AuthProvider = ({ children }) => {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error('Magic link error:', error.message);
+      logger.error('Magic link error:', error.message);
       return { success: false, error: 'Erro ao enviar o link de acesso. Verifique seu e-mail.' };
     }
   };
@@ -156,7 +157,7 @@ export const AuthProvider = ({ children }) => {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error('Google Auth error:', error.message);
+      logger.error('Google Auth error:', error.message);
       return { success: false, error: 'Falha ao autenticar com o Google.' };
     }
   };
@@ -207,7 +208,7 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(prev => ({ ...prev, ...updated }));
       return { success: true };
     } catch (error) {
-      console.error('Update profile error:', error.message);
+      logger.error('Update profile error:', error.message);
       return { success: false, error: 'Falha ao atualizar perfil.' };
     }
   };

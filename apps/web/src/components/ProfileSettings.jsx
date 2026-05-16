@@ -13,8 +13,6 @@ const ProfileSettings = () => {
     const { currentUser, updateProfile } = useAuth();
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
-    const [avatarFile, setAvatarFile] = useState(null);
-    const [avatarPreview, setAvatarPreview] = useState(null);
     const [formData, setFormData] = useState({
         nome_exibicao: '',
         bio: '',
@@ -30,20 +28,9 @@ const ProfileSettings = () => {
                 meta_titulo: currentUser.meta_titulo || '',
                 meta_descricao: currentUser.meta_descricao || ''
             });
-            if (currentUser.avatar) {
-                const pbUrl = import.meta.env.VITE_POCKETBASE_URL || 'http://localhost:8090';
-                setAvatarPreview(`${pbUrl}/api/files/usuarios/${currentUser.id}/${currentUser.avatar}`);
-            }
         }
     }, [currentUser]);
 
-    const handleAvatarChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setAvatarFile(file);
-            setAvatarPreview(URL.createObjectURL(file));
-        }
-    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -60,12 +47,6 @@ const ProfileSettings = () => {
             meta_titulo: formData.meta_titulo,
             meta_descricao: formData.meta_descricao
         };
-        
-        // TODO: Avatar upload via Supabase Storage
-        // if (avatarFile) {
-        //     const avatarUrl = await uploadAvatarToSupabase(avatarFile);
-        //     profileData.avatar_url = avatarUrl;
-        // }
 
         const result = await updateProfile(profileData);
 
@@ -101,32 +82,6 @@ const ProfileSettings = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="flex flex-col items-center mb-8">
-                    <div 
-                        className="relative group cursor-pointer outline-none" 
-                        onClick={() => document.getElementById('avatar-upload').click()}
-                    >
-                        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 shadow-lg bg-card flex items-center justify-center transition-transform group-hover:scale-105">
-                            {avatarPreview ? (
-                                <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
-                            ) : (
-                                <User className="h-10 w-10 text-primary" />
-                            )}
-                        </div>
-                        <div className="absolute inset-0 bg-black/30 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[1px]">
-                            <User className="h-6 w-6 text-white mb-1" />
-                        </div>
-                        <input 
-                            type="file" 
-                            id="avatar-upload" 
-                            accept="image/*" 
-                            onChange={handleAvatarChange} 
-                            className="hidden" 
-                        />
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-3 font-medium uppercase tracking-wider">Foto do Perfil</p>
-                </div>
-
                 <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-3">
                         <Label htmlFor="nome_exibicao" className="flex items-center gap-2">

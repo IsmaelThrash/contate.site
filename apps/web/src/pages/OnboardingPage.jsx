@@ -9,6 +9,7 @@ import { AtSign, Loader2, Link2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { isReservedSlug } from '@/lib/constants.js';
 import { supabase } from '@/lib/supabaseClient.js';
+import { logger } from '@/lib/logger.js';
 
 const OnboardingPage = () => {
   const [slug, setSlug] = useState('');
@@ -86,7 +87,7 @@ const OnboardingPage = () => {
       navigate('/dashboard', { replace: true });
 
     } catch (error) {
-      console.error("Onboarding error:", error);
+      logger.error("Onboarding error:", error);
       toast({
         title: 'Erro inesperado',
         description: 'Ocorreu um erro ao definir o seu link. Tente novamente.',

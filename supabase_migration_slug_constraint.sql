@@ -27,7 +27,7 @@ ALTER TABLE usuarios ADD CONSTRAINT slug_format_check
     )
   );
 
--- Verificar se a constraint foi criada corretamente
-SELECT conname, consrc
+-- Verificar se a constraint foi criada corretamente (compatível com PostgreSQL 15+)
+SELECT conname, pg_get_constraintdef(oid) AS definition
 FROM pg_constraint
 WHERE conname = 'slug_format_check';

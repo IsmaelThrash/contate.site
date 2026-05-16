@@ -1,5 +1,42 @@
 # 📓 DEVLOG — contate.site v2
 
+## 2026-05-12 — Sessão de Deploy: Resolução do Deadlock do Onboarding
+
+### Resumo
+Identificamos e corrigimos o erro fatal do Onboarding que impedia o acesso ao Dashboard (loop infinito no Onboarding / tela branca). O SDK do Supabase estava causando deadlock na persistência da sessão.
+
+---
+
+### 🐛 Problemas Resolvidos
+
+#### 1. Deadlock da Sessão (Web Locks API)
+- **Problema:** Ao fazer login via Google OAuth, a aplicação congelava (tela branca) tentando gravar a sessão localmente.
+- **Causa:** Conflitos do `localStorage` com a API nativa do Supabase GoTrue SDK (`navigator.locks`).
+- **Solução:** Criada uma classe de Storage customizada em `supabaseClient.js` ignorando os locks e forçando a leitura síncrona do `localStorage`.
+
+#### 2. Loop Infinito no Onboarding
+- **Problema:** Ao escolher um slug no Onboarding, o usuário era devolvido para a própria tela de Onboarding, sem entrar no Dashboard.
+- **Causa:** O salvamento forçava um Hard Reload (`window.location.href`). O contexto do React reiniciava sem o `slug` mapeado devido à lentidão do Cold Start do Supabase para baixar o perfil, ativando a proteção de rota (`ProtectedRoute`).
+- **Solução:**
+  - Em `AuthContext.jsx`, a leitura do perfil foi otimizada para `fetch` nativo (REST) bypassando o SDK travado.
+  - O estado do usuário agora recebe *Optimistic Updates* (recebe o ID instantaneamente sem esperar o DB).
+  - Em `OnboardingPage.jsx`, o uso do `navigate('/dashboard', { replace: true })` e `updateProfile()` garantem que a memória do React seja atualizada e a rota alterada sem reload.
+
+#### 3. Deploy via FTP
+- **Problema:** A `FTP-Deploy-Action` falhava repetidamente com erro `Timeout (control socket)`.
+- **Causa:** O servidor do Hostinger rate-limita o FTP por excesso de conexões simultâneas quando ocorrem múltiplos pushes rápidos.
+- **Solução:** Pushes foram espaçados para permitir a liberação das conexões TCP no firewall do Hostinger.
+
+### 📁 Arquivos Modificados Nesta Sessão
+| Arquivo | Tipo | O que mudou |
+|---------|------|-------------|
+| `apps/web/src/lib/supabaseClient.js` | FIX | Criado proxy Storage customizado |
+| `apps/web/src/contexts/AuthContext.jsx` | FIX | Conversão de calls do DB para Fetch API nativo + Optimistic Update no `onAuthStateChange` |
+| `apps/web/src/pages/OnboardingPage.jsx` | FIX | Remoção do `window.location.href`, adoção do `updateProfile` com redirecionamento React |
+| `apps/web/src/pages/DashboardPage.jsx` | FIX | Transição das escritas e deleções de links do SDK para a Fetch API |
+
+---
+
 ## 2026-05-11 — Sessão Completa: Supabase Auth + Google OAuth + Estabilização
 
 ### Resumo

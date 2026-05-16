@@ -7,6 +7,7 @@ import ProfileSettings from '@/components/ProfileSettings.jsx';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabaseClient.js';
+import { logger } from '@/lib/logger.js';
 import { SortableLink } from '@/components/SortableLink.jsx';
 
 import {
@@ -49,7 +50,7 @@ const DashboardPage = () => {
       if (error) throw error;
       setLinks(data || []);
     } catch (error) {
-      console.error('Error fetching links:', error);
+      logger.error('Error fetching links:', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível carregar seus links.',
@@ -80,7 +81,7 @@ const DashboardPage = () => {
       });
       fetchLinks();
     } catch (error) {
-      console.error('Error deleting link:', error);
+      logger.error('Error deleting link:', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível remover o link.',
@@ -151,7 +152,7 @@ const DashboardPage = () => {
 
           if (error) throw error;
         } catch (error) {
-          console.error('Error updating order:', error);
+          logger.error('Error updating order:', error);
           toast({
             title: 'Erro ao reordenar',
             description: 'Não foi possível salvar a nova ordem dos links.',

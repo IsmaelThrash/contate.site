@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabaseClient.js';
 import VideoEmbed from '@/components/VideoEmbed.jsx';
 import DOMPurify from 'dompurify';
+import { logger } from '@/lib/logger.js';
 
 // Sanitiza para texto puro — sem HTML, sem XSS
 const safe = (str) => DOMPurify.sanitize(str || '', { ALLOWED_TAGS: [] });
@@ -48,7 +49,7 @@ const ProfilePage = () => {
         setLinks(linksRecords || []);
       }
     } catch (err) {
-      console.error('Error fetching profile:', err);
+      logger.error('Error fetching profile:', err);
       setError('Perfil não encontrado');
     } finally {
       setLoading(false);
