@@ -27,7 +27,7 @@ const customStorage = {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    flowType: 'implicit',
+    flowType: 'pkce',
     detectSessionInUrl: true,
     autoRefreshToken: true,
     persistSession: true,

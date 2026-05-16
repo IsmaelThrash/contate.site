@@ -179,9 +179,8 @@ export const AuthProvider = ({ children }) => {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       
-      const storageKey = Object.keys(window.localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
-      const tokenObj = storageKey ? JSON.parse(window.localStorage.getItem(storageKey)) : null;
-      const accessToken = tokenObj?.access_token || session?.access_token || supabaseAnonKey;
+      // Usar o token da sessão gerenciada pelo Supabase — nunca ler localStorage diretamente
+      const accessToken = session?.access_token || supabaseAnonKey;
 
       const response = await fetch(`${supabaseUrl}/rest/v1/usuarios`, {
         method: 'POST',

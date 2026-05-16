@@ -9,6 +9,17 @@ import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Link2, Type } from 'lucide-react';
 
 const LinkForm = ({ open, onOpenChange, link, onSuccess }) => {
+
+  // Rejeita qualquer protocolo fora de http/https (ex: javascript:, data:)
+  const isUrlSegura = (url) => {
+    try {
+      const parsed = new URL(url);
+      return ['http:', 'https:'].includes(parsed.protocol);
+    } catch {
+      return false;
+    }
+  };
+
   const [titulo, setTitulo] = useState('');
   const [url, setUrl] = useState('');
   const [tipo, setTipo] = useState('link');
@@ -35,6 +46,15 @@ const LinkForm = ({ open, onOpenChange, link, onSuccess }) => {
       toast({
         title: 'Erro',
         description: 'Por favor, preencha todos os campos.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!isUrlSegura(url.trim())) {
+      toast({
+        title: 'URL inválida',
+        description: 'Use apenas endereços que comecem com https:// ou http://',
         variant: 'destructive'
       });
       return;

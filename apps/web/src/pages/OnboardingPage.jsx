@@ -13,7 +13,7 @@ import { supabase } from '@/lib/supabaseClient.js';
 const OnboardingPage = () => {
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
-  const { currentUser, updateProfile } = useAuth();
+  const { currentUser } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -52,29 +52,22 @@ const OnboardingPage = () => {
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      
+
       const userId = currentUser?.id || session?.user?.id;
       if (!userId) {
         throw new Error("Sessão expirada. Por favor, faça login novamente.");
       }
 
-      // Check if slug already exists and belongs to someone else using native fetch
-      const searchRes = await fetch(`${supabaseUrl}/rest/v1/usuarios?select=id&slug=eq.${slug}`, {
-        headers: {
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${session?.access_token || supabaseKey}`
-        }
+      // Registro atômico: a função no banco faz UPDATE com tratamento de unique_violation
+      // Elimina a race condition entre check e update separados
+      const { data: claimed, error: rpcError } = await supabase.rpc('claim_slug', {
+        p_user_id: userId,
+        p_slug: slug,
       });
-      
-      if (!searchRes.ok) throw new Error('Erro ao buscar disponibilidade do link.');
-      const existingSlugs = await searchRes.json();
 
-      // Filter out our own ID just in case
-      const isTaken = existingSlugs.some(row => row.id !== userId);
+      if (rpcError) throw rpcError;
 
-      if (isTaken) {
+      if (!claimed) {
         toast({
           title: 'Link indisponível',
           description: 'Este link já está em uso. Por favor, escolha outro.',
@@ -84,21 +77,14 @@ const OnboardingPage = () => {
         return;
       }
 
-      // Atualizar o perfil usando o contexto para não perder o estado local
-      const result = await updateProfile({ slug: slug, status: 1 });
-      
-      if (!result.success) {
-        throw new Error(result.error || 'Falha ao atualizar perfil.');
-      }
-
       toast({
         title: 'Link garantido!',
         description: 'Bem-vindo ao contate.site. Seu link está pronto.'
       });
-      
+
       // Use client-side routing to avoid hard refresh and state loss
       navigate('/dashboard', { replace: true });
-      
+
     } catch (error) {
       console.error("Onboarding error:", error);
       toast({
