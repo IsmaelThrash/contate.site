@@ -9,7 +9,7 @@ import { supabase } from '@/lib/supabaseClient.js';
 import VideoEmbed from '@/components/VideoEmbed.jsx';
 import DOMPurify from 'dompurify';
 import { logger } from '@/lib/logger.js';
-import { isVip, renderVip } from '@/vips/registry.js';
+import { isVip, renderVip } from '@/vips/registry.jsx';
 
 // Sanitiza para texto puro — sem HTML, sem XSS
 const safe = (str) => DOMPurify.sanitize(str || '', { ALLOWED_TAGS: [] });
