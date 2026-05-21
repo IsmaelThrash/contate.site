@@ -9,6 +9,7 @@ import LoginPage from '@/pages/LoginPage.jsx';
 import DashboardPage from '@/pages/DashboardPage.jsx';
 import ProfilePage from '@/pages/ProfilePage.jsx';
 import OnboardingPage from '@/pages/OnboardingPage.jsx';
+import AdminPage from '@/pages/AdminPage.jsx';
 import { Toaster } from '@/components/ui/toaster';
 
 function App() {
@@ -34,6 +35,14 @@ function App() {
               element={
                 <ProtectedRoute requireSlug={false}>
                   <OnboardingPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminPage />
                 </ProtectedRoute>
               }
             />

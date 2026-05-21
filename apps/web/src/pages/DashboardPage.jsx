@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Button } from '@/components/ui/button';
-import { Plus, LayoutDashboard, Share2, Copy, Check, ExternalLink, Loader2 } from 'lucide-react';
+import { Plus, LayoutDashboard, Share2, Copy, Check, ExternalLink, Loader2, Shield } from 'lucide-react';
 import LinkForm from '@/components/LinkForm.jsx';
 import ProfileSettings from '@/components/ProfileSettings.jsx';
 import { useToast } from '@/hooks/use-toast';
@@ -27,6 +28,7 @@ import {
 
 const DashboardPage = () => {
   const { currentUser, logout, updateUserColor } = useAuth();
+  const navigate = useNavigate();
   const [links, setLinks] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingLink, setEditingLink] = useState(null);
@@ -187,6 +189,16 @@ const DashboardPage = () => {
           </div>
           
           <div className="flex items-center gap-2 sm:gap-4">
+            {currentUser?.is_admin && (
+              <Button 
+                variant="outline" 
+                className="rounded-xl gap-2 font-semibold border-primary/30 text-primary hover:bg-primary/10"
+                onClick={() => navigate('/admin')}
+              >
+                <Shield className="h-4 w-4" />
+                <span className="hidden xs:inline">Console Admin</span>
+              </Button>
+            )}
             <Button 
               variant="outline" 
               className="hidden sm:flex rounded-xl gap-2 font-medium"
