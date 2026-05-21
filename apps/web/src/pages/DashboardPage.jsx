@@ -292,7 +292,7 @@ const DashboardPage = () => {
 
           <div className="space-y-6">
             <div className="glass-card rounded-3xl p-6 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <h3 className="font-heading font-bold text-lg mb-2">Seu Link Público</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Compartilhe este link na bio do seu Instagram, TikTok e outras redes.
