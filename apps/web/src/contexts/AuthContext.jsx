@@ -94,14 +94,11 @@ export const AuthProvider = ({ children }) => {
             // Optimistic update: set the user immediately so the app doesn't crash if fetchProfile hangs
             if (mounted) setCurrentUser(session.user);
             
-            // Then attempt to fetch the profile in the background
-            fetchProfile(session.user.id, session.access_token).then(profile => {
-              if (mounted && profile) {
-                setCurrentUser(prev => ({ ...prev, ...profile }));
-              }
-            }).catch(err => {
-              logger.error('[Auth] Background profile fetch failed:', err);
-            });
+            // Wait for profile data to avoid redirecting users to /onboarding due to a race condition
+            const profile = await fetchProfile(session.user.id, session.access_token);
+            if (mounted && profile) {
+              setCurrentUser(prev => ({ ...prev, ...profile }));
+            }
           } else {
             if (mounted) setCurrentUser(null);
           }

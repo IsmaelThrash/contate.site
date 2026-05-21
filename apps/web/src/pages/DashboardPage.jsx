@@ -196,7 +196,7 @@ const DashboardPage = () => {
                 onClick={() => navigate('/admin')}
               >
                 <Shield className="h-4 w-4" />
-                <span className="hidden xs:inline">Console Admin</span>
+                <span className="hidden sm:inline">Console Admin</span>
               </Button>
             )}
             <Button 
