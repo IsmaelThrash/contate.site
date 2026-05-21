@@ -133,3 +133,6 @@ MÃºltiplas camadas de problemas foram identificadas e resolvidas em sequÃªncia:
 3. Refinamento visual do perfil pÃºblico
 4. Implementar upload de avatar via Supabase Storage
 5. Analytics bÃ¡sico (contagem de cliques nos links)
+
+## Regras do Projeto
+- **GitHub Workflow**: Após cada atualização ou correção de bug concluída, o agente DEVE fazer o commit e o push automático para o GitHub.
