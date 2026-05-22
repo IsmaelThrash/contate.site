@@ -14,9 +14,16 @@ import { logger } from '@/lib/logger.js';
 const OnboardingPage = () => {
   const [slug, setSlug] = useState('');
   const [loading, setLoading] = useState(false);
-  const { currentUser } = useAuth();
+  const { currentUser, setCurrentUser } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Bloqueio de Segurança: Impede troca silenciosa de slug via rota
+  React.useEffect(() => {
+    if (currentUser?.slug) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [currentUser, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,6 +83,11 @@ const OnboardingPage = () => {
         });
         setLoading(false);
         return;
+      }
+
+      // Atualiza o estado local para que as ProtectedRoutes reconheçam o novo slug e não entrem em loop
+      if (setCurrentUser) {
+        setCurrentUser(prev => ({ ...prev, slug: slug }));
       }
 
       toast({

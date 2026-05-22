@@ -216,6 +216,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     currentUser,
+    setCurrentUser,
     session,
     isAuthenticated: !!session,
     loginWithMagicLink,

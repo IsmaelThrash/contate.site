@@ -2,6 +2,7 @@
 import React from 'react';
 import { Route, Routes, BrowserRouter as Router, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext.jsx';
+import { ThemeProvider } from '@/contexts/ThemeProvider.jsx';
 import ScrollToTop from '@/components/ScrollToTop.jsx';
 import ProtectedRoute from '@/components/ProtectedRoute.jsx';
 import HomePage from '@/pages/HomePage.jsx';
@@ -15,8 +16,9 @@ import { Toaster } from '@/components/ui/toaster';
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <ScrollToTop />
+      <ThemeProvider defaultTheme="system" storageKey="contate-site-theme">
+        <AuthProvider>
+          <ScrollToTop />
         <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 selection:text-primary">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -50,7 +52,8 @@ function App() {
           </Routes>
           <Toaster />
         </div>
-      </AuthProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </Router>
   );
 }

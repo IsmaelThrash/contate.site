@@ -23,11 +23,12 @@ import {
   Trash2, 
   Edit, 
   ArrowLeft, 
-  ExternalLink, 
+  ExternalLink,
   Loader2,
   ShieldCheck,
   ShieldAlert
 } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabaseClient.js';
 import { logger } from '@/lib/logger.js';
@@ -236,9 +237,9 @@ const AdminPage = () => {
         <title>Console Admin - contate.site</title>
       </Helmet>
 
-      <div className="min-h-screen bg-zinc-950 text-zinc-50 selection:bg-primary/30">
+      <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
         {/* Header */}
-        <header className="sticky top-0 z-40 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-900">
+        <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50">
           <div className="container max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Button 
@@ -260,13 +261,16 @@ const AdminPage = () => {
               </div>
             </div>
 
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/dashboard')}
-              className="rounded-xl border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-white"
-            >
-              Voltar ao Meu Dashboard
-            </Button>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/dashboard')}
+                className="rounded-xl"
+              >
+                Voltar ao Meu Dashboard
+              </Button>
+            </div>
           </div>
         </header>
 
@@ -277,7 +281,7 @@ const AdminPage = () => {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="bg-zinc-900/40 backdrop-blur-md border border-zinc-900 p-6 rounded-3xl relative overflow-hidden"
+              className="glass-card p-6 rounded-3xl relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 p-4 opacity-5">
                 <Users className="h-24 w-24" />
@@ -291,7 +295,7 @@ const AdminPage = () => {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
-              className="bg-zinc-900/40 backdrop-blur-md border border-zinc-900 p-6 rounded-3xl relative overflow-hidden"
+              className="glass-card p-6 rounded-3xl relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 p-4 opacity-5">
                 <Sparkles className="h-24 w-24" />
@@ -305,7 +309,7 @@ const AdminPage = () => {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
-              className="bg-zinc-900/40 backdrop-blur-md border border-zinc-900 p-6 rounded-3xl relative overflow-hidden"
+              className="glass-card p-6 rounded-3xl relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 p-4 opacity-5">
                 <ShieldCheck className="h-24 w-24" />
@@ -368,7 +372,7 @@ const AdminPage = () => {
           </div>
 
           {/* User List Table */}
-          <div className="bg-zinc-900/20 border border-zinc-900/80 rounded-3xl overflow-hidden shadow-2xl">
+          <div className="glass-card rounded-3xl overflow-hidden shadow-2xl">
             {loading ? (
               <div className="py-24 text-center text-zinc-500 space-y-3">
                 <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
@@ -501,7 +505,7 @@ const AdminPage = () => {
 
         {/* Modal: Editar Perfil de Outro Usuário */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="bg-zinc-950 border-zinc-900 text-zinc-100">
+          <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold flex items-center gap-2">
                 <Edit className="h-5 w-5 text-primary" />
@@ -557,7 +561,7 @@ const AdminPage = () => {
 
         {/* Modal: Confirmação de Exclusão */}
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogContent className="bg-zinc-950 border-zinc-900 text-zinc-100">
+          <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold flex items-center gap-2 text-red-500">
                 <Trash2 className="h-5 w-5" />

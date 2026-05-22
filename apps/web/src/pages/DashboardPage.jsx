@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ThemeToggle.jsx';
 import { Plus, LayoutDashboard, Share2, Copy, Check, ExternalLink, Loader2, Shield } from 'lucide-react';
 import LinkForm from '@/components/LinkForm.jsx';
 import ProfileSettings from '@/components/ProfileSettings.jsx';
@@ -196,9 +197,10 @@ const DashboardPage = () => {
                 onClick={() => navigate('/admin')}
               >
                 <Shield className="h-4 w-4" />
-                <span className="hidden sm:inline">Console Admin</span>
+                <span className="hidden sm:inline">Admin Console</span>
               </Button>
             )}
+            <ThemeToggle />
             <Button 
               variant="outline" 
               className="hidden sm:flex rounded-xl gap-2 font-medium"
