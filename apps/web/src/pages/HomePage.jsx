@@ -125,6 +125,25 @@ const Hero = () => {
   const navigate = useNavigate();
   const [handle, setHandle] = useState('');
   const [activeTab, setActiveTab] = useState('creator');
+  const [isAutoRotating, setIsAutoRotating] = useState(true);
+
+  // Rotação automática de abas do carrossel (demo interativa)
+  React.useEffect(() => {
+    if (!isAutoRotating) return;
+    const tabs = ['creator', 'local', 'infoproduct', 'ecommerce'];
+    const timer = setInterval(() => {
+      setActiveTab((prev) => {
+        const nextIndex = (tabs.indexOf(prev) + 1) % tabs.length;
+        return tabs[nextIndex];
+      });
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [isAutoRotating]);
+
+  const handleTabClick = (tabKey) => {
+    setActiveTab(tabKey);
+    setIsAutoRotating(false); // Pausa a rotação automática se o usuário clicar manualmente
+  };
 
   // Interactive phone preview mockup states inspired by Biosites
   const profiles = {
@@ -252,23 +271,7 @@ const Hero = () => {
               <span className="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
                 <CheckCircle2 size={14} /> {handle ? `contate.site/${handle} está disponível!` : '100% Grátis · Domínio Próprio · Sem Cartão'}
               </span>
-              <span className="hidden sm:inline text-slate-500">Pronto em 2 minutos</span>
             </div>
-          </motion.div>
-
-          {/* Social Proof Metric */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-8 flex items-center gap-3 text-slate-400 text-sm"
-          >
-            <div className="flex -space-x-2">
-              <img className="w-8 h-8 rounded-full border-2 border-slate-950 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" alt="User" />
-              <img className="w-8 h-8 rounded-full border-2 border-slate-950 object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop" alt="User" />
-              <img className="w-8 h-8 rounded-full border-2 border-slate-950 object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" alt="User" />
-            </div>
-            <span>Usado por <strong className="text-white font-semibold">+10.000</strong> criadores e negócios no Brasil</span>
           </motion.div>
         </div>
 
@@ -279,44 +282,33 @@ const Hero = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex-1 w-full max-w-md relative z-10"
         >
-          {/* Vertical Profile Switcher Tabs */}
+          {/* Profile Switcher Tabs with Auto-Rotation */}
           <div className="flex justify-center gap-2 mb-4 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800/80">
             <button 
-              onClick={() => setActiveTab('creator')} 
-              className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${activeTab === 'creator' ? 'bg-violet-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+              onClick={() => handleTabClick('creator')} 
+              className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${activeTab === 'creator' ? 'bg-[#a78bfa] text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
             >
               Criador
             </button>
             <button 
-              onClick={() => setActiveTab('local')} 
-              className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${activeTab === 'local' ? 'bg-violet-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+              onClick={() => handleTabClick('local')} 
+              className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${activeTab === 'local' ? 'bg-[#a78bfa] text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
             >
               Serviços
             </button>
             <button 
-              onClick={() => setActiveTab('infoproduct')} 
-              className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${activeTab === 'infoproduct' ? 'bg-violet-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+              onClick={() => handleTabClick('infoproduct')} 
+              className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${activeTab === 'infoproduct' ? 'bg-[#a78bfa] text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
             >
               Mentor
             </button>
             <button 
-              onClick={() => setActiveTab('ecommerce')} 
-              className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${activeTab === 'ecommerce' ? 'bg-violet-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+              onClick={() => handleTabClick('ecommerce')} 
+              className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all ${activeTab === 'ecommerce' ? 'bg-[#a78bfa] text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
             >
               Loja
             </button>
           </div>
-
-          {/* Floating Live Badge */}
-          <motion.div 
-            key={currentProfile.badge}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="absolute -top-3 -right-2 z-20 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-cyan-300 text-xs font-bold px-3.5 py-1.5 rounded-full shadow-xl flex items-center gap-1.5"
-          >
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-            {currentProfile.badge}
-          </motion.div>
 
           {/* Phone Shell */}
           <div className="w-full aspect-[9/18] max-h-[580px] bg-slate-950 rounded-[3rem] border-[8px] border-slate-900 shadow-2xl shadow-violet-950/50 relative overflow-hidden flex flex-col mx-auto">

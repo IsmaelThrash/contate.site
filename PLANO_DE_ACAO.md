@@ -69,3 +69,13 @@ gantt
 2. *"Sua vitrine profissional completa em menos de 5 minutos, sem precisar contratar um programador."*
 3. *"Receba pagamentos via Pix direto do seu link da bio, sem intermediários com taxas abusivas."*
 4. *"Conheça quem visita seu perfil, entenda o comportamento dos seus seguidores e venda mais todo dia."*
+
+---
+
+## 🚀 5. Métricas e Prova Social Futura (Para ativar quando a base crescer)
+
+> **Nota de Transparência:** Os contadores numéricos e badges estatísticos simulados foram removidos da Landing Page para garantir total autenticidade durante a fase inicial de lançamento.
+
+- [ ] **Badges Flutuantes de Atividade na Demonstração:** Exibir badges dinâmicos de engajamento no celular interativo (ex: `⚡ +1.840 cliques essa semana`, `📅 42 Agendamentos hoje`, `💰 R$ 14.890 em vendas Pix`, `📦 89 Pedidos enviados`).
+- [ ] **Contador Global de Criadores Ativos:** Exibir o total real de criadores cadastrados no topo do Hero (ex: `Usado por +10.000 criadores e negócios no Brasil`) via consulta direta no Supabase.
+- [ ] **Notificações Toast em Tempo Real (Social Proof):** Notificações no canto da tela informando sobre novas contas e links criados recentemente.
