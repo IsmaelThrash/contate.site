@@ -340,8 +340,9 @@ const Footer = () => (
         <a href="#" className="hover:text-slate-900">Privacidade</a>
         <a href="#" className="hover:text-slate-900">Contato</a>
       </div>
-      <div className="text-slate-400 text-sm">
-        &copy; {new Date().getFullYear()} contate.site. Todos os direitos reservados.
+      <div className="text-slate-400 text-sm flex flex-col items-center md:items-end gap-1">
+        <div>&copy; {new Date().getFullYear()} contate.site. Todos os direitos reservados.</div>
+        <div className="text-[10px] text-slate-400 font-mono opacity-60">Build: 364e029 (v2.1-sec)</div>
       </div>
     </div>
   </footer>
