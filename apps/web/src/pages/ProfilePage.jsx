@@ -10,6 +10,7 @@ import VideoEmbed from '@/components/VideoEmbed.jsx';
 import DOMPurify from 'dompurify';
 import { logger } from '@/lib/logger.js';
 import { isVip, renderVip } from '@/vips/registry.jsx';
+import { sanitizeColor } from '@/lib/utils.js';
 
 // Sanitiza para texto puro — sem HTML, sem XSS
 const safe = (str) => DOMPurify.sanitize(str || '', { ALLOWED_TAGS: [] });
@@ -109,7 +110,7 @@ const ProfilePage = () => {
 
         <div
           className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-          style={{ backgroundColor: user.cor_fundo || '#ffffff' }}
+          style={{ backgroundColor: sanitizeColor(user.cor_fundo, '#ffffff') }}
         >
           {/* Subtle overlay to ensure contrast */}
           <div className="absolute inset-0 bg-black/5 dark:bg-black/20 backdrop-blur-[2px]"></div>
@@ -178,7 +179,7 @@ const ProfilePage = () => {
 
       <div
         className="min-h-screen py-20 px-4 relative overflow-hidden mesh-bg"
-        style={{ backgroundColor: user.cor_fundo || 'hsl(var(--background))' }}
+        style={{ backgroundColor: sanitizeColor(user.cor_fundo, 'hsl(var(--background))') }}
       >
 
         <div className="max-w-2xl mx-auto relative z-10">

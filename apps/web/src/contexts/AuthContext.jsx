@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient.js';
 import { logger } from '@/lib/logger.js';
+import { isValidColor } from '@/lib/utils.js';
 
 const AuthContext = createContext(null);
 
@@ -172,6 +173,11 @@ export const AuthProvider = ({ children }) => {
         id: currentUser.id,
         ...data
       };
+
+      if (payload.cor_fundo !== undefined && payload.cor_fundo !== null && payload.cor_fundo !== '' && !isValidColor(payload.cor_fundo)) {
+        logger.error('Invalid cor_fundo format:', payload.cor_fundo);
+        return { success: false, error: 'Formato de cor de fundo inválido.' };
+      }
       
       if (!payload.slug && currentUser.slug) {
         payload.slug = currentUser.slug;

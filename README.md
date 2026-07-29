@@ -10,13 +10,13 @@ O `contate.site` centraliza todos os ecossistemas digitais de um usuário sob um
 O sistema foi desenhado para baixo custo inicial e alta escalabilidade:
 
 - **Frontend (Hostinger)**: Desenvolvido em **React + Vite + TailwindCSS**. Todo o ambiente do cliente é gerado de forma estática interativa e será hospedado em um ambiente de baixo custo (Apache/Nginx Shared Hosting via Hostinger's `public_html`).
-- **Backend (Pockethost/PocketBase)**: Desenvolvido com **PocketBase**. Atua como banco de dados em tempo real, backend-as-a-service e painel administrativo (Auth, Collections, Data Rules). Deploy efetuado no Pockethost.io.
+- **Backend (Supabase)**: Desenvolvido com **Supabase**. Atua como banco de dados em tempo real, backend-as-a-service e painel administrativo (Auth, PostgreSQL, Row Level Security).
 
 ```mermaid
 graph TD
     User((Visitante)) -->|Acessa :slug| Frontend[React Single Page App]
-    Frontend -->|Busca dados REST API| Backend[(PocketBase Backend)]
-    Backend -->|Valida Auth / Regras| DB[SQLite Data]
+    Frontend -->|Busca dados| Backend[(Supabase Backend)]
+    Backend -->|Valida Auth / RLS| DB[PostgreSQL Data]
     DB -. Retorna -> Frontend
 ```
 
@@ -28,11 +28,9 @@ graph TD
 
 ## 🛠 Como rodar localmente
 
-### 1. Inicie o Backend (PocketBase)
-1. Navegue até a pasta: `cd apps/pocketbase`
-2. Aplique as migrações (se for a primeira vez): `./pocketbase migrate up`
-3. Rode o servidor Web API (o terminal ficará preso no log de acesso): `./pocketbase serve`
-   - Painel Admin: `http://localhost:8090/_/`
+### 1. Configure o Backend (Supabase)
+1. Crie um projeto no Supabase e configure as variáveis de ambiente em `apps/web/.env` (veja `.env.example` ou siga o padrão).
+2. Execute os arquivos SQL de migração disponíveis na raiz do projeto (`supabase_migration_*.sql`) no painel SQL Editor do Supabase para criar as tabelas e políticas de segurança.
 
 ### 2. Inicie o Frontend (Vite/React)
 1. Em outro terminal, na raiz do repositório, rode: `npm install`
@@ -44,4 +42,4 @@ graph TD
 As diretrizes do projeto foram estabelecidas através da colaboração (via *Google Antigravity*):
 - **Estrategista**: Direcionou pesquisa, competitividade, modelos híbridos de hospedagem e priorizações (como SEO Dinâmico vs Analytics Inicial).
 - **Designer**: Arquitetura do Bento Grid, Mesh Gradients de Background, Efeitos Visuais.
-- **Arquiteto**: Modelagem de migrações (`pb_migrations`), lógica JWT/Session via PocketBase, `AuthContext.jsx` customizável.
+- **Arquiteto**: Modelagem do banco relacional, scripts SQL de Row Level Security (RLS), configuração da autenticação via Supabase e gestão customizável de sessões.
