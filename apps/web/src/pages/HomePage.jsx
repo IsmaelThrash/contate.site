@@ -783,26 +783,34 @@ const CTA = () => {
   );
 };
 
-const Footer = () => (
-  <footer className="border-t border-slate-800/80 bg-slate-950 py-12 text-slate-400 text-sm">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
-      <div className="flex items-center gap-3">
-        <img src="/favicon.svg" alt="contate.site" className="w-6 h-6" />
-        <span className="font-extrabold text-xl text-white">contate.site</span>
-      </div>
+const Footer = () => {
+  const commitHash = typeof __COMMIT_HASH__ !== 'undefined' ? __COMMIT_HASH__ : 'latest';
 
-      <div className="flex gap-6 font-medium text-xs sm:text-sm">
-        <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
-        <a href="#" className="hover:text-white transition-colors">Privacidade</a>
-        <a href="#" className="hover:text-white transition-colors">Suporte</a>
-      </div>
+  return (
+    <footer className="border-t border-slate-800/80 bg-slate-950 py-12 text-slate-400 text-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="flex items-center gap-3">
+          <img src="/favicon.svg" alt="contate.site" className="w-6 h-6" />
+          <span className="font-extrabold text-xl text-white">contate.site</span>
+        </div>
 
-      <div className="text-xs text-slate-500 text-center md:text-right">
-        &copy; {new Date().getFullYear()} contate.site — Todos os direitos reservados.
+        <div className="flex gap-6 font-medium text-xs sm:text-sm">
+          <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
+          <a href="#" className="hover:text-white transition-colors">Privacidade</a>
+          <a href="#" className="hover:text-white transition-colors">Suporte</a>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center gap-3 text-xs text-slate-500 text-center md:text-right">
+          <span>&copy; {new Date().getFullYear()} contate.site — Todos os direitos reservados.</span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-400 shadow-sm" title="Versão atual em produção">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            v2.0 ({commitHash})
+          </span>
+        </div>
       </div>
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};
 
 const HomePage = () => {
   return (
