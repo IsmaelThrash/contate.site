@@ -7,30 +7,24 @@ const ThemeProviderContext = createContext({
 
 export function ThemeProvider({
   children,
-  defaultTheme = 'system',
+  defaultTheme = 'dark',
   storageKey = 'vite-ui-theme',
   ...props
 }) {
-  const [theme, setTheme] = useState(
-    () => (localStorage.getItem(storageKey)) || defaultTheme
-  );
+  const [theme, setTheme] = useState(() => {
+    const stored = localStorage.getItem(storageKey);
+    // Forçar tema escuro Obsidian por padrão
+    if (!stored || stored === 'light' || stored === 'system') {
+      localStorage.setItem(storageKey, 'dark');
+      return 'dark';
+    }
+    return stored;
+  });
 
   useEffect(() => {
     const root = window.document.documentElement;
-
-    root.classList.remove('light', 'dark');
-
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
-        .matches
-        ? 'dark'
-        : 'light';
-
-      root.classList.add(systemTheme);
-      return;
-    }
-
-    root.classList.add(theme);
+    root.classList.remove('light');
+    root.classList.add('dark');
   }, [theme]);
 
   const value = {

@@ -7,26 +7,26 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 0 0% 12%;
-    --primary: 257 91% 76%;
+    --background: 0 0% 12%;       /* #1f1f1f - Canvas Obsidian */
+    --foreground: 0 0% 93%;       /* #eeeeee - Texto principal */
+    --primary: 257 91% 76%;       /* #a78bfa - Roxo Obsidian primário */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 90%;
-    --secondary-foreground: 0 0% 12%;
+    --secondary: 0 0% 18%;        /* #2e2e2e */
+    --secondary-foreground: 0 0% 93%;
     --accent: 263 83% 58%;
     --accent-foreground: 0 0% 100%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 12%;
-    --border: 0 0% 85%;
-    --input: 0 0% 90%;
-    --muted: 0 0% 92%;
-    --muted-foreground: 0 0% 40%;
+    --card: 0 0% 15%;             /* #262626 */
+    --card-foreground: 0 0% 93%;
+    --border: 0 0% 25%;           /* #404040 */
+    --input: 0 0% 25%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 85%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --ring: 257 91% 76%;
     --radius: 0.75rem;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 12%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 93%;
   }
   .dark {
     --background: 0 0% 12%;       /* #1f1f1f - Canvas original do Obsidian */
