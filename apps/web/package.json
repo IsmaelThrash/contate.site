@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --host :: --port 3000",
     "build:llms": "node tools/generate-llms.js || true",
-    "build:vite": "vite build",
+    "build:vite": "vite build && node -e \"const fs=require('fs'); if(fs.existsSync('../../dist')) fs.cpSync('dist', '../../', {recursive: true});\"",
     "build": "npm run build:llms && npm run build:vite",
     "start": "vite preview --host :: --port 3000",
     "lint": "eslint . --quiet",

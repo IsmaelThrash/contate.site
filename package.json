@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently --raw \"npm run dev --prefix apps/web\"",
-    "build": "concurrently --raw \"npm run build --prefix apps/web\"",
+    "build": "concurrently --raw \"npm run build --prefix apps/web\" && node -e \"const fs=require('fs'); fs.cpSync('apps/web/dist', '.', {recursive: true});\"",
     "start": "concurrently --raw \"npm run start --prefix apps/web\"",
     "lint": "concurrently --raw \"npm run lint --prefix apps/web\""
   },

@@ -1,0 +1,28 @@
+<svg viewBox="0 0 1200 360" width="1200" height="360" xmlns="http://www.w3.org/2000/svg">
+  <!-- Full Vector Logo (Symbol + Typography) for contate.site - Registration Ready -->
+  <defs>
+    <linearGradient id="full-logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+    <style>
+      .brand-text-main { font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif; font-weight: 800; font-size: 110px; fill: #0F172A; }
+      .brand-text-tld { font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif; font-weight: 800; font-size: 110px; fill: url(#full-logo-grad); }
+      .brand-tagline { font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 600; font-size: 28px; fill: #64748B; letter-spacing: 2px; }
+    </style>
+  </defs>
+  
+  <!-- Icon Mark -->
+  <g transform="translate(40, 40)">
+    <rect x="0" y="0" width="280" height="280" rx="70" fill="url(#full-logo-grad)"/>
+    <path d="M 90 140 C 65 115, 65 75, 95 60 C 125 45, 155 75, 190 110" fill="none" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round"/>
+    <path d="M 190 140 C 215 165, 215 205, 185 220 C 155 235, 125 205, 90 170" fill="none" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round"/>
+    <circle cx="140" cy="140" r="18" fill="#FFFFFF"/>
+    <circle cx="140" cy="140" r="9" fill="#6366F1"/>
+  </g>
+  
+  <!-- Typography -->
+  <text x="360" y="200" class="brand-text-main">contate<tspan class="brand-text-tld">.site</tspan></text>
+  <text x="365" y="255" class="brand-tagline">SUA IDENTIDADE DIGITAL EM UM SÓ LINK</text>
+</svg>

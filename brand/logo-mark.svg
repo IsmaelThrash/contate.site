@@ -1,0 +1,20 @@
+<svg viewBox="0 0 512 512" width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Brand Vector Mark for contate.site - High Precision Vector -->
+  <defs>
+    <linearGradient id="logo-mark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+  
+  <rect x="32" y="32" width="448" height="448" rx="112" fill="url(#logo-mark-grad)"/>
+  
+  <g fill="none" stroke="#FFFFFF" stroke-width="36" stroke-linecap="round">
+    <path d="M 176 256 C 136 216, 136 152, 184 128 C 232 104, 280 152, 336 208"/>
+    <path d="M 336 256 C 376 296, 376 360, 328 384 C 280 408, 232 360, 176 304"/>
+  </g>
+
+  <circle cx="256" cy="256" r="28" fill="#FFFFFF"/>
+  <circle cx="256" cy="256" r="14" fill="#6366F1"/>
+</svg>

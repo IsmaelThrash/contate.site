@@ -1,0 +1,26 @@
+<svg viewBox="0 0 1200 360" width="1200" height="360" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark Background Vector Logo for contate.site -->
+  <defs>
+    <linearGradient id="dark-logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="50%" stop-color="#818CF8"/>
+      <stop offset="100%" stop-color="#22D3EE"/>
+    </linearGradient>
+    <style>
+      .brand-text-dark { font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif; font-weight: 800; font-size: 110px; fill: #FFFFFF; }
+      .brand-text-tld-dark { font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif; font-weight: 800; font-size: 110px; fill: url(#dark-logo-grad); }
+      .brand-tagline-dark { font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 600; font-size: 28px; fill: #94A3B8; letter-spacing: 2px; }
+    </style>
+  </defs>
+  
+  <g transform="translate(40, 40)">
+    <rect x="0" y="0" width="280" height="280" rx="70" fill="url(#dark-logo-grad)"/>
+    <path d="M 90 140 C 65 115, 65 75, 95 60 C 125 45, 155 75, 190 110" fill="none" stroke="#0F172A" stroke-width="22" stroke-linecap="round"/>
+    <path d="M 190 140 C 215 165, 215 205, 185 220 C 155 235, 125 205, 90 170" fill="none" stroke="#0F172A" stroke-width="22" stroke-linecap="round"/>
+    <circle cx="140" cy="140" r="18" fill="#0F172A"/>
+    <circle cx="140" cy="140" r="9" fill="#A78BFA"/>
+  </g>
+  
+  <text x="360" y="200" class="brand-text-dark">contate<tspan class="brand-text-tld-dark">.site</tspan></text>
+  <text x="365" y="255" class="brand-tagline-dark">SUA IDENTIDADE DIGITAL EM UM SÓ LINK</text>
+</svg>
