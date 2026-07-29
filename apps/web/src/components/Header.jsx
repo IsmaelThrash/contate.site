@@ -39,10 +39,10 @@ const Header = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="bg-gradient-to-br from-primary to-secondary p-2.5 rounded-xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-              <Link2 className="h-5 w-5 text-white" />
+            <div className="bg-zinc-100 dark:bg-white text-zinc-900 p-2.5 rounded-xl group-hover:scale-105 transition-all duration-300 shadow-md">
+              <Link2 className="h-5 w-5 text-zinc-950" />
             </div>
-            <span className="text-2xl font-heading font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent tracking-tight">
+            <span className="text-2xl font-heading font-bold text-foreground tracking-tight group-hover:text-primary transition-colors">
               contate.site
             </span>
           </Link>

@@ -128,8 +128,8 @@ const OnboardingPage = () => {
             <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-secondary/20 rounded-full blur-3xl"></div>
 
             <div className="relative z-10 mb-8">
-              <div className="bg-gradient-to-br from-primary to-secondary p-4 rounded-2xl w-24 h-24 mx-auto mb-6 flex items-center justify-center shadow-lg">
-                <Link2 className="h-12 w-12 text-white" />
+              <div className="bg-zinc-100 dark:bg-white p-4 rounded-2xl w-24 h-24 mx-auto mb-6 flex items-center justify-center shadow-lg">
+                <Link2 className="h-12 w-12 text-zinc-950" />
               </div>
               <h1 className="text-3xl md:text-4xl font-heading font-bold mb-4 tracking-tight">Crie sua Identidade</h1>
               <p className="text-muted-foreground text-lg">

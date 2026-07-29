@@ -122,8 +122,8 @@ const LoginPage = () => {
               <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-secondary/30 rounded-full blur-3xl"></div>
 
               <div className="text-center mb-10 relative z-10">
-                <div className="bg-gradient-to-br from-primary to-secondary p-4 rounded-2xl w-20 h-20 mx-auto mb-6 flex items-center justify-center shadow-lg">
-                  <Link2 className="h-10 w-10 text-white" />
+                <div className="bg-zinc-100 dark:bg-white p-4 rounded-2xl w-20 h-20 mx-auto mb-6 flex items-center justify-center shadow-lg">
+                  <Link2 className="h-10 w-10 text-zinc-950" />
                 </div>
                 <h1 className="text-3xl md:text-4xl font-heading font-bold mb-3">Bem-vindo de volta</h1>
                 <p className="text-muted-foreground text-lg">Acesse sua conta para gerenciar seus links</p>

@@ -9,13 +9,13 @@ const buttonVariants = cva(
 	{
 		variants: {
 			variant: {
-				default: 'bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg hover:shadow-xl hover:scale-105 hover:opacity-90',
-				destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 hover:shadow-md',
-				outline: 'border-2 border-primary/20 bg-transparent shadow-sm hover:bg-primary/10 hover:border-primary hover:text-primary',
-				secondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md',
-				ghost: 'hover:bg-primary/10 hover:text-primary',
-				link: 'text-primary underline-offset-4 hover:underline',
-                glass: 'bg-white/10 backdrop-blur-md border border-white/20 text-foreground hover:bg-white/20 shadow-lg hover:shadow-xl',
+				default: 'bg-[#a78bfa] text-white hover:bg-[#9066fa] active:scale-[0.98] font-medium shadow-sm transition-all duration-100 ease-in-out rounded-lg',
+				destructive: 'bg-red-600/90 text-white shadow-sm hover:bg-red-600 rounded-lg font-medium',
+				outline: 'border border-[#404040] bg-[#262626] hover:bg-[#333333] text-[#eeeeee] hover:text-white transition-all duration-100 ease-in-out rounded-lg shadow-sm',
+				secondary: 'bg-[#262626] text-[#eeeeee] hover:bg-[#333333] font-medium rounded-lg',
+				ghost: 'hover:bg-[#262626] text-[#dadada] hover:text-[#eeeeee] transition-colors duration-100 ease-in-out rounded-lg',
+				link: 'text-[#a78bfa] underline-offset-4 hover:underline',
+				glass: 'bg-[#262626]/80 border border-[#404040] text-[#eeeeee] hover:bg-[#262626] shadow-sm rounded-lg',
 			},
 			size: {
 				default: 'h-11 px-6 py-2',

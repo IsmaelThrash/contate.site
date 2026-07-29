@@ -237,9 +237,16 @@ const AdminPage = () => {
         <title>Console Admin - contate.site</title>
       </Helmet>
 
-      <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
+      <div className="min-h-screen mesh-bg text-foreground selection:bg-red-500/30 relative">
+        {/* Red Admin Border Indicator */}
+        <div className="fixed inset-0 border-4 border-red-500/80 pointer-events-none z-50 shadow-[inset_0_0_20px_rgba(239,68,68,0.2)]"></div>
+        <div className="fixed top-0 left-1/2 -translate-x-1/2 bg-red-600 text-white px-4 py-0.5 rounded-b-lg text-[11px] font-mono uppercase font-bold tracking-widest z-50 flex items-center gap-1.5 shadow-lg shadow-red-600/30">
+          <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+          Modo Administrador Restrito
+        </div>
+
         {/* Header */}
-        <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50">
+        <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-red-500/20">
           <div className="container max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Button 
@@ -251,11 +258,14 @@ const AdminPage = () => {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div className="flex items-center gap-2">
-                <div className="bg-primary/20 text-primary p-2 rounded-xl border border-primary/20">
+                <div className="bg-red-500/20 text-red-400 p-2 rounded-xl border border-red-500/30">
                   <Shield className="h-5 w-5" />
                 </div>
                 <div>
-                  <span className="font-heading font-black text-lg tracking-tight block">Console Admin</span>
+                  <span className="font-heading font-black text-lg tracking-tight block flex items-center gap-2">
+                    Console Admin
+                    <span className="bg-red-500/20 text-red-400 text-[10px] px-2 py-0.5 rounded-full border border-red-500/30">PAINEL MASTER</span>
+                  </span>
                   <span className="text-[10px] text-zinc-500 font-mono -mt-1 block">contate.site v2</span>
                 </div>
               </div>

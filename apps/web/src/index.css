@@ -7,47 +7,47 @@
 
 @layer base {
   :root {
-    --background: 250 10% 98%;
-    --foreground: 220 13% 20%;
-    --primary: 280 85% 55%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 12%;
+    --primary: 257 91% 76%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 180 70% 50%;
-    --secondary-foreground: 0 0% 100%;
-    --accent: 40 95% 55%;
-    --accent-foreground: 220 13% 20%;
-    --card: 250 5% 95%;
-    --card-foreground: 220 13% 20%;
-    --border: 220 13% 85%;
-    --input: 250 5% 92%;
-    --muted: 220 10% 70%;
-    --muted-foreground: 220 13% 40%;
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 0 0% 12%;
+    --accent: 263 83% 58%;
+    --accent-foreground: 0 0% 100%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 12%;
+    --border: 0 0% 85%;
+    --input: 0 0% 90%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 40%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --ring: 280 85% 55%;
+    --ring: 257 91% 76%;
     --radius: 0.75rem;
-    --popover: 250 5% 95%;
-    --popover-foreground: 220 13% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 12%;
   }
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 280 90% 65%;
+    --background: 0 0% 12%;       /* #1f1f1f - Canvas original do Obsidian */
+    --foreground: 0 0% 93%;       /* #eeeeee - Texto principal */
+    --card: 0 0% 15%;             /* #262626 - Superfície de cards */
+    --card-foreground: 0 0% 93%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 93%;
+    --primary: 257 91% 76%;       /* #a78bfa - Roxo Obsidian primário */
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 40 100% 65%;
-    --accent-foreground: 240 10% 3.9%;
-    --destructive: 0 62.8% 30.6%;
+    --secondary: 0 0% 18%;        /* #2e2e2e */
+    --secondary-foreground: 0 0% 93%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 85%; /* #dadada - Texto secundário */
+    --accent: 263 83% 58%;        /* #7c3aed - Roxo accent profundo */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 40%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 280 90% 65%;
+    --border: 0 0% 25%;           /* #404040 - Divisores e bordas */
+    --input: 0 0% 25%;
+    --ring: 257 91% 76%;
   }
 }
 
@@ -61,11 +61,11 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased selection:bg-primary/30 selection:text-primary;
+    @apply bg-[#1f1f1f] text-[#eeeeee] font-sans antialiased selection:bg-[#a78bfa]/30 selection:text-[#a78bfa];
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading font-bold tracking-tight;
+    @apply font-heading tracking-tight;
   }
 }
 
@@ -75,17 +75,16 @@
   }
   
   .glass-card {
-    @apply bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
+    background-color: #262626;
+    border: 1px solid #404040;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
   }
 
   .mesh-bg {
-    background-color: hsl(var(--background));
+    background-color: #1f1f1f;
     background-image: 
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E"),
-      radial-gradient(at 0% 0%, hsla(var(--primary)/0.2) 0px, transparent 55%),
-      radial-gradient(at 100% 0%, hsla(var(--secondary)/0.2) 0px, transparent 55%),
-      radial-gradient(at 100% 100%, hsla(var(--accent)/0.2) 0px, transparent 55%),
-      radial-gradient(at 0% 100%, hsla(var(--primary)/0.2) 0px, transparent 55%);
-    background-blend-mode: overlay, normal, normal, normal, normal;
+      radial-gradient(at 0% 0%, rgba(167, 139, 250, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.06) 0px, transparent 50%);
   }
 }
