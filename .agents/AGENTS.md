@@ -7,7 +7,7 @@ Este arquivo é lido automaticamente pela IA em todas as sessões de desenvolvim
 ## 📌 1. Componentes Obrigatórios (NUNCA remover em redesigns)
 
 - [x] **Verificador de Versão no Rodapé (`Footer`)**:
-  - **Requisito**: O rodapé da aplicação MUST sempre exibir a versão `v2.0` e o hash do commit (`__COMMIT_HASH__`) com o badge escuro e o ponto verde pulsante.
+  - **Requisito**: O rodapé da aplicação MUST sempre exibir a versão `v2.1` e o hash do commit (`__COMMIT_HASH__`) com o badge escuro e o ponto verde pulsante.
   - **Motivo**: Permite auditagem visual instantânea do deploy em produção.
 
 - [x] **Painel de Administração Sinalizado (`AdminPage.jsx`)**:
