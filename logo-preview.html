@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logo 1A — Comparativo Pixel a Pixel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #0b0d13; color: #f8fafc; font-family: sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen p-6 flex flex-col items-center justify-center">
+  <div class="max-w-4xl w-full space-y-6">
+    <h1 class="text-2xl font-bold text-center text-white">Comparativo Direto: Referência vs SVG Puro</h1>
+    
+    <div class="grid md:grid-cols-2 gap-6 bg-slate-900 p-6 rounded-3xl border border-slate-800">
+      
+      <!-- Referência -->
+      <div class="flex flex-col items-center gap-3">
+        <span class="text-xs font-bold text-slate-400">Referência Original</span>
+        <div class="w-full aspect-square bg-[#12141a] rounded-2xl flex items-center justify-center p-6 border border-slate-800">
+          <img src="/logo_var1a_pure_geometric_1787694239519.jpg" class="max-w-full max-h-full rounded-xl object-contain" alt="Referência">
+        </div>
+      </div>
+
+      <!-- SVG -->
+      <div class="flex flex-col items-center gap-3">
+        <span class="text-xs font-bold text-emerald-400">SVG Limpo (Orientação Correta /)</span>
+        <div class="w-full aspect-square bg-[#12141a] rounded-2xl flex items-center justify-center p-10 border border-emerald-900/50">
+          <svg class="w-full h-full max-w-[260px] max-h-[260px]" viewBox="0 0 100 100" fill="none" stroke="#22d3ee" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Elo Esquerdo -->
+            <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)"/>
+            <!-- Barra Central Horizontal -->
+            <line x1="30" y1="50" x2="70" y2="50"/>
+            <!-- Elo Direito -->
+            <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

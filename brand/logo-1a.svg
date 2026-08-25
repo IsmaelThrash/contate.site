@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Elo Esquerdo (inclinado / a 45°) -->
+  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)"/>
+
+  <!-- Barra Central Horizontal -->
+  <line x1="30" y1="50" x2="70" y2="50"/>
+
+  <!-- Elo Direito (inclinado / a 45°) -->
+  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)"/>
+</svg>

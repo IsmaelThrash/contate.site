@@ -20,6 +20,12 @@ Este arquivo é lido automaticamente pela IA em todas as sessões de desenvolvim
 - [x] **Carrossel Automático na Demonstração (`HomePage.jsx`)**:
   - **Requisito**: As abas de nicho na hero section MUST alternar automaticamente a cada 3.5s, pausando ao clique do usuário.
 
+- [x] **Logotipo Oficial e Favicon Padrão (`Versão 1A - Elo Duplo a +45°`)**:
+  - **Requisito**: O logotipo e ícone oficial da marca MUST ser rigorosamente a **Versão 1A** (Dois elos tubulares paralelos inclinados a `+45°` com centros em `(35, 42)` e `(65, 58)`, conectados por uma barra horizontal central de `X=30` a `X=70` em `Y=50`).
+  - **Arquivos Fonte Obrigatórios**: `apps/web/public/favicon.svg`, `favicon.svg`, `brand/logo-1a.svg` e `brand/logo-icon.svg`.
+  - **Proibição Estrita**: A IA NUNCA deve alterar, distorcer, trocar ou reinventar a geometria do logo em nenhuma sessão.
+
+
 ---
 
 ## 🔒 2. Regras Técnicas e de Segurança
