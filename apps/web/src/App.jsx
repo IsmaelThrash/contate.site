@@ -18,7 +18,7 @@ import { Toaster } from '@/components/ui/toaster';
 function App() {
   return (
     <Router>
-      <ThemeProvider defaultTheme="system" storageKey="contate-site-theme">
+      <ThemeProvider defaultTheme="dark" storageKey="contate-site-theme">
         <AuthProvider>
           <ScrollToTop />
         <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 selection:text-primary">

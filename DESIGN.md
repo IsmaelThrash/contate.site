@@ -46,7 +46,7 @@ Inspirada no padrão visual dos maiores SaaS globais (Stripe, Linear, Supabase),
 | `primary-hover` | `#4F46E5` | `indigo-600` | Estado hover de botões primários |
 | `primary-active` | `#4338CA` | `indigo-700` | Estado pressionado/ativo |
 
-### 🌌 Neutros Escuros (Tema Obsidian / Dark Mode Nativo)
+### 🌌 Neutros Escuros (Tema Tech Dark Nativo)
 | Token | Hex | Tailwind | Aplicação |
 | :--- | :--- | :--- | :--- |
 | `bg-canvas` | `#080A0F` | — | Fundo principal da aplicação (Deep Black/Navy) |

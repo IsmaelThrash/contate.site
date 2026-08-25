@@ -14,8 +14,9 @@ Este arquivo é lido automaticamente pela IA em todas as sessões de desenvolvim
   - **Requisito**: A página de Admin MUST possuir a moldura/borda vermelha de 4px fixada no viewport (`border-red-500/80`) e o badge superior `MODO ADMINISTRADOR RESTRITO`.
   - **Motivo**: Alerta de segurança visual para prevenir ações acidentais em contas de terceiros.
 
-- [x] **Tema Escuro Obsidian Padrão (`index.css` & `ThemeProvider.jsx`)**:
-  - **Requisito**: A aplicação MUST carregar nativamente com a classe `.dark` e com as variáveis `:root` configuradas para os tokens do tema Obsidian (`#1f1f1f`).
+- [x] **Tema Escuro Tech Dark Padrão e Nativo (`index.css`, `index.html` & `ThemeProvider.jsx`)**:
+  - **Requisito**: A aplicação MUST carregar nativamente com a classe `.dark` no elemento `<html>` e com as variáveis `:root` configuradas para os tokens do tema escuro (`#080A0F` / `#0E121A` / `#1E2638`). O modo escuro é a identidade visual padrão do projeto.
+  - **Motivo**: Preservar a estética SaaS moderna com alto contraste para os gradientes de Índigo & Cobalto Tech.
 
 - [x] **Carrossel Automático na Demonstração (`HomePage.jsx`)**:
   - **Requisito**: As abas de nicho na hero section MUST alternar automaticamente a cada 3.5s, pausando ao clique do usuário.
@@ -27,7 +28,7 @@ Este arquivo é lido automaticamente pela IA em todas as sessões de desenvolvim
 
 - [x] **Paleta Oficial Homologada (`Índigo & Cobalto Tech`)**:
   - **Requisito**: O gradiente oficial da marca MUST ser rigorosamente o gradiente linear de Índigo Elétrico (`#6366F1`) para Cobalto Tech (`#3B82F6`) e Sky (`#38BDF8`), aplicado no logotipo, destaques e no sufixo `.site`.
-  - **Fundo Padrão**: Obsidian Dark (`#080A0F` / `#0B0D13`) e superfícies (`#0E121A`).
+  - **Fundo Padrão**: Tech Dark (`#080A0F` / `#0B0D13`) e superfícies (`#0E121A`).
 
 - [x] **Tipografia Oficial de Marca (`Sora`)**:
   - **Requisito**: O wordmark `contate.site` e títulos principais MUST usar a fonte **`Sora`** (Google Fonts) com peso `800` (ExtraBold) para máxima autoridade e harmonia com os elos tubulares do ícone.
