@@ -25,6 +25,14 @@ Este arquivo é lido automaticamente pela IA em todas as sessões de desenvolvim
   - **Arquivos Fonte Obrigatórios**: `apps/web/public/favicon.svg`, `favicon.svg`, `brand/logo-1a.svg` e `brand/logo-icon.svg`.
   - **Proibição Estrita**: A IA NUNCA deve alterar, distorcer, trocar ou reinventar a geometria do logo em nenhuma sessão.
 
+- [x] **Paleta Oficial Homologada (`Índigo & Cobalto Tech`)**:
+  - **Requisito**: O gradiente oficial da marca MUST ser rigorosamente o gradiente linear de Índigo Elétrico (`#6366F1`) para Cobalto Tech (`#3B82F6`) e Sky (`#38BDF8`), aplicado no logotipo, destaques e no sufixo `.site`.
+  - **Fundo Padrão**: Obsidian Dark (`#080A0F` / `#0B0D13`) e superfícies (`#0E121A`).
+
+- [x] **Tipografia Oficial de Marca (`Sora`)**:
+  - **Requisito**: O wordmark `contate.site` e títulos principais MUST usar a fonte **`Sora`** (Google Fonts) com peso `800` (ExtraBold) para máxima autoridade e harmonia com os elos tubulares do ícone.
+
+
 
 ---
 

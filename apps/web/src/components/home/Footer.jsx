@@ -11,13 +11,13 @@ export const Footer = () => {
         
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-cyan-500 p-0.5 shadow-sm">
-            <div className="w-full h-full bg-white dark:bg-slate-950 rounded-[6px] flex items-center justify-center">
-              <img src="/favicon.svg" alt="contate.site" className="w-5 h-5" />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#4F46E5] to-[#38BDF8] p-0.5 shadow-sm">
+            <div className="w-full h-full bg-white dark:bg-slate-950 rounded-[6px] flex items-center justify-center p-1">
+              <img src="/favicon.svg" alt="contate.site" className="w-full h-full" />
             </div>
           </div>
-          <span className="font-extrabold text-xl text-slate-900 dark:text-white">
-            contate<span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-cyan-500">.site</span>
+          <span className="font-sora font-extrabold text-xl text-slate-900 dark:text-white">
+            contate<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#38BDF8]">.site</span>
           </span>
         </div>
 

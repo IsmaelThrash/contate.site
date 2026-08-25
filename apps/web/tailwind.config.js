@@ -17,8 +17,10 @@ module.exports = {
     	},
     	extend: {
             fontFamily: {
-                sans: ['Inter', 'Space Grotesk', 'sans-serif'],
-                heading: ['Space Grotesk', 'Outfit', 'sans-serif'],
+                sans: ['Inter', 'system-ui', 'sans-serif'],
+                sora: ['Sora', 'sans-serif'],
+                brand: ['Sora', 'sans-serif'],
+                heading: ['Sora', 'Space Grotesk', 'sans-serif'],
             },
     		colors: {
     			border: 'hsl(var(--border))',

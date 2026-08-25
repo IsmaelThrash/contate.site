@@ -20,6 +20,13 @@ graph TD
     DB -. Retorna -> Frontend
 ```
 
+## 🎨 Identidade Visual Oficial
+- **Logotipo (Versão 1A)**: O Elo Duplo a `+45°`, representando conectividade, rapidez e unificação de canais de contato.
+- **Paleta Cromática (Índigo & Cobalto Tech)**:
+  - Gradiente de Marca: `#6366F1` (Índigo Elétrico) ➔ `#3B82F6` (Cobalto Tech) ➔ `#38BDF8` (Sky)
+  - Fundo & Superfícies: Obsidian Dark (`#080A0F` / `#0E121A`)
+- **Tipografia**: **`Sora`** (Google Fonts) para Wordmark e Títulos de Alta Conversão, e **`Inter`** para corpo e UI.
+
 ## ✨ Funcionalidades Core
 - **Bento Grid & Glassmorphism Design:** Experiência visual imersiva e responsiva.
 - **Autenticação Segura:** Criação de conta via E-mail/Senha com validação de robustez.

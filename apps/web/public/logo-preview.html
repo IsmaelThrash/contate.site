@@ -3,42 +3,370 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Logo 1A — Comparativo Pixel a Pixel</title>
+  <title>Laboratório Tipográfico — contate.site</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts Selecionadas para Branding Tech -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=Plus+Jakarta+Sans:wght@700;800;900&family=Space+Grotesk:wght@700;800&family=Outfit:wght@700;800;900&family=Sora:wght@700;800;900&family=Syne:wght@700;800&family=Urbanist:wght@700;800;900&display=swap" rel="stylesheet">
+
   <style>
-    body { background-color: #0b0d13; color: #f8fafc; font-family: sans-serif; }
+    body { font-family: 'Inter', sans-serif; background-color: #080a0f; color: #f8fafc; }
+    
+    .font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-space { font-family: 'Space Grotesk', sans-serif; }
+    .font-outfit { font-family: 'Outfit', sans-serif; }
+    .font-sora { font-family: 'Sora', sans-serif; }
+    .font-syne { font-family: 'Syne', sans-serif; }
+    .font-urbanist { font-family: 'Urbanist', sans-serif; }
+    .font-inter { font-family: 'Inter', sans-serif; }
   </style>
 </head>
-<body class="min-h-screen p-6 flex flex-col items-center justify-center">
-  <div class="max-w-4xl w-full space-y-6">
-    <h1 class="text-2xl font-bold text-center text-white">Comparativo Direto: Referência vs SVG Puro</h1>
+<body class="min-h-screen p-4 sm:p-10 flex flex-col items-center">
+  <div class="max-w-6xl w-full space-y-10">
     
-    <div class="grid md:grid-cols-2 gap-6 bg-slate-900 p-6 rounded-3xl border border-slate-800">
-      
-      <!-- Referência -->
-      <div class="flex flex-col items-center gap-3">
-        <span class="text-xs font-bold text-slate-400">Referência Original</span>
-        <div class="w-full aspect-square bg-[#12141a] rounded-2xl flex items-center justify-center p-6 border border-slate-800">
-          <img src="/logo_var1a_pure_geometric_1787694239519.jpg" class="max-w-full max-h-full rounded-xl object-contain" alt="Referência">
+    <!-- Cabeçalho do Laboratório -->
+    <div class="text-center space-y-3">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-950 border border-indigo-700 text-indigo-300 text-xs font-bold font-mono">
+        <span>Ícone Oficial 1A (Índigo & Cobalto Tech) Fixo</span>
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+        Laboratório Tipográfico do Nome
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto">
+        O ícone e as cores estão fixados. Escolha a tipografia que melhor transmite autoridade, modernidade e personalidade para a marca <strong>contate.site</strong>.
+      </p>
+    </div>
+
+    <!-- Grid de Opções Tipográficas -->
+    <div class="grid md:grid-cols-2 gap-6">
+
+      <!-- OPÇÃO A: Plus Jakarta Sans -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 hover:border-indigo-500/50 transition-all shadow-xl">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono font-bold text-indigo-400 bg-indigo-950 px-2.5 py-1 rounded-lg border border-indigo-800">
+              Opção A · Plus Jakarta Sans
+            </span>
+            <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded-full font-bold">
+              ★ Mais Recomendada
+            </span>
+          </div>
+          <span class="text-xs text-slate-500">Geométrica & Enérgica</span>
         </div>
+
+        <!-- Dark Box -->
+        <div class="bg-[#0b0d13] p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#2563EB] p-[2px] shadow-lg shadow-indigo-500/20 flex-shrink-0">
+              <div class="w-full h-full bg-[#0b0d13] rounded-[10px] flex items-center justify-center p-1.5">
+                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <defs>
+                    <linearGradient id="svgIC" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="100">
+                      <stop offset="0%" stop-color="#6366F1"/>
+                      <stop offset="100%" stop-color="#38BDF8"/>
+                    </linearGradient>
+                  </defs>
+                  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)" stroke="url(#svgIC)" stroke-width="7"/>
+                  <line x1="30" y1="50" x2="70" y2="50" stroke="url(#svgIC)" stroke-width="7"/>
+                  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)" stroke="url(#svgIC)" stroke-width="7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="font-jakarta font-extrabold text-2xl tracking-tight text-white">
+              contate<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#38BDF8]">.site</span>
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-500 font-semibold">Dark</span>
+        </div>
+
+        <!-- Light Box -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#2563EB] p-[2px] shadow-md flex-shrink-0">
+              <div class="w-full h-full bg-white rounded-[10px] flex items-center justify-center p-1.5">
+                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)" stroke="url(#svgIC)" stroke-width="7"/>
+                  <line x1="30" y1="50" x2="70" y2="50" stroke="url(#svgIC)" stroke-width="7"/>
+                  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)" stroke="url(#svgIC)" stroke-width="7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="font-jakarta font-extrabold text-2xl tracking-tight text-slate-900">
+              contate<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#2563EB]">.site</span>
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-400 font-semibold">Light</span>
+        </div>
+
+        <p class="text-xs text-slate-400">
+          <strong>Parecer do Designer:</strong> Padrão de excelência em SaaS moderno. O desenho arredondado das letras casa perfeitamente com os elos tubulares da marca, mantendo alta legibilidade.
+        </p>
       </div>
 
-      <!-- SVG -->
-      <div class="flex flex-col items-center gap-3">
-        <span class="text-xs font-bold text-emerald-400">SVG Limpo (Orientação Correta /)</span>
-        <div class="w-full aspect-square bg-[#12141a] rounded-2xl flex items-center justify-center p-10 border border-emerald-900/50">
-          <svg class="w-full h-full max-w-[260px] max-h-[260px]" viewBox="0 0 100 100" fill="none" stroke="#22d3ee" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
-            <!-- Elo Esquerdo -->
-            <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)"/>
-            <!-- Barra Central Horizontal -->
-            <line x1="30" y1="50" x2="70" y2="50"/>
-            <!-- Elo Direito -->
-            <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)"/>
-          </svg>
+      <!-- OPÇÃO B: Space Grotesk -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 hover:border-indigo-500/50 transition-all shadow-xl">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono font-bold text-indigo-400 bg-indigo-950 px-2.5 py-1 rounded-lg border border-indigo-800">
+            Opção B · Space Grotesk
+          </span>
+          <span class="text-xs text-slate-500">Tech & Futurista</span>
         </div>
+
+        <!-- Dark Box -->
+        <div class="bg-[#0b0d13] p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#2563EB] p-[2px] shadow-lg shadow-indigo-500/20 flex-shrink-0">
+              <div class="w-full h-full bg-[#0b0d13] rounded-[10px] flex items-center justify-center p-1.5">
+                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)" stroke="url(#svgIC)" stroke-width="7"/>
+                  <line x1="30" y1="50" x2="70" y2="50" stroke="url(#svgIC)" stroke-width="7"/>
+                  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)" stroke="url(#svgIC)" stroke-width="7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="font-space font-extrabold text-2xl tracking-tight text-white">
+              contate<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#38BDF8]">.site</span>
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-500 font-semibold">Dark</span>
+        </div>
+
+        <!-- Light Box -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#2563EB] p-[2px] shadow-md flex-shrink-0">
+              <div class="w-full h-full bg-white rounded-[10px] flex items-center justify-center p-1.5">
+                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)" stroke="url(#svgIC)" stroke-width="7"/>
+                  <line x1="30" y1="50" x2="70" y2="50" stroke="url(#svgIC)" stroke-width="7"/>
+                  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)" stroke="url(#svgIC)" stroke-width="7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="font-space font-extrabold text-2xl tracking-tight text-slate-900">
+              contate<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#2563EB]">.site</span>
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-400 font-semibold">Light</span>
+        </div>
+
+        <p class="text-xs text-slate-400">
+          <strong>Parecer do Designer:</strong> Visual forte de produto de tecnologia e IA. Possui cortes singulares no 'a' e no 'e' que dão um ar inovador e proprietário.
+        </p>
+      </div>
+
+      <!-- OPÇÃO C: Outfit -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 hover:border-indigo-500/50 transition-all shadow-xl">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono font-bold text-indigo-400 bg-indigo-950 px-2.5 py-1 rounded-lg border border-indigo-800">
+            Opção C · Outfit
+          </span>
+          <span class="text-xs text-slate-500">Minimalista & Elegante</span>
+        </div>
+
+        <!-- Dark Box -->
+        <div class="bg-[#0b0d13] p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#2563EB] p-[2px] shadow-lg shadow-indigo-500/20 flex-shrink-0">
+              <div class="w-full h-full bg-[#0b0d13] rounded-[10px] flex items-center justify-center p-1.5">
+                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)" stroke="url(#svgIC)" stroke-width="7"/>
+                  <line x1="30" y1="50" x2="70" y2="50" stroke="url(#svgIC)" stroke-width="7"/>
+                  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)" stroke="url(#svgIC)" stroke-width="7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="font-outfit font-extrabold text-2xl tracking-tight text-white">
+              contate<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#38BDF8]">.site</span>
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-500 font-semibold">Dark</span>
+        </div>
+
+        <!-- Light Box -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#2563EB] p-[2px] shadow-md flex-shrink-0">
+              <div class="w-full h-full bg-white rounded-[10px] flex items-center justify-center p-1.5">
+                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)" stroke="url(#svgIC)" stroke-width="7"/>
+                  <line x1="30" y1="50" x2="70" y2="50" stroke="url(#svgIC)" stroke-width="7"/>
+                  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)" stroke="url(#svgIC)" stroke-width="7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="font-outfit font-extrabold text-2xl tracking-tight text-slate-900">
+              contate<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#2563EB]">.site</span>
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-400 font-semibold">Light</span>
+        </div>
+
+        <p class="text-xs text-slate-400">
+          <strong>Parecer do Designer:</strong> Desenho puro, limpo e arejado. Transmite sensação amigável, premium e muito acessível para o usuário final.
+        </p>
+      </div>
+
+      <!-- OPÇÃO D: Sora -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 hover:border-indigo-500/50 transition-all shadow-xl">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono font-bold text-indigo-400 bg-indigo-950 px-2.5 py-1 rounded-lg border border-indigo-800">
+            Opção D · Sora
+          </span>
+          <span class="text-xs text-slate-500">Design de Interfaces UI</span>
+        </div>
+
+        <!-- Dark Box -->
+        <div class="bg-[#0b0d13] p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#2563EB] p-[2px] shadow-lg shadow-indigo-500/20 flex-shrink-0">
+              <div class="w-full h-full bg-[#0b0d13] rounded-[10px] flex items-center justify-center p-1.5">
+                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)" stroke="url(#svgIC)" stroke-width="7"/>
+                  <line x1="30" y1="50" x2="70" y2="50" stroke="url(#svgIC)" stroke-width="7"/>
+                  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)" stroke="url(#svgIC)" stroke-width="7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="font-sora font-extrabold text-2xl tracking-tight text-white">
+              contate<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#38BDF8]">.site</span>
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-500 font-semibold">Dark</span>
+        </div>
+
+        <!-- Light Box -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#2563EB] p-[2px] shadow-md flex-shrink-0">
+              <div class="w-full h-full bg-white rounded-[10px] flex items-center justify-center p-1.5">
+                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)" stroke="url(#svgIC)" stroke-width="7"/>
+                  <line x1="30" y1="50" x2="70" y2="50" stroke="url(#svgIC)" stroke-width="7"/>
+                  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)" stroke="url(#svgIC)" stroke-width="7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="font-sora font-extrabold text-2xl tracking-tight text-slate-900">
+              contate<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#2563EB]">.site</span>
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-400 font-semibold">Light</span>
+        </div>
+
+        <p class="text-xs text-slate-400">
+          <strong>Parecer do Designer:</strong> Desenhada especificamente para produtos digitais. Tem alta densidade visual e excelente presença em resoluções retina.
+        </p>
+      </div>
+
+      <!-- OPÇÃO E: Syne -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 hover:border-indigo-500/50 transition-all shadow-xl">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono font-bold text-indigo-400 bg-indigo-950 px-2.5 py-1 rounded-lg border border-indigo-800">
+            Opção E · Syne
+          </span>
+          <span class="text-xs text-slate-500">Editorial & Autoral</span>
+        </div>
+
+        <!-- Dark Box -->
+        <div class="bg-[#0b0d13] p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#2563EB] p-[2px] shadow-lg shadow-indigo-500/20 flex-shrink-0">
+              <div class="w-full h-full bg-[#0b0d13] rounded-[10px] flex items-center justify-center p-1.5">
+                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)" stroke="url(#svgIC)" stroke-width="7"/>
+                  <line x1="30" y1="50" x2="70" y2="50" stroke="url(#svgIC)" stroke-width="7"/>
+                  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)" stroke="url(#svgIC)" stroke-width="7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="font-syne font-extrabold text-2xl tracking-tight text-white">
+              contate<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#38BDF8]">.site</span>
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-500 font-semibold">Dark</span>
+        </div>
+
+        <!-- Light Box -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#2563EB] p-[2px] shadow-md flex-shrink-0">
+              <div class="w-full h-full bg-white rounded-[10px] flex items-center justify-center p-1.5">
+                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)" stroke="url(#svgIC)" stroke-width="7"/>
+                  <line x1="30" y1="50" x2="70" y2="50" stroke="url(#svgIC)" stroke-width="7"/>
+                  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)" stroke="url(#svgIC)" stroke-width="7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="font-syne font-extrabold text-2xl tracking-tight text-slate-900">
+              contate<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#2563EB]">.site</span>
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-400 font-semibold">Light</span>
+        </div>
+
+        <p class="text-xs text-slate-400">
+          <strong>Parecer do Designer:</strong> Extremamente marcante e estilosa. Dá um aspecto arrojado e moderno, ideal se a marca quiser se posicionar como descolada e criativa.
+        </p>
+      </div>
+
+      <!-- OPÇÃO F: Urbanist -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 hover:border-indigo-500/50 transition-all shadow-xl">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono font-bold text-indigo-400 bg-indigo-950 px-2.5 py-1 rounded-lg border border-indigo-800">
+            Opção F · Urbanist
+          </span>
+          <span class="text-xs text-slate-500">Geometria Neomoderna</span>
+        </div>
+
+        <!-- Dark Box -->
+        <div class="bg-[#0b0d13] p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#2563EB] p-[2px] shadow-lg shadow-indigo-500/20 flex-shrink-0">
+              <div class="w-full h-full bg-[#0b0d13] rounded-[10px] flex items-center justify-center p-1.5">
+                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)" stroke="url(#svgIC)" stroke-width="7"/>
+                  <line x1="30" y1="50" x2="70" y2="50" stroke="url(#svgIC)" stroke-width="7"/>
+                  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)" stroke="url(#svgIC)" stroke-width="7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="font-urbanist font-extrabold text-2xl tracking-tight text-white">
+              contate<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#38BDF8]">.site</span>
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-500 font-semibold">Dark</span>
+        </div>
+
+        <!-- Light Box -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#4F46E5] to-[#2563EB] p-[2px] shadow-md flex-shrink-0">
+              <div class="w-full h-full bg-white rounded-[10px] flex items-center justify-center p-1.5">
+                <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="23" y="14" width="24" height="56" rx="12" transform="rotate(45 35 42)" stroke="url(#svgIC)" stroke-width="7"/>
+                  <line x1="30" y1="50" x2="70" y2="50" stroke="url(#svgIC)" stroke-width="7"/>
+                  <rect x="53" y="30" width="24" height="56" rx="12" transform="rotate(45 65 58)" stroke="url(#svgIC)" stroke-width="7"/>
+                </svg>
+              </div>
+            </div>
+            <span class="font-urbanist font-extrabold text-2xl tracking-tight text-slate-900">
+              contate<span class="text-transparent bg-clip-text bg-gradient-to-r from-[#4F46E5] to-[#2563EB]">.site</span>
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-400 font-semibold">Light</span>
+        </div>
+
+        <p class="text-xs text-slate-400">
+          <strong>Parecer do Designer:</strong> Proporções geométricas muito elegantes, inspiradas no estilo Bauhaus moderno. Dá um toque limpo e sofisticado.
+        </p>
       </div>
 
     </div>
+
   </div>
 </body>
 </html>
