@@ -61,7 +61,7 @@ export const Navbar = () => {
               key={link.href}
               href={link.href}
               onClick={(e) => handleNavClick(e, link.href)}
-              className="hover:text-violet-600 dark:hover:text-white transition-colors py-1"
+              className="hover:text-indigo-500 dark:hover:text-white transition-colors py-1"
             >
               {link.label}
             </a>
@@ -72,13 +72,13 @@ export const Navbar = () => {
         <div className="hidden md:flex items-center gap-3">
           <button
             onClick={() => navigate('/login')}
-            className="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-violet-600 dark:hover:text-white px-4 py-2 rounded-xl transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-800"
+            className="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-400 dark:hover:text-white px-4 py-2 rounded-xl transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-800"
           >
             {homeContent.nav.loginText}
           </button>
           <button
             onClick={() => navigate('/login')}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-violet-600 hover:bg-violet-700 active:bg-violet-800 rounded-xl shadow-md shadow-violet-600/20 hover:shadow-violet-600/30 transition-all hover:scale-[1.02]"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 active:from-indigo-700 active:to-blue-700 rounded-xl shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all hover:scale-[1.02]"
           >
             <span>{homeContent.nav.ctaText}</span>
             <ArrowRight size={16} />
@@ -133,7 +133,7 @@ export const Navbar = () => {
                   setMobileMenuOpen(false);
                   navigate('/login');
                 }}
-                className="w-full text-center py-3 text-sm font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl shadow-md shadow-violet-600/20 transition-all flex items-center justify-center gap-2"
+                className="w-full text-center py-3 text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2"
               >
                 <span>{homeContent.nav.ctaText}</span>
                 <ArrowRight size={16} />

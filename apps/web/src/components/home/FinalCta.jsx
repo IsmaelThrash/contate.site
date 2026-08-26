@@ -8,15 +8,15 @@ export const FinalCta = () => {
 
   return (
     <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="bg-gradient-to-br from-violet-900 via-indigo-900 to-slate-950 rounded-3xl p-8 sm:p-16 text-center relative overflow-hidden shadow-2xl border border-violet-500/30">
+      <div className="bg-gradient-to-br from-indigo-950 via-slate-900 to-[#080A0F] rounded-3xl p-8 sm:p-16 text-center relative overflow-hidden shadow-2xl border border-indigo-500/30">
         
         {/* Efeitos de Iluminação de Fundo */}
-        <div className="absolute -top-24 -left-24 w-80 h-80 bg-violet-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -left-24 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-violet-200 rounded-full px-4 py-1.5 text-xs sm:text-sm font-semibold mb-6">
-            <Sparkles size={14} className="text-cyan-300" />
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-indigo-200 rounded-full px-4 py-1.5 text-xs sm:text-sm font-semibold mb-6">
+            <Sparkles size={14} className="text-sky-300" />
             <span>Comece hoje sem nenhum custo</span>
           </div>
 

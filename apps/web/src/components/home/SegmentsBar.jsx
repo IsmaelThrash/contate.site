@@ -30,9 +30,9 @@ export const SegmentsBar = () => {
               return (
                 <div
                   key={idx}
-                  className="inline-flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 shadow-sm hover:border-violet-400 dark:hover:border-violet-600 transition-colors cursor-default"
+                  className="inline-flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 shadow-sm hover:border-indigo-400 dark:hover:border-indigo-600 transition-colors cursor-default"
                 >
-                  <IconComponent size={15} className="text-violet-600 dark:text-violet-400" />
+                  <IconComponent size={15} className="text-indigo-600 dark:text-indigo-400" />
                   <span>{item.name}</span>
                 </div>
               );

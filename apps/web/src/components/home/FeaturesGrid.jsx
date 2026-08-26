@@ -22,7 +22,7 @@ export const FeaturesGrid = () => {
     <section id="recursos" className="py-20 md:py-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto mb-16">
-        <span className="text-xs uppercase tracking-wider text-violet-600 dark:text-violet-400 font-bold">
+        <span className="text-xs uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-bold">
           Recursos da Plataforma
         </span>
         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-2 mb-4">
@@ -40,11 +40,11 @@ export const FeaturesGrid = () => {
           return (
             <div
               key={idx}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all hover:border-violet-300 dark:hover:border-violet-700 flex flex-col justify-between group"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-2xl bg-violet-50 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800 flex items-center justify-center text-violet-600 dark:text-violet-400 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
                     <IconComponent size={24} />
                   </div>
                   <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/80">
@@ -67,7 +67,7 @@ export const FeaturesGrid = () => {
       {/* Caixa de Recursos Futuros ("Em Breve") */}
       <div className="bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8">
         <div className="flex items-center gap-2 mb-6">
-          <Sparkles size={18} className="text-violet-600 dark:text-violet-400" />
+          <Sparkles size={18} className="text-indigo-600 dark:text-indigo-400" />
           <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
             {homeContent.features.upcomingTitle}
           </h3>
@@ -86,7 +86,7 @@ export const FeaturesGrid = () => {
                     <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
                       <IconComponent size={16} />
                     </div>
-                    <span className="text-[10px] font-bold text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/60 px-2 py-0.5 rounded-md border border-violet-200 dark:border-violet-800">
+                    <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-800">
                       Em breve
                     </span>
                   </div>

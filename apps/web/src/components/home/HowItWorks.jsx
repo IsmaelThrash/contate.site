@@ -29,14 +29,14 @@ export const HowItWorks = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: idx * 0.15 }}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm hover:shadow-md transition-all hover:border-violet-300 dark:hover:border-violet-700 flex flex-col justify-between group"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm hover:shadow-md transition-all hover:border-indigo-300 dark:hover:border-indigo-700 flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-12 h-12 rounded-2xl bg-violet-50 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800 flex items-center justify-center text-violet-600 dark:text-violet-400 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
                     <StepIcon size={24} />
                   </div>
-                  <span className="text-3xl font-black font-mono text-slate-200 dark:text-slate-800 group-hover:text-violet-500/40 transition-colors">
+                  <span className="text-3xl font-black font-mono text-slate-200 dark:text-slate-800 group-hover:text-indigo-500/40 transition-colors">
                     {step.number}
                   </span>
                 </div>
@@ -49,7 +49,7 @@ export const HowItWorks = () => {
                 </p>
               </div>
 
-              <div className="mt-8 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2 text-xs font-bold text-violet-600 dark:text-violet-400">
+              <div className="mt-8 pt-4 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400">
                 <span>Passo {idx + 1} de 3</span>
                 <ArrowRight size={14} />
               </div>

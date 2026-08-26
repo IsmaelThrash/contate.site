@@ -15,7 +15,7 @@ import { Footer } from '@/components/home/Footer.jsx';
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#121212] text-slate-900 dark:text-slate-100 font-sans selection:bg-violet-500/20 selection:text-violet-700 dark:selection:text-violet-300 overflow-x-hidden">
+    <div className="min-h-screen bg-white dark:bg-[#080A0F] text-slate-900 dark:text-slate-100 font-sans selection:bg-indigo-500/20 selection:text-indigo-700 dark:selection:text-indigo-300 overflow-x-hidden">
       <Helmet>
         <title>{homeContent.seo.title}</title>
         <meta name="description" content={homeContent.seo.description} />

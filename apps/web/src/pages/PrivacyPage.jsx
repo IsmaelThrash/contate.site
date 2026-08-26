@@ -15,17 +15,17 @@ const PrivacyPage = () => {
       </Helmet>
 
       {/* Top Header */}
-      <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#080A0F]/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <button
             onClick={() => navigate('/')}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-500 dark:hover:text-white transition-colors"
           >
             <ArrowLeft size={18} />
             <span>Voltar para o início</span>
           </button>
-          <span className="font-extrabold text-lg">
-            contate<span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-cyan-500">.site</span>
+          <span className="font-sora font-extrabold text-lg">
+            contate<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#38BDF8]">.site</span>
           </span>
         </div>
       </header>
