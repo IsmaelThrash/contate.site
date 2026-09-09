@@ -15,7 +15,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
@@ -45,15 +45,15 @@ jobs:
             exit 1
           fi
 
-      # SEC-B05: Deploy via SFTP (criptografado) em vez de FTP (texto plano)
-      - name: Deploy via SFTP
+      # SEC-B05: Deploy via FTPS (criptografado) em vez de FTP (texto plano)
+      - name: Deploy via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          port: 65002
+          port: 21
           local-dir: ./apps/web/dist/
           server-dir: /domains/contate.site/public_html/
-          protocol: sftp
+          protocol: ftps
           dangerous-clean-slate: true
