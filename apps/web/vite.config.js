@@ -5,14 +5,9 @@ import { defineConfig } from 'vite';
 
 const getGitHash = () => {
   try {
-    const gitCmd = '"C:\\Users\\Ismael\\AppData\\Local\\Programs\\Git\\cmd\\git.exe"';
-    return execSync(`${gitCmd} rev-parse --short HEAD`).toString().trim();
+    return execSync('git rev-parse --short HEAD').toString().trim();
   } catch {
-    try {
-      return execSync('git rev-parse --short HEAD').toString().trim();
-    } catch {
-      return 'latest';
-    }
+    return 'latest';
   }
 };
 
@@ -23,8 +18,6 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    cors: true,
-    allowedHosts: true,
   },
   resolve: {
     extensions: ['.jsx', '.js', '.tsx', '.ts', '.json'],

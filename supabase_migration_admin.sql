@@ -33,10 +33,7 @@ CREATE POLICY "usuarios_delete_own" ON public.usuarios
   FOR DELETE
   USING (auth.uid() = id OR public.is_admin());
 
--- 4. Definir o usuário administrador inicial pelo e-mail
--- Busca o ID de auth.users pelo e-mail e ativa is_admin na tabela public.usuarios
-UPDATE public.usuarios
-SET is_admin = true
-WHERE id IN (
-  SELECT id FROM auth.users WHERE email = 'ismaelthrash@gmail.com'
-);
+-- 4. Definir o usuário administrador inicial
+-- Admin configurado manualmente via Supabase Dashboard
+-- UPDATE public.usuarios SET is_admin = true
+-- WHERE id IN (SELECT id FROM auth.users WHERE email = '<ADMIN_EMAIL>');

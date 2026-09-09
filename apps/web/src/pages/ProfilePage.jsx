@@ -173,7 +173,7 @@ const ProfilePage = () => {
         <title>{safe(user.meta_titulo) || `@${safe(user.slug)} - contate.site`}</title>
         <meta name="description" content={safe(user.meta_descricao) || `Confira todos os links de ${safe(user.slug)} em um só lugar`} />
         <script type="application/ld+json">
-          {JSON.stringify(jsonLd)}
+          {JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')}
         </script>
       </Helmet>
 

@@ -26,6 +26,11 @@ jobs:
         run: npm ci
         working-directory: apps/web
 
+      # SEC-M01: Audit de segurança bloqueante (apenas deps de produção)
+      - name: Security audit (production deps)
+        run: npm audit --omit=dev --audit-level=high
+        working-directory: apps/web
+
       - name: Build
         run: npm run build
         working-directory: apps/web
@@ -40,12 +45,15 @@ jobs:
             exit 1
           fi
 
-      - name: Deploy via FTP
+      # SEC-B05: Deploy via SFTP (criptografado) em vez de FTP (texto plano)
+      - name: Deploy via SFTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          port: 65002
           local-dir: ./apps/web/dist/
           server-dir: /domains/contate.site/public_html/
+          protocol: sftp
           dangerous-clean-slate: true

@@ -96,7 +96,6 @@ const ProfileSettings = () => {
         // Se o slug mudou, chama o RPC primeiro
         if (currentUser && formData.slug && formData.slug !== currentUser.slug) {
             const { data: claimed, error: rpcError } = await supabase.rpc('claim_slug', {
-                p_user_id: currentUser.id,
                 p_slug: formData.slug,
             });
 

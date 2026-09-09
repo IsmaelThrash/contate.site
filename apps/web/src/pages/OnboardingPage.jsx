@@ -69,7 +69,6 @@ const OnboardingPage = () => {
       // Registro atômico: a função no banco faz UPDATE com tratamento de unique_violation
       // Elimina a race condition entre check e update separados
       const { data: claimed, error: rpcError } = await supabase.rpc('claim_slug', {
-        p_user_id: userId,
         p_slug: slug,
       });
 

@@ -169,18 +169,24 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (data) => {
     if (!currentUser?.id) return { success: false };
     try {
+      // SEC-C01: Whitelist — aceitar SOMENTE campos seguros para edição pelo usuário
+      const ALLOWED_PROFILE_FIELDS = [
+        'nome_exibicao', 'bio', 'cor_fundo', 'avatar',
+        'meta_titulo', 'meta_descricao'
+      ];
+      const sanitized = {};
+      for (const key of ALLOWED_PROFILE_FIELDS) {
+        if (key in data) sanitized[key] = data[key];
+      }
+
       const payload = {
         id: currentUser.id,
-        ...data
+        ...sanitized
       };
 
       if (payload.cor_fundo !== undefined && payload.cor_fundo !== null && payload.cor_fundo !== '' && !isValidColor(payload.cor_fundo)) {
         logger.error('Invalid cor_fundo format:', payload.cor_fundo);
         return { success: false, error: 'Formato de cor de fundo inválido.' };
-      }
-      
-      if (!payload.slug && currentUser.slug) {
-        payload.slug = currentUser.slug;
       }
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;

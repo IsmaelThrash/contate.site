@@ -329,7 +329,7 @@ const DashboardPage = () => {
               <Button 
                 variant="default" 
                 className="w-full rounded-xl gap-2"
-                onClick={() => window.open(publicUrl, '_blank')}
+                onClick={() => window.open(publicUrl, '_blank', 'noopener,noreferrer')}
               >
                 Ver minha página
                 <ExternalLink className="h-4 w-4" />
