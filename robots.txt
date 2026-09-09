@@ -1,0 +1,13 @@
+# robots.txt for contate.site
+User-agent: *
+Allow: /
+Allow: /preview
+Allow: /termos
+Allow: /privacidade
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /login
+Disallow: /signup
+
+Sitemap: https://contate.site/sitemap.xml

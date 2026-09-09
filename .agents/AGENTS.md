@@ -33,6 +33,14 @@ Este arquivo é lido automaticamente pela IA em todas as sessões de desenvolvim
 - [x] **Tipografia Oficial de Marca (`Sora`)**:
   - **Requisito**: O wordmark `contate.site` e títulos principais MUST usar a fonte **`Sora`** (Google Fonts) com peso `800` (ExtraBold) para máxima autoridade e harmonia com os elos tubulares do ícone.
 
+- [x] **Copy e Headline Oficial Homologada (Opção 1 - Imutável e Obrigatória)**:
+  - **Requisito**: O texto da Hero section MUST ser rigorosamente a Opção 1 homologada:
+    - **Badge**: `✦ Centralize tudo o que você faz em um só lugar`
+    - **H1 Linha 1**: `Seus clientes encontram tudo`
+    - **H1 Linha 2 (Gradiente de Destaque)**: `em um único link na bio.`
+    - **Subtítulo Oficial**: `Centralize suas redes sociais, catálogo de serviços, vídeos e formas de contato em uma página moderna criada em 2 minutos direto do celular. 100% grátis e sem complicação.`
+  - **Motivo**: Preservar a identidade universal e ampla da plataforma sem limitar a marca a uma única ferramenta (como WhatsApp), garantindo autoridade máxima e ranqueamento orgânico para a palavra-chave de maior volume no Brasil ("link na bio").
+
 
 
 ---

@@ -11,6 +11,7 @@ import DOMPurify from 'dompurify';
 import { logger } from '@/lib/logger.js';
 import { isVip, renderVip } from '@/vips/registry.jsx';
 import { sanitizeColor } from '@/lib/utils.js';
+import { GoogleAdSlot } from '@/components/common/GoogleAdSlot.jsx';
 
 // Sanitiza para texto puro — sem HTML, sem XSS
 const safe = (str) => DOMPurify.sanitize(str || '', { ALLOWED_TAGS: [] });
@@ -283,11 +284,22 @@ const ProfilePage = () => {
             </div>
           )}
 
+          {/* Espaço Google Ads (Exibido para contas gratuitas - Monetização Freemium) */}
+          {user.plano !== 'pro' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <GoogleAdSlot variant="profile" />
+            </motion.div>
+          )}
+
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="text-center mt-16"
+            className="text-center mt-12"
           >
             <a
               href="/"

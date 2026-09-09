@@ -12,20 +12,9 @@ import { supabase } from '@/lib/supabaseClient.js';
 import { logger } from '@/lib/logger.js';
 import { SortableLink } from '@/components/SortableLink.jsx';
 
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import MouseSpotlight from '@/components/common/MouseSpotlight.jsx';
 
 const DashboardPage = () => {
   const { currentUser, logout, updateUserColor } = useAuth();
@@ -179,21 +168,42 @@ const DashboardPage = () => {
   ];
 
   return (
-    <div className="min-h-screen mesh-bg text-foreground selection:bg-primary/30">
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
+    <div className="min-h-screen relative overflow-hidden bg-background mesh-bg text-foreground selection:bg-primary/30">
+      {/* Interactive Cursor Spotlight */}
+      <MouseSpotlight />
+
+      {/* Background Ambient Glows */}
+      <div className="pointer-events-none fixed top-0 right-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[140px] -z-10" />
+      <div className="pointer-events-none fixed bottom-10 left-10 w-[450px] h-[450px] bg-blue-500/10 rounded-full blur-[140px] -z-10" />
+
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/[0.08]">
         <div className="container max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-primary p-2 rounded-xl">
-              <LayoutDashboard className="h-5 w-5 text-primary-foreground" />
+          <div 
+            className="flex items-center gap-3 cursor-pointer group select-none"
+            onClick={() => navigate('/')}
+            title="Ir para a página inicial"
+          >
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#4F46E5] via-[#2563EB] to-[#38BDF8] p-0.5 shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300">
+              <div className="w-full h-full bg-[#0E121A] rounded-[10px] flex items-center justify-center p-1">
+                <img src="/favicon.svg" alt="contate.site" className="w-full h-full" />
+              </div>
             </div>
-            <span className="font-heading font-bold text-xl tracking-tight">Painel</span>
+            <div className="flex items-center gap-2">
+              <span className="font-sora font-extrabold text-xl tracking-tight text-white">
+                contate<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#38BDF8]">.site</span>
+              </span>
+              <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/25 text-primary tracking-wide">
+                Painel
+              </span>
+            </div>
           </div>
           
           <div className="flex items-center gap-2 sm:gap-4">
             {currentUser?.is_admin && (
               <Button 
                 variant="outline" 
-                className="rounded-xl gap-2 font-semibold border-primary/30 text-primary hover:bg-primary/10"
+                className="rounded-xl gap-2 font-semibold border-primary/30 text-primary hover:bg-primary/10 transition-colors"
                 onClick={() => navigate('/admin')}
               >
                 <Shield className="h-4 w-4" />
@@ -203,16 +213,16 @@ const DashboardPage = () => {
             <ThemeToggle />
             <Button 
               variant="outline" 
-              className="hidden sm:flex rounded-xl gap-2 font-medium"
+              className="hidden sm:flex rounded-xl gap-2 font-medium border-white/[0.1] bg-card/60 backdrop-blur-sm hover:border-primary/40 hover:bg-primary/5 transition-all"
               onClick={handleCopyLink}
             >
-              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              Copiar Link
+              {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
+              {copied ? 'Copiado!' : 'Copiar Link'}
             </Button>
             <Button 
               variant="ghost" 
               onClick={logout}
-              className="rounded-xl hover:bg-destructive/10 hover:text-destructive"
+              className="rounded-xl hover:bg-destructive/10 hover:text-destructive transition-colors"
             >
               Sair
             </Button>
@@ -225,14 +235,16 @@ const DashboardPage = () => {
           <div className="space-y-8">
             <ProfileSettings />
 
-            <div className="glass-card rounded-3xl p-6 md:p-8">
+            <div className="glass-card rounded-3xl p-6 md:p-8 relative overflow-hidden">
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                   <h2 className="text-2xl font-heading font-bold flex items-center gap-2">
                     Meus Links
                     {savingOrder && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
                   </h2>
-                  <p className="text-muted-foreground">Gerencie o conteúdo da sua página</p>
+                  <p className="text-muted-foreground text-sm">Gerencie e reordene o conteúdo da sua página pública</p>
                 </div>
                 
                 <Button 
@@ -240,8 +252,9 @@ const DashboardPage = () => {
                     setEditingLink(null);
                     setIsFormOpen(true);
                   }}
-                  className="rounded-xl gap-2 shadow-lg shadow-primary/20"
+                  className="rounded-xl gap-2 bg-gradient-to-r from-[#6366F1] via-[#4F46E5] to-[#3B82F6] hover:from-[#4F46E5] hover:to-[#2563EB] text-white shadow-lg shadow-indigo-500/25 border-0 font-semibold relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                 >
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
                   <Plus className="h-4 w-4" />
                   Adicionar Link
                 </Button>
@@ -256,14 +269,14 @@ const DashboardPage = () => {
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-16 px-4 bg-muted/30 rounded-2xl border border-dashed border-border"
+                  className="text-center py-16 px-4 bg-muted/20 rounded-2xl border border-dashed border-white/[0.08]"
                 >
-                  <div className="bg-background w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                  <div className="bg-primary/10 border border-primary/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
                     <Share2 className="h-8 w-8 text-primary" />
                   </div>
                   <h3 className="text-xl font-bold mb-2">Nenhum link ainda</h3>
-                  <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-                    Crie seu primeiro link e comece a compartilhar seu conteúdo com o mundo.
+                  <p className="text-muted-foreground mb-6 max-w-sm mx-auto text-sm">
+                    Crie seu primeiro link e comece a compartilhar seu conteúdo com o mundo em menos de 1 minuto.
                   </p>
                   <Button 
                     variant="outline"
@@ -271,7 +284,7 @@ const DashboardPage = () => {
                       setEditingLink(null);
                       setIsFormOpen(true);
                     }}
-                    className="rounded-xl"
+                    className="rounded-xl border-primary/30 hover:bg-primary/10 hover:border-primary/60 font-semibold"
                   >
                     Criar meu primeiro link
                   </Button>
@@ -305,14 +318,14 @@ const DashboardPage = () => {
           </div>
 
           <div className="space-y-6">
-            <div className="glass-card rounded-3xl p-6 relative overflow-hidden group">
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="glass-card rounded-3xl p-6 relative overflow-hidden group hover:border-primary/30 transition-all duration-300">
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <h3 className="font-heading font-bold text-lg mb-2">Seu Link Público</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Compartilhe este link na bio do seu Instagram, TikTok e outras redes.
+                Compartilhe este link na bio do seu Instagram, TikTok e outras redes sociais.
               </p>
               
-              <div className="flex items-center gap-2 bg-background/50 border border-border p-3 rounded-xl mb-4">
+              <div className="flex items-center gap-2 bg-background/60 border border-white/[0.08] p-3 rounded-xl mb-4 group-hover:border-primary/30 transition-colors">
                 <span className="text-sm font-medium truncate flex-1 text-primary">
                   contate.site/{currentUser?.slug}
                 </span>
@@ -320,15 +333,16 @@ const DashboardPage = () => {
                   size="icon" 
                   variant="ghost" 
                   onClick={handleCopyLink}
-                  className="h-8 w-8 rounded-lg"
+                  className="h-8 w-8 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                  title="Copiar link"
                 >
-                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
 
               <Button 
                 variant="default" 
-                className="w-full rounded-xl gap-2"
+                className="w-full rounded-xl gap-2 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white shadow-lg shadow-primary/20 font-semibold transition-all duration-300 hover:scale-[1.01]"
                 onClick={() => window.open(publicUrl, '_blank', 'noopener,noreferrer')}
               >
                 Ver minha página
@@ -336,18 +350,18 @@ const DashboardPage = () => {
               </Button>
             </div>
 
-            <div className="glass-card rounded-3xl p-6">
+            <div className="glass-card rounded-3xl p-6 relative overflow-hidden">
               <h3 className="font-heading font-bold text-lg mb-4">Aparência Básica</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Cor de Fundo Principal</label>
+                  <label className="text-sm font-medium mb-2 block text-muted-foreground">Cor de Fundo Principal</label>
                   <div className="flex flex-wrap gap-3">
                     {THEME_COLORS.map(color => (
                       <button
                         key={color.id}
                         onClick={() => updateUserColor(color.value)}
                         className={`w-10 h-10 rounded-full border-2 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${
-                          currentUser?.cor_fundo === color.value ? 'border-white scale-110 shadow-lg' : 'border-transparent'
+                          currentUser?.cor_fundo === color.value ? 'border-white scale-110 shadow-lg ring-2 ring-primary/40' : 'border-transparent'
                         }`}
                         style={{ backgroundColor: `hsl(${color.value})` }}
                         title={color.label}
