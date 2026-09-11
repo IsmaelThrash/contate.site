@@ -12,7 +12,7 @@
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 
   # CSP (Content-Security-Policy): Restringe origens de scripts, estilos, conexões e frames
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src https://www.youtube.com https://player.vimeo.com https://www.tiktok.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src https://www.youtube.com https://player.vimeo.com https://www.tiktok.com; connect-src 'self' https://api.contate.site wss://api.contate.site https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
 
   # Proteção contra Clickjacking e Framing Indevido
   Header always set X-Frame-Options "SAMEORIGIN"
