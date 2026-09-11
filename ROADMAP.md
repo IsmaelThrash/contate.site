@@ -3,23 +3,23 @@
 Este documento mapeia o desenvolvimento, as conquistas e os próximos passos estratégicos do projeto `contate.site`.
 
 ## ✅ Fases Concluídas (Fundação e UI)
-- [x] **Setup de Infraestrutura:** Criação do ambiente monorepo (Frontend Vite/React + Backend PocketBase).
+- [x] **Setup de Infraestrutura:** Criação do ambiente monorepo (Frontend Vite/React + Backend Supabase).
 - [x] **Roteamento Dinâmico:** Implementação do sistema de perfis públicos (`/slug`).
 - [x] **Segurança de URLs (Blocklist):** Proibição de slugs reservados (ex: `dashboard`, `admin`, `api`) via validação no Frontend e Regex básico no Backend.
 - [x] **Identidade Visual Premium:** Adoção do estilo **Bento Grid** e **Glassmorphism** com gradientes de fundo malhados (Mesh Gradients) e animações responsivas.
 - [x] **SEO Dinâmico e Perfiling:** Campos customizáveis de Nome, Bio, Meta Title e Meta Description conectados ao React Helmet para ricas prévias de compartilhamento web/social.
-- [x] **Limpeza e Versionamento:** Extração do conhecimento de projeto (KIs) e consolidação do repositório `.git` (primeira release base).
 
----
+## ✅ Fase de Autenticação e Segurança
+- [x] **Login e Controle de Acesso:** Implementação de JWT via Supabase Auth.
+- [x] **Login Social:** Integração do Google OAuth2.
+- [x] **Segurança do Banco de Dados (RLS):** Criação de políticas RLS para garantir que usuários só alterem seus próprios perfis.
+- [x] **Proteção contra IDOR/Concorrência:** Sistema anti-sequestro de slugs usando funções PL/pgSQL RPC (`claim_slug`) e cooldown de 30 dias para reciclagem.
 
-## ⏳ Fase Atual (Autenticação e Prova de Titularidade)
-**Foco:** Garantir que apenas os proprietários reais de um e-mail possam clamar um slug (`/nome`).
-
-- [ ] **Implementar Login Social (Google Auth):**
-  - Criar credenciais OAuth2 no **Google Cloud Console**.
-  - Configurar e ativar o provedor Google no **Painel Admin do PocketBase**.
-  - Refatorar a tela de Cadastro/Login (`LoginPage`, `SignupPage`) para incluir o fluxo "Continuar com o Google".
-  - *Opcional:* Implementar sistema de bloqueio e remoção de contas orfãs criadas manualmente (ou forçar validação de e-mail como fallback).
+## ✅ Fase de Deploy e Infraestrutura Soberana (Self-Hosted)
+- [x] **Migração de Cloud para VPS:** Abandono do modelo DBaaS (Supabase Cloud) para instanciar o Supabase Stack via Docker (`winbot`).
+- [x] **Networking Local (Tunnels):** Configuração de Cloudflare Edge Tunnels (`cloudflared`) servindo a API publicamente via `api.contate.site`.
+- [x] **Serviço de Email Nativo:** SMTP da Hostinger integrado ao GoTrue para Magic Links e recuperações de conta.
+- [x] **Frontend na Hostinger:** Script de build automático para a Hostinger, permitindo push-to-deploy via GitHub.
 
 ---
 
@@ -34,11 +34,6 @@ Este documento mapeia o desenvolvimento, as conquistas e os próximos passos est
 - [ ] Upload de Imagem de Avatar (Storage).
 - [ ] Adição customizada de plano de fundo (Imagens/Gifs).
 - [ ] Presets de cores temáticas prontas (Ex: Cyberpunk, Monocromático, Moderno).
-
-### 🚀 Deploy de Produção (Híbrido)
-- [ ] Pipeline final de build otimizado para produção.
-- [ ] Envio das builds estáticas (`/dist`) para a infraestrutura **Hostinger** (`public_html`).
-- [ ] Migração do backend local para um servidor **Pockethost** de produção e vinculação pelo arquivo `.env`.
 
 ### 💰 Sustentabilidade e Monetização
 - [ ] Controle de limites: Limitar números de blocos/links por usuário "Free".
