@@ -30,3 +30,17 @@ export function sanitizeColor(color, fallback = '#ffffff') {
   return isValidColor(color) && color ? color.trim() : fallback;
 }
 
+export function isSafeUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  try {
+    const parsed = new URL(url.trim());
+    return ['http:', 'https:'].includes(parsed.protocol);
+  } catch {
+    return false;
+  }
+}
+
+export function getSafeUrl(url, fallback = '#') {
+  return isSafeUrl(url) ? url.trim() : fallback;
+}
+

@@ -5,6 +5,7 @@ export const RESERVED_SLUGS = [
     'signup',
     'admin',
     'api',
+    'app',
     'settings',
     'account',
     'profile',
@@ -15,13 +16,21 @@ export const RESERVED_SLUGS = [
     'links',
     'help',
     'support',
+    'suporte',
     'contact',
     'contato',
     'about',
     'blog',
     'legal',
     'privacy',
+    'privacidade',
     'terms',
+    'termos',
+    'onboarding',
+    'planos',
+    'pricing',
+    'cadastro',
+    'entrar',
     'root',
     'index',
     'home',
@@ -32,8 +41,18 @@ export const RESERVED_SLUGS = [
     'auth',
     'register',
     'recover',
-    'reset-password'
+    'reset-password',
+    'robots.txt',
+    'sitemap.xml',
+    'favicon.ico',
+    'assets',
+    'static',
+    'public',
+    'images',
+    'null',
+    'undefined'
 ];
+
 
 export const isReservedSlug = (slug) => {
     return RESERVED_SLUGS.includes(slug.toLowerCase().trim());

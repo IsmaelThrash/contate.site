@@ -10,7 +10,7 @@ import VideoEmbed from '@/components/VideoEmbed.jsx';
 import DOMPurify from 'dompurify';
 import { logger } from '@/lib/logger.js';
 import { isVip, renderVip } from '@/vips/registry.jsx';
-import { sanitizeColor } from '@/lib/utils.js';
+import { sanitizeColor, getSafeUrl } from '@/lib/utils.js';
 import { GoogleAdSlot } from '@/components/common/GoogleAdSlot.jsx';
 
 // Sanitiza para texto puro — sem HTML, sem XSS
@@ -253,7 +253,7 @@ const ProfilePage = () => {
                 return (
                   <motion.a
                     key={link.id}
-                    href={link.url}
+                    href={getSafeUrl(link.url)}
                     target="_blank"
                     rel="noopener noreferrer"
                     initial={{ opacity: 0, y: 20, scale: 0.95 }}

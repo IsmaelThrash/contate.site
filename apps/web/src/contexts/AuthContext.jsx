@@ -189,6 +189,15 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: 'Formato de cor de fundo inválido.' };
       }
 
+      if (payload.avatar !== undefined && payload.avatar !== null && payload.avatar !== '') {
+        const avatarRegex = /^[a-zA-Z0-9_.-]+\.(jpg|jpeg|png|webp|gif)$/i;
+        if (typeof payload.avatar !== 'string' || !avatarRegex.test(payload.avatar) || payload.avatar.includes('..')) {
+          logger.error('Invalid avatar format:', payload.avatar);
+          return { success: false, error: 'Formato de arquivo de avatar inválido.' };
+        }
+      }
+
+
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       

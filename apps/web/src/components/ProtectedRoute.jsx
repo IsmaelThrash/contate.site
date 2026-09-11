@@ -8,7 +8,7 @@ const ProtectedRoute = ({ children, requireSlug = true, requireAdmin = false }) 
   const { isAuthenticated, currentUser } = useAuth();
   const location = useLocation();
   const [adminChecked, setAdminChecked] = useState(!requireAdmin);
-  const [isAdminValid, setIsAdminValid] = useState(currentUser?.is_admin || false);
+  const [isAdminValid, setIsAdminValid] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -19,20 +19,21 @@ const ProtectedRoute = ({ children, requireSlug = true, requireAdmin = false }) 
             if (!error && typeof data === 'boolean') {
               setIsAdminValid(data);
             } else {
-              setIsAdminValid(!!currentUser.is_admin);
+              setIsAdminValid(false);
             }
             setAdminChecked(true);
           }
         })
         .catch(() => {
           if (isMounted) {
-            setIsAdminValid(!!currentUser.is_admin);
+            setIsAdminValid(false);
             setAdminChecked(true);
           }
         });
     } else {
       setAdminChecked(true);
     }
+
     return () => { isMounted = false; };
   }, [requireAdmin, isAuthenticated, currentUser]);
 

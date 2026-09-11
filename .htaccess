@@ -6,3 +6,24 @@
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]
 </IfModule>
+
+<IfModule mod_headers.c>
+  # HSTS (Strict-Transport-Security): Força HTTPS por 1 ano incluindo subdomínios
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+  # CSP (Content-Security-Policy): Restringe origens de scripts, estilos, conexões e frames
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src https://www.youtube.com https://player.vimeo.com https://www.tiktok.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+
+  # Proteção contra Clickjacking e Framing Indevido
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Proteção contra MIME Sniffing
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Controle de Referer para preservar privacidade
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Restrição de recursos sensíveis de hardware no navegador
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+</IfModule>
+

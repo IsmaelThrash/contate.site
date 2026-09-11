@@ -1,0 +1,11 @@
+services:
+  db:
+    container_name: contate-db
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: contate-tunnel
+    command: tunnel --no-autoupdate run --token eyJhIjoiYjgxYjYwZDJiNDA1NDA1YTgyZmI5MzQyZmVhN2FjMTAiLCJ0IjoiYjRiNGRjOWUtZjQzYS00MmM2LWJhMzYtM2Q3NDBhODBmYzc5IiwicyI6Ik16Vm1aakl6Tm1RdE1XRXlOeTAwWVdReUxXSXdOMkl0WlRGbU1qUTFNamRrTkRnNSJ9
+    restart: unless-stopped
+    depends_on:
+      - api-gw

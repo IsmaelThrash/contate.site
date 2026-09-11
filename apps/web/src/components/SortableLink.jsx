@@ -4,6 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
 import { GripVertical, Edit, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { getSafeUrl } from '@/lib/utils.js';
 
 export const SortableLink = memo(({ link, onEdit, onDelete }) => {
   const {
@@ -42,7 +43,7 @@ export const SortableLink = memo(({ link, onEdit, onDelete }) => {
             {link.titulo}
           </h3>
           <a
-            href={link.url}
+            href={getSafeUrl(link.url)}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs sm:text-sm text-muted-foreground hover:text-primary hover:underline truncate block transition-colors"

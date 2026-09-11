@@ -9,10 +9,12 @@ export const vipRegistry = {
 };
 
 export const isVip = (slug) => {
-  return !!vipRegistry[slug];
+  if (!slug || typeof slug !== 'string') return false;
+  return Object.hasOwn(vipRegistry, slug);
 };
 
 export const renderVip = (slug) => {
+  if (!isVip(slug)) return null;
   const VipComponent = vipRegistry[slug];
   if (!VipComponent) return null;
   
@@ -26,3 +28,4 @@ export const renderVip = (slug) => {
     </Suspense>
   );
 };
+
