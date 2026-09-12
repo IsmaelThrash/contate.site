@@ -134,18 +134,14 @@ MÃºltiplas camadas de problemas foram identificadas e resolvidas em sequÃªnc
 ### âš™ï¸� ConfiguraÃ§Ãµes Externas NecessÃ¡rias
 
 #### Supabase Dashboard
-- **Authentication > Providers > Google:** Ativado com Client ID e Client Secret corretos
-- **Authentication > URL Configuration:**
-  - Site URL: `http://localhost:3000/`
-  - Redirect URLs: `http://localhost:3000/*`, `http://localhost:3000/**`
-- **Authentication > Sign In / Providers:**
-  - Allow manual linking: **OFF** (vinculaÃ§Ã£o automÃ¡tica de contas)
-  - Confirm email: **ON**
+#### Supabase Auth (GoTrue / URL Configuration)
+- **Site URL:** `https://contate.site`
+- **Redirect URLs (Allow List):** `https://contate.site/*`, `https://contate.site/**`, `https://www.contate.site/*`, `http://localhost:3000/*`, `http://localhost:3000/**`
 
 #### Google Cloud Console
-- **OAuth Client:** `contate-site-auth` â€” Status: **Ativado**
-- **Callback URL:** `https://jxdupvgluypllzfupung.supabase.co/auth/v1/callback`
-- **Origens autorizadas:** `http://localhost:3000`
+- **OAuth Client:** `contate-site-auth` — Status: **Ativado**
+- **Callback URL:** `https://api.contate.site/auth/v1/callback`
+- **Origens autorizadas:** `https://contate.site`, `https://www.contate.site`, `http://localhost:3000`
 
 ---
 
