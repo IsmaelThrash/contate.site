@@ -154,3 +154,16 @@ MÃºltiplas camadas de problemas foram identificadas e resolvidas em sequÃªnc
 
 ## Regras do Projeto
 - **GitHub Workflow**: Após cada atualização ou correção de bug concluída, o agente DEVE fazer o commit e o push automático para o GitHub.
+
+## 📝 Pendências / Tech Debt
+- **Gerenciamento de Secrets**: Atualmente, o arquivo `.env` do Supabase no servidor `winbot` está sendo sincronizado manualmente com o script standalone `sync-env-to-winbot.ps1`. No futuro (quando a aplicação crescer ou por segurança), é altamente recomendado migrar para um gerenciador de secrets self-hosted open source (ex: **Infisical**) rodando na mesma infraestrutura, eliminando a necessidade deste sync manual de arquivos.
+
+---
+
+### 🎨 Revisão e Reorganização da Dashboard (v2.1)
+- **Slug Fixo & Imutável**: Removido campo de edição de slug do formulário; slug agora é exclusivamente exibido no card lateral "Seu Link Exclusivo" com etiqueta de fixo.
+- **Declaração de Titularidade**: Inserido callout de responsabilidade jurídica atestando que o usuário deve ser o legítimo titular ou representante autorizado caso o perfil represente marcas comerciais ou empresas.
+- **Limpeza de Histórico de Slugs**: Removidas referências a histórico, cofre de 30 dias de reservas e RPCs não utilizadas no frontend.
+- **Fluxo Integrado de Conteúdo**: O bloco **Meus Links** foi posicionado imediatamente abaixo de **Nome de Exibição & Bio**, permitindo acesso e reordenação instantânea sem rolagem.
+- **SEO & Segurança Modular**: Módulo de SEO alocado abaixo dos links; Zona de Segurança com exclusão de conta alocada de forma minimalista e discreta no rodapé.
+- **Aparência Básica Corrigida**: Cores refatoradas para paleta HEX de alta fidelidade (`#080A0F`, `#0B132B`, `#0F172A`, `#062016`, `#1C0B14`, `#140B24`), com feedback por toast em tempo real e renderização fiel na página pública `ProfilePage.jsx`.

@@ -179,8 +179,11 @@ const ProfilePage = () => {
       </Helmet>
 
       <div
-        className="min-h-screen py-20 px-4 relative overflow-hidden mesh-bg"
-        style={{ backgroundColor: sanitizeColor(user.cor_fundo, 'hsl(var(--background))') }}
+        className="min-h-screen py-20 px-4 relative overflow-hidden"
+        style={{ 
+          backgroundColor: sanitizeColor(user.cor_fundo, '#080A0F'),
+          backgroundImage: `radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.08) 0px, transparent 50%)`
+        }}
       >
 
         <div className="max-w-2xl mx-auto relative z-10">

@@ -3,9 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle.jsx';
-import { Plus, LayoutDashboard, Share2, Copy, Check, ExternalLink, Loader2, Shield } from 'lucide-react';
+import { 
+  Plus, 
+  Share2, 
+  Copy, 
+  Check, 
+  ExternalLink, 
+  Loader2, 
+  Shield, 
+  ShieldAlert,
+  Sparkles 
+} from 'lucide-react';
 import LinkForm from '@/components/LinkForm.jsx';
-import ProfileSettings from '@/components/ProfileSettings.jsx';
+import { ProfileIdentity, ProfileSEO, SecuritySection } from '@/components/ProfileSettings.jsx';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabaseClient.js';
@@ -16,6 +26,15 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import MouseSpotlight from '@/components/common/MouseSpotlight.jsx';
 
+const THEME_COLORS = [
+  { id: 'tech-dark', value: '#080A0F', label: 'Tech Dark (Oficial)', border: '#6366F1' },
+  { id: 'cobalt', value: '#0B132B', label: 'Cobalto Tech', border: '#3B82F6' },
+  { id: 'slate', value: '#0F172A', label: 'Slate Obsidian', border: '#38BDF8' },
+  { id: 'emerald', value: '#062016', label: 'Esmeralda Deep', border: '#10B981' },
+  { id: 'crimson', value: '#1C0B14', label: 'Vinho Nobre', border: '#F43F5E' },
+  { id: 'purple', value: '#140B24', label: 'Roxo Meia-Noite', border: '#A855F7' },
+];
+
 const DashboardPage = () => {
   const { currentUser, logout, updateUserColor } = useAuth();
   const navigate = useNavigate();
@@ -25,9 +44,11 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [savingOrder, setSavingOrder] = useState(false);
+  const [changingColor, setChangingColor] = useState(false);
   const { toast } = useToast();
 
   const publicUrl = `${window.location.origin}/${currentUser?.slug}`;
+  const activeColor = currentUser?.cor_fundo || '#080A0F';
 
   const fetchLinks = useCallback(async () => {
     if (!currentUser?.id) return;
@@ -92,9 +113,31 @@ const DashboardPage = () => {
     setCopied(true);
     toast({
       title: 'Link copiado!',
-      description: 'O link do seu perfil foi copiado para a área de transferência.'
+      description: 'O endereço do seu perfil foi copiado para a área de transferência.'
     });
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleColorChange = async (color) => {
+    if (changingColor || color.value === activeColor) return;
+    setChangingColor(true);
+    try {
+      const res = await updateUserColor(color.value);
+      if (res?.success) {
+        toast({
+          title: 'Aparência atualizada!',
+          description: `Tema alterado para "${color.label}".`
+        });
+      } else {
+        toast({
+          title: 'Erro ao alterar cor',
+          description: res?.error || 'Não foi possível atualizar a aparência.',
+          variant: 'destructive'
+        });
+      }
+    } finally {
+      setChangingColor(false);
+    }
   };
 
   const sensors = useSensors(
@@ -131,8 +174,6 @@ const DashboardPage = () => {
       if (newOrder.length > 0) {
         setSavingOrder(true);
         try {
-          // Envia apenas id + ordem — nunca dados completos do link
-          // O banco valida via RLS que o usuário só pode alterar seus próprios links
           const updates = newOrder.map(link => ({
             id: link.id,
             ordem: link.ordem,
@@ -150,7 +191,6 @@ const DashboardPage = () => {
             description: 'Não foi possível salvar a nova ordem dos links.',
             variant: 'destructive'
           });
-          // Revert on error
           fetchLinks();
         } finally {
           setSavingOrder(false);
@@ -158,14 +198,6 @@ const DashboardPage = () => {
       }
     }
   };
-
-  const THEME_COLORS = [
-    { id: 'zinc', value: '240 5.9% 10%', label: 'Dark Zinc' },
-    { id: 'slate', value: '222.2 84% 4.9%', label: 'Deep Blue' },
-    { id: 'emerald', value: '160 50% 15%', label: 'Forest' },
-    { id: 'rose', value: '346 45% 15%', label: 'Crimson' },
-    { id: 'amber', value: '30 60% 15%', label: 'Sunset' },
-  ];
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-background mesh-bg text-foreground selection:bg-primary/30">
@@ -232,9 +264,12 @@ const DashboardPage = () => {
 
       <main className="container max-w-5xl mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-[1fr_350px] gap-8">
+          {/* Coluna Principal: Fluxo integrado (Identidade -> Meus Links -> SEO -> Segurança) */}
           <div className="space-y-8">
-            <ProfileSettings />
+            {/* 1. Identidade do Perfil (Nome de Exibição & Bio) */}
+            <ProfileIdentity />
 
+            {/* 2. Meus Links (Integrado diretamente no início, abaixo da Identidade) */}
             <div className="glass-card rounded-3xl p-6 md:p-8 relative overflow-hidden">
               <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
               
@@ -244,7 +279,7 @@ const DashboardPage = () => {
                     Meus Links
                     {savingOrder && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
                   </h2>
-                  <p className="text-muted-foreground text-sm">Gerencie e reordene o conteúdo da sua página pública</p>
+                  <p className="text-muted-foreground text-sm">Adicione, edite ou arraste para organizar a ordem dos seus links</p>
                 </div>
                 
                 <Button 
@@ -261,22 +296,22 @@ const DashboardPage = () => {
               </div>
 
               {loading ? (
-                <div className="py-20 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                <div className="py-16 flex flex-col items-center justify-center gap-3 text-muted-foreground">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p>Carregando seus links...</p>
+                  <p className="text-sm">Carregando seus links...</p>
                 </div>
               ) : links.length === 0 ? (
                 <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-16 px-4 bg-muted/20 rounded-2xl border border-dashed border-white/[0.08]"
+                  className="text-center py-14 px-4 bg-muted/10 rounded-2xl border border-dashed border-white/[0.08]"
                 >
-                  <div className="bg-primary/10 border border-primary/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
-                    <Share2 className="h-8 w-8 text-primary" />
+                  <div className="bg-primary/10 border border-primary/20 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                    <Share2 className="h-7 w-7 text-primary" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">Nenhum link ainda</h3>
-                  <p className="text-muted-foreground mb-6 max-w-sm mx-auto text-sm">
-                    Crie seu primeiro link e comece a compartilhar seu conteúdo com o mundo em menos de 1 minuto.
+                  <h3 className="text-lg font-bold mb-1">Nenhum link cadastrado ainda</h3>
+                  <p className="text-muted-foreground mb-5 max-w-sm mx-auto text-xs leading-relaxed">
+                    Comece adicionando seu WhatsApp, redes sociais, loja virtual ou catálogo de produtos.
                   </p>
                   <Button 
                     variant="outline"
@@ -284,9 +319,9 @@ const DashboardPage = () => {
                       setEditingLink(null);
                       setIsFormOpen(true);
                     }}
-                    className="rounded-xl border-primary/30 hover:bg-primary/10 hover:border-primary/60 font-semibold"
+                    className="rounded-xl border-primary/30 hover:bg-primary/10 hover:border-primary/60 font-semibold text-sm"
                   >
-                    Criar meu primeiro link
+                    Adicionar meu primeiro link
                   </Button>
                 </motion.div>
               ) : (
@@ -315,25 +350,40 @@ const DashboardPage = () => {
                 </div>
               )}
             </div>
+
+            {/* 3. Configurações de SEO */}
+            <ProfileSEO />
+
+            {/* 4. Segurança (Minimalista e compacto no final de tudo) */}
+            <SecuritySection />
           </div>
 
+          {/* Coluna Lateral: Informações Fixas & Estilo */}
           <div className="space-y-6">
+            {/* Card: Seu Link Exclusivo & Permanente */}
             <div className="glass-card rounded-3xl p-6 relative overflow-hidden group hover:border-primary/30 transition-all duration-300">
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <h3 className="font-heading font-bold text-lg mb-2">Seu Link Público</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Compartilhe este link na bio do seu Instagram, TikTok e outras redes sociais.
+              
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <h3 className="font-heading font-bold text-lg">Seu Link Exclusivo</h3>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-primary/15 border border-primary/30 text-primary">
+                  Fixo
+                </span>
+              </div>
+
+              <p className="text-xs text-muted-foreground mb-4">
+                Este é seu endereço oficial na web para bio do Instagram, WhatsApp e cartões.
               </p>
               
-              <div className="flex items-center gap-2 bg-background/60 border border-white/[0.08] p-3 rounded-xl mb-4 group-hover:border-primary/30 transition-colors">
-                <span className="text-sm font-medium truncate flex-1 text-primary">
+              <div className="flex items-center gap-2 bg-background/80 border border-white/[0.08] p-3 rounded-xl mb-3 group-hover:border-primary/30 transition-colors">
+                <span className="text-sm font-semibold truncate flex-1 text-primary">
                   contate.site/{currentUser?.slug}
                 </span>
                 <Button 
                   size="icon" 
                   variant="ghost" 
                   onClick={handleCopyLink}
-                  className="h-8 w-8 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                  className="h-8 w-8 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors shrink-0"
                   title="Copiar link"
                 >
                   {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
@@ -348,26 +398,70 @@ const DashboardPage = () => {
                 Ver minha página
                 <ExternalLink className="h-4 w-4" />
               </Button>
+
+              {/* Declaração de Responsabilidade sobre Titularidade de Marca */}
+              <div className="mt-4 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200/90 flex gap-2.5 items-start">
+                <ShieldAlert className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <span className="font-semibold text-amber-300 block text-[11px] uppercase tracking-wide">
+                    Declaração de Titularidade
+                  </span>
+                  <p className="text-[11px] leading-relaxed text-amber-200/80">
+                    O seu link é permanente. Caso este perfil represente uma empresa, produto ou marca, você declara sob responsabilidade legal ser o titular legítimo ou representante autorizado. O uso indevido de nomes e marcas registradas de terceiros pode acarretar na suspensão imediata da conta conforme nossos Termos de Uso.
+                  </p>
+                </div>
+              </div>
             </div>
 
+            {/* Card: Aparência Básica (Cores reais funcionando) */}
             <div className="glass-card rounded-3xl p-6 relative overflow-hidden">
-              <h3 className="font-heading font-bold text-lg mb-4">Aparência Básica</h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-heading font-bold text-lg flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  Aparência Básica
+                </h3>
+                {changingColor && <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />}
+              </div>
+
+              <p className="text-xs text-muted-foreground mb-4">
+                Selecione o tema de cor de fundo que melhor combina com a sua identidade visual:
+              </p>
+
               <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block text-muted-foreground">Cor de Fundo Principal</label>
-                  <div className="flex flex-wrap gap-3">
-                    {THEME_COLORS.map(color => (
+                <div className="grid grid-cols-3 gap-3">
+                  {THEME_COLORS.map(color => {
+                    const isSelected = activeColor === color.value;
+                    return (
                       <button
                         key={color.id}
-                        onClick={() => updateUserColor(color.value)}
-                        className={`w-10 h-10 rounded-full border-2 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background ${
-                          currentUser?.cor_fundo === color.value ? 'border-white scale-110 shadow-lg ring-2 ring-primary/40' : 'border-transparent'
+                        type="button"
+                        onClick={() => handleColorChange(color)}
+                        className={`group relative p-2 rounded-2xl border transition-all flex flex-col items-center gap-1.5 text-center ${
+                          isSelected 
+                            ? 'border-primary bg-primary/10 shadow-md shadow-primary/20 scale-[1.03]' 
+                            : 'border-white/[0.08] hover:border-white/20 bg-background/40 hover:bg-background/80'
                         }`}
-                        style={{ backgroundColor: `hsl(${color.value})` }}
                         title={color.label}
-                      />
-                    ))}
-                  </div>
+                      >
+                        <span 
+                          className="w-8 h-8 rounded-full shadow-inner border border-white/20 flex items-center justify-center transition-transform group-hover:scale-110"
+                          style={{ backgroundColor: color.value }}
+                        >
+                          {isSelected && <Check className="h-3.5 w-3.5 text-white drop-shadow" />}
+                        </span>
+                        <span className="text-[10px] font-medium truncate w-full text-foreground/80">
+                          {color.label.split(' ')[0]}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-muted-foreground">
+                  <span>Tema selecionado:</span>
+                  <span className="font-semibold text-primary">
+                    {THEME_COLORS.find(c => c.value === activeColor)?.label || 'Tech Dark'}
+                  </span>
                 </div>
               </div>
             </div>
