@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
-import { GripVertical, Edit, Trash2 } from 'lucide-react';
+import { GripVertical, Edit, Trash2, Play, Columns, Maximize2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getSafeUrl } from '@/lib/utils.js';
 
@@ -23,6 +23,10 @@ export const SortableLink = memo(({ link, onEdit, onDelete }) => {
     position: 'relative'
   };
 
+  const isVideo = link.tipo === 'video' || link.tipo === 'video_compacto';
+  const isDestaque = link.tipo === 'destaque' || link.tipo === 'link_destaque';
+  const isCompacto = link.tipo === 'compacto' || link.tipo === 'link_compacto';
+
   return (
     <div ref={setNodeRef} style={style} className={isDragging ? 'opacity-50 z-50' : ''}>
       <motion.div
@@ -39,9 +43,34 @@ export const SortableLink = memo(({ link, onEdit, onDelete }) => {
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-heading font-bold text-base sm:text-lg mb-0.5 truncate text-foreground group-hover:text-primary transition-colors">
-            {link.titulo}
-          </h3>
+          <div className="flex items-center gap-2 flex-wrap mb-0.5">
+            <h3 className="font-heading font-bold text-base sm:text-lg truncate text-foreground group-hover:text-primary transition-colors">
+              {link.titulo}
+            </h3>
+
+            {/* Badge de Formato / Tamanho */}
+            {isVideo ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20 shrink-0">
+                <Play className="h-2.5 w-2.5 fill-current" />
+                {link.tipo === 'video_compacto' ? 'Vídeo (50%)' : 'Vídeo (100%)'}
+              </span>
+            ) : isDestaque ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20 shrink-0">
+                <Maximize2 className="h-2.5 w-2.5" />
+                Destaque (100%)
+              </span>
+            ) : isCompacto ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-300 border border-blue-500/20 shrink-0">
+                <Columns className="h-2.5 w-2.5" />
+                Meia Coluna (50%)
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-500/10 text-slate-400 border border-slate-500/20 shrink-0">
+                <Sparkles className="h-2.5 w-2.5" />
+                Auto
+              </span>
+            )}
+          </div>
           <a
             href={getSafeUrl(link.url)}
             target="_blank"

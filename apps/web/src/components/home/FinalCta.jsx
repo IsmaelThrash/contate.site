@@ -17,15 +17,15 @@ export const FinalCta = () => {
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="bg-gradient-to-br from-indigo-950/90 via-slate-900 to-[#080A0F] rounded-3xl p-8 sm:p-16 text-center relative overflow-hidden shadow-2xl border border-indigo-500/40 backdrop-blur-md"
+        className="bg-[#0D111C] border border-blue-500/20 rounded-3xl p-8 sm:p-16 text-center relative overflow-hidden shadow-2xl backdrop-blur-md"
       >
         
-        {/* Efeitos de Iluminação de Fundo */}
-        <div className="absolute -top-24 -left-24 w-80 h-80 bg-indigo-500/25 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-sky-500/25 rounded-full blur-3xl pointer-events-none" />
+        {/* Efeitos de Iluminação de Fundo Calibrados */}
+        <div className="absolute -top-24 -left-24 w-80 h-80 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-sky-500/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-indigo-200 rounded-full px-4 py-1.5 text-xs sm:text-sm font-semibold mb-6">
+          <div className="inline-flex items-center gap-2 bg-blue-500/10 backdrop-blur-md border border-blue-400/20 text-blue-200 rounded-full px-4 py-1.5 text-xs sm:text-sm font-semibold mb-6">
             <Sparkles size={14} className="text-sky-300" />
             <span>Comece hoje sem nenhum custo</span>
           </div>

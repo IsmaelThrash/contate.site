@@ -10,6 +10,7 @@ Gerencia os dados de perfil e configurações globais de cada usuário.
 | `id` | `uuid` | Primary Key, referencia `auth.users.id` (Relacionamento com Auth) |
 | `slug` | `text` | Nome de usuário único para a URL (ex: `/advogadojoao`). Único (`UNIQUE`) |
 | `nome_exibicao` | `text` | Nome que aparecerá no topo do perfil |
+| `avatar` | `text` | Nome do arquivo no bucket `avatars` ou URL HTTPS segura (OAuth/Gravatar) |
 | `bio` | `text` | Texto descritivo curto |
 | `cor_fundo` | `text` | Hex (`#fff`), HSL (`hsl(...)`) ou RGB (`rgb(...)`) validado via constraint `cor_fundo_check` |
 | `status` | `integer` | Status da conta: `0` (Aguardando ativação), `1` (Ativo), `2` (Inativo/Suspenso). Constraint `status_check` |
@@ -18,7 +19,16 @@ Gerencia os dados de perfil e configurações globais de cada usuário.
 | `meta_descricao`| `text` | Para injeção no React Helmet (SEO) |
 | `created_at` | `timestamp`| Data de criação |
 
-## 2. Tabela: `slugs_reservados`
+## 2. Bucket de Storage: `avatars`
+Armazena as fotos de perfil dos usuários em alta definição (WebP/JPEG/PNG).
+- **Público:** Sim (`public = true`)
+- **Limite por arquivo:** 5 MB (`5242880` bytes)
+- **MIME Types Permitidos:** `image/png`, `image/jpeg`, `image/webp`, `image/gif`
+- **Políticas RLS:**
+  - Leitura pública irrestrita: `bucket_id = 'avatars'`
+  - Upload e exclusão restritos ao dono da pasta: `(storage.foldername(name))[1] = auth.uid()::text`
+
+## 3. Tabela: `slugs_reservados`
 Cofre de segurança de retenção temporária (cooldown de 30 dias) de slugs alterados.
 
 | Coluna | Tipo | Descrição |

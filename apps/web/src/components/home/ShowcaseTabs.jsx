@@ -41,7 +41,7 @@ export const ShowcaseTabs = () => {
                 onClick={() => setSelectedKey(key)}
                 className={`px-5 py-2.5 rounded-2xl text-sm font-bold transition-all ${
                   isSelected
-                    ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-600/20 scale-105'
+                    ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30 scale-105 border border-blue-400/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]'
                     : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
@@ -63,7 +63,7 @@ export const ShowcaseTabs = () => {
           >
             {/* Coluna Esquerda: Explicação de Benefícios */}
             <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-xs font-semibold border border-indigo-200 dark:border-indigo-800">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 text-xs font-semibold border border-blue-200 dark:border-blue-800">
                 <span>{profile.socialProof}</span>
               </div>
 
@@ -93,7 +93,7 @@ export const ShowcaseTabs = () => {
               <div className="pt-4">
                 <button
                   onClick={() => navigate('/login')}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-bold px-6 py-3.5 rounded-2xl shadow-md shadow-indigo-600/20 transition-all hover:scale-[1.02]"
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold px-6 py-3.5 rounded-2xl shadow-sm shadow-blue-600/20 hover:shadow-blue-600/35 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <span>Criar página para {profile.tabLabel}</span>
                   <ArrowRight size={18} />

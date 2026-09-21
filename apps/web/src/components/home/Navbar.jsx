@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ArrowRight } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle.jsx';
 import { homeContent } from '@/lib/homeContent.js';
 
 export const Navbar = () => {
@@ -70,15 +71,16 @@ export const Navbar = () => {
 
         {/* Action Buttons */}
         <div className="hidden md:flex items-center gap-3">
+          <ThemeToggle />
           <button
             onClick={() => navigate('/login')}
-            className="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-400 dark:hover:text-white px-4 py-2 rounded-xl transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-800"
+            className="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-blue-500 dark:hover:text-white px-4 py-2 rounded-xl transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-800"
           >
             {homeContent.nav.loginText}
           </button>
           <button
             onClick={() => navigate('/login')}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 active:from-indigo-700 active:to-blue-700 rounded-xl shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all hover:scale-[1.02]"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl shadow-sm shadow-blue-500/20 hover:shadow-blue-500/30 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <span>{homeContent.nav.ctaText}</span>
             <ArrowRight size={16} />
@@ -86,13 +88,16 @@ export const Navbar = () => {
         </div>
 
         {/* Mobile Toggle Button */}
-        <button
-          aria-label="Abrir menu de navegação"
-          className="md:hidden p-2.5 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            aria-label="Abrir menu de navegação"
+            className="p-2.5 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Nav Dropdown */}
@@ -133,7 +138,7 @@ export const Navbar = () => {
                   setMobileMenuOpen(false);
                   navigate('/login');
                 }}
-                className="w-full text-center py-3 text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2"
+                className="w-full text-center py-3 text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl shadow-sm shadow-blue-500/20 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all flex items-center justify-center gap-2"
               >
                 <span>{homeContent.nav.ctaText}</span>
                 <ArrowRight size={16} />

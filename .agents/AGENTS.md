@@ -26,9 +26,11 @@ Este arquivo é lido automaticamente pela IA em todas as sessões de desenvolvim
   - **Arquivos Fonte Obrigatórios**: `apps/web/public/favicon.svg`, `favicon.svg`, `brand/logo-1a.svg` e `brand/logo-icon.svg`.
   - **Proibição Estrita**: A IA NUNCA deve alterar, distorcer, trocar ou reinventar a geometria do logo em nenhuma sessão.
 
-- [x] **Paleta Oficial Homologada (`Índigo & Cobalto Tech`)**:
-  - **Requisito**: O gradiente oficial da marca MUST ser rigorosamente o gradiente linear de Índigo Elétrico (`#6366F1`) para Cobalto Tech (`#3B82F6`) e Sky (`#38BDF8`), aplicado no logotipo, destaques e no sufixo `.site`.
-  - **Fundo Padrão**: Tech Dark (`#080A0F` / `#0B0D13`) e superfícies (`#0E121A`).
+- [x] **Paleta Oficial Homologada (`Cobalto Tech & Padrão Supabase`)**:
+  - **Identidade da Marca**: O gradiente oficial da marca MUST ser rigorosamente o gradiente linear de Índigo Elétrico (`#6366F1`) para Cobalto Tech (`#3B82F6`) e Sky (`#38BDF8`), aplicado exclusivamente no logotipo oficial (Versão 1A) e no sufixo `.site`.
+  - **Botões e CTAs Primários (Anti-IA Slop)**: Os botões de ação e conversão primários MUST ser em **Cobalto Tech Sólido** (`#2563EB` / `#1D4ED8`) com acabamento tátil de 1px (`shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]`) no padrão de alta autoridade Supabase/Linear. É estritamente proibido o uso de degradês roxos espalhafatosos e feixes metálicos passantes (`shimmer`) de IA nos botões.
+  - **Fundo e Superfícies**: Padrão Tech Dark (`#080A0F` / `#0B0D13`) e superfícies (`#0E121A` / `#121620`), com suporte total a alternância para Modo Claro (`#F8FAFC`).
+  - **Temas de Página Pública**: Sistema de 9 temas calibrados (`themePresets.js`) com ambient glows dinâmicos e Mini Live Preview em tempo real no Dashboard.
 
 - [x] **Tipografia Oficial de Marca (`Sora`)**:
   - **Requisito**: O wordmark `contate.site` e títulos principais MUST usar a fonte **`Sora`** (Google Fonts) com peso `800` (ExtraBold) para máxima autoridade e harmonia com os elos tubulares do ícone.

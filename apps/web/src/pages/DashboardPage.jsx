@@ -26,14 +26,8 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import MouseSpotlight from '@/components/common/MouseSpotlight.jsx';
 
-const THEME_COLORS = [
-  { id: 'tech-dark', value: '#080A0F', label: 'Tech Dark (Oficial)', border: '#6366F1' },
-  { id: 'cobalt', value: '#0B132B', label: 'Cobalto Tech', border: '#3B82F6' },
-  { id: 'slate', value: '#0F172A', label: 'Slate Obsidian', border: '#38BDF8' },
-  { id: 'emerald', value: '#062016', label: 'Esmeralda Deep', border: '#10B981' },
-  { id: 'crimson', value: '#1C0B14', label: 'Vinho Nobre', border: '#F43F5E' },
-  { id: 'purple', value: '#140B24', label: 'Roxo Meia-Noite', border: '#A855F7' },
-];
+import { THEME_PRESETS, getThemePreset } from '@/lib/themePresets.js';
+import { getAvatarUrl } from '@/lib/utils.js';
 
 const DashboardPage = () => {
   const { currentUser, logout, updateUserColor } = useAuth();
@@ -48,7 +42,8 @@ const DashboardPage = () => {
   const { toast } = useToast();
 
   const publicUrl = `${window.location.origin}/${currentUser?.slug}`;
-  const activeColor = currentUser?.cor_fundo || '#080A0F';
+  const activeColor = currentUser?.cor_fundo || '#0B0D13';
+  const currentTheme = getThemePreset(activeColor);
 
   const fetchLinks = useCallback(async () => {
     if (!currentUser?.id) return;
@@ -153,49 +148,45 @@ const DashboardPage = () => {
 
   const handleDragEnd = async (event) => {
     const { active, over } = event;
+    if (!over || active.id === over.id) return;
 
-    if (active.id !== over?.id) {
-      let newOrder = [];
-      setLinks((items) => {
-        const oldIndex = items.findIndex(item => item.id === active.id);
-        const newIndex = items.findIndex(item => item.id === over.id);
-        const reordered = arrayMove(items, oldIndex, newIndex);
-        
-        // Update ordem locally
-        newOrder = reordered.map((item, index) => ({
-          ...item,
-          ordem: index + 1
-        }));
-        
-        return newOrder;
+    const oldIndex = links.findIndex(item => item.id === active.id);
+    const newIndex = links.findIndex(item => item.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(links, oldIndex, newIndex);
+    const newOrder = reordered.map((item, index) => ({
+      ...item,
+      ordem: index + 1
+    }));
+
+    // Atualização otimista imediata na UI
+    setLinks(newOrder);
+
+    // Salvar nova ordem no Supabase com updates individuais validados por RLS
+    setSavingOrder(true);
+    try {
+      const updatePromises = newOrder.map(link => 
+        supabase
+          .from('blocos_links')
+          .update({ ordem: link.ordem })
+          .eq('id', link.id)
+          .eq('usuario_id', currentUser.id)
+      );
+
+      const results = await Promise.all(updatePromises);
+      const failed = results.find(res => res.error);
+      if (failed?.error) throw failed.error;
+    } catch (error) {
+      logger.error('Error updating order:', error);
+      toast({
+        title: 'Erro ao reordenar',
+        description: 'Não foi possível salvar a nova ordem dos links.',
+        variant: 'destructive'
       });
-
-      // Save new order to Supabase
-      if (newOrder.length > 0) {
-        setSavingOrder(true);
-        try {
-          const updates = newOrder.map(link => ({
-            id: link.id,
-            ordem: link.ordem,
-          }));
-
-          const { error } = await supabase
-            .from('blocos_links')
-            .upsert(updates);
-
-          if (error) throw error;
-        } catch (error) {
-          logger.error('Error updating order:', error);
-          toast({
-            title: 'Erro ao reordenar',
-            description: 'Não foi possível salvar a nova ordem dos links.',
-            variant: 'destructive'
-          });
-          fetchLinks();
-        } finally {
-          setSavingOrder(false);
-        }
-      }
+      fetchLinks();
+    } finally {
+      setSavingOrder(false);
     }
   };
 
@@ -287,9 +278,8 @@ const DashboardPage = () => {
                     setEditingLink(null);
                     setIsFormOpen(true);
                   }}
-                  className="rounded-xl gap-2 bg-gradient-to-r from-[#6366F1] via-[#4F46E5] to-[#3B82F6] hover:from-[#4F46E5] hover:to-[#2563EB] text-white shadow-lg shadow-indigo-500/25 border-0 font-semibold relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                  className="rounded-xl gap-2 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white shadow-sm shadow-blue-500/20 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] font-semibold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
                   <Plus className="h-4 w-4" />
                   Adicionar Link
                 </Button>
@@ -413,44 +403,166 @@ const DashboardPage = () => {
               </div>
             </div>
 
-            {/* Card: Aparência Básica (Cores reais funcionando) */}
+            {/* Card: Aparência da Página com Live Preview Instantâneo */}
             <div className="glass-card rounded-3xl p-6 relative overflow-hidden">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-heading font-bold text-lg flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  Aparência Básica
+                  <Sparkles className="h-4 w-4 text-blue-500" />
+                  Aparência da Página
                 </h3>
-                {changingColor && <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />}
+                {changingColor ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-500" />
+                ) : (
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Ao Vivo
+                  </span>
+                )}
               </div>
 
               <p className="text-xs text-muted-foreground mb-4">
-                Selecione o tema de cor de fundo que melhor combina com a sua identidade visual:
+                Personalize o visual e a atmosfera da sua página. A cor e os glows ambientes mudam em tempo real:
               </p>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-3">
-                  {THEME_COLORS.map(color => {
-                    const isSelected = activeColor === color.value;
+              {/* Mini Smartphone Mockup com Live Preview */}
+              <div className="mb-5 flex flex-col items-center">
+                <div 
+                  className="w-full max-w-[240px] rounded-[1.75rem] p-3 border-2 border-white/10 shadow-2xl relative overflow-hidden transition-all duration-500"
+                  style={{
+                    backgroundColor: currentTheme.value,
+                    backgroundImage: `radial-gradient(at 15% 15%, ${currentTheme.glowColor} 0px, transparent 60%), radial-gradient(at 85% 85%, ${currentTheme.secondaryGlow} 0px, transparent 60%)`
+                  }}
+                >
+                  {/* Dynamic notch */}
+                  <div className={`w-12 h-1 rounded-full mx-auto mb-3 ${currentTheme.isLight ? 'bg-slate-300' : 'bg-white/20'}`} />
+
+                  {/* Mini Profile Header */}
+                  <div className="flex flex-col items-center text-center mb-3">
+                    <div 
+                      className="w-10 h-10 rounded-full p-0.5 border border-white/20 shadow-md mb-1.5 flex items-center justify-center overflow-hidden"
+                      style={{
+                        background: `linear-gradient(135deg, ${currentTheme.border} 0%, #0F172A 100%)`
+                      }}
+                    >
+                      {getAvatarUrl(currentUser) ? (
+                        <img 
+                          src={getAvatarUrl(currentUser)} 
+                          alt="Avatar" 
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <span className="text-xs font-black text-white">
+                          {(currentUser?.nome_exibicao || currentUser?.slug || 'U').charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <span 
+                      className="text-xs font-bold truncate max-w-[170px] leading-tight"
+                      style={{ color: currentTheme.textColor || '#FFFFFF' }}
+                    >
+                      {currentUser?.nome_exibicao || `@${currentUser?.slug}`}
+                    </span>
+                    <span 
+                      className="text-[9px] truncate max-w-[180px]"
+                      style={{ color: currentTheme.bioColor || 'rgba(255, 255, 255, 0.75)' }}
+                    >
+                      {currentUser?.bio || 'Seus links oficiais aqui'}
+                    </span>
+                  </div>
+
+                  {/* Mini Link Slots Preview */}
+                  <div className="space-y-1.5">
+                    <div 
+                      className={`p-1.5 rounded-lg border backdrop-blur-sm flex items-center justify-between transition-colors ${
+                        currentTheme.isLight ? 'bg-white/90 border-slate-200 shadow-sm' : 'bg-white/10 dark:bg-black/30'
+                      }`}
+                      style={{ borderColor: currentTheme.isLight ? undefined : `${currentTheme.border}40` }}
+                    >
+                      <span 
+                        className="text-[10px] font-semibold truncate"
+                        style={{ color: currentTheme.textColor || '#FFFFFF' }}
+                      >
+                        {links[0]?.titulo || 'WhatsApp Oficial'}
+                      </span>
+                      <div 
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: currentTheme.accent }}
+                      />
+                    </div>
+                    <div 
+                      className={`p-1.5 rounded-lg border backdrop-blur-sm flex items-center justify-between transition-colors ${
+                        currentTheme.isLight ? 'bg-white/90 border-slate-200 shadow-sm' : 'bg-white/10 dark:bg-black/30'
+                      }`}
+                      style={{ borderColor: currentTheme.isLight ? undefined : `${currentTheme.border}40` }}
+                    >
+                      <span 
+                        className="text-[10px] font-semibold truncate"
+                        style={{ color: currentTheme.textColor || '#FFFFFF' }}
+                      >
+                        {links[1]?.titulo || 'Catálogo de Serviços'}
+                      </span>
+                      <div 
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: currentTheme.accent }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-3 text-center">
+                    <span 
+                      className="text-[8px] tracking-wider uppercase font-mono"
+                      style={{ color: currentTheme.bioColor || 'rgba(255, 255, 255, 0.5)' }}
+                    >
+                      contate.site/{currentUser?.slug}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Grade de Seletor de Cores & Estilo de Tipografia */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-[11px] font-medium text-muted-foreground px-0.5">
+                  <span>Paleta e Cor das Letras:</span>
+                  <span className="text-[10px] text-blue-400 font-semibold">{currentTheme.subLabel}</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2.5">
+                  {THEME_PRESETS.map(color => {
+                    const isSelected = activeColor === color.value || 
+                      (color.legacyValues && color.legacyValues.includes(activeColor));
                     return (
                       <button
                         key={color.id}
                         type="button"
                         onClick={() => handleColorChange(color)}
-                        className={`group relative p-2 rounded-2xl border transition-all flex flex-col items-center gap-1.5 text-center ${
+                        className={`group relative p-2 rounded-xl border transition-all flex flex-col items-center gap-1 text-center ${
                           isSelected 
-                            ? 'border-primary bg-primary/10 shadow-md shadow-primary/20 scale-[1.03]' 
+                            ? 'border-blue-500 bg-blue-500/10 shadow-sm shadow-blue-500/30 scale-[1.04]' 
                             : 'border-white/[0.08] hover:border-white/20 bg-background/40 hover:bg-background/80'
                         }`}
-                        title={color.label}
+                        title={`${color.label} (${color.subLabel}): ${color.description}`}
                       >
                         <span 
-                          className="w-8 h-8 rounded-full shadow-inner border border-white/20 flex items-center justify-center transition-transform group-hover:scale-110"
-                          style={{ backgroundColor: color.value }}
+                          className="w-7 h-7 rounded-full shadow-inner border border-white/20 flex items-center justify-center transition-transform group-hover:scale-110 font-bold text-[11px]"
+                          style={{ 
+                            backgroundColor: color.value,
+                            color: color.textColor,
+                            boxShadow: `0 0 10px ${color.glowColor}`
+                          }}
                         >
-                          {isSelected && <Check className="h-3.5 w-3.5 text-white drop-shadow" />}
+                          {isSelected ? (
+                            <Check className="h-3.5 w-3.5 drop-shadow" style={{ color: color.textColor }} />
+                          ) : (
+                            'A'
+                          )}
                         </span>
-                        <span className="text-[10px] font-medium truncate w-full text-foreground/80">
-                          {color.label.split(' ')[0]}
+                        <span className="text-[9px] font-bold truncate w-full text-foreground/90">
+                          {color.label}
+                        </span>
+                        <span 
+                          className="text-[8px] font-medium truncate w-full"
+                          style={{ color: color.isLight ? '#475569' : color.textColor }}
+                        >
+                          {color.subLabel}
                         </span>
                       </button>
                     );
@@ -459,8 +571,8 @@ const DashboardPage = () => {
 
                 <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-muted-foreground">
                   <span>Tema selecionado:</span>
-                  <span className="font-semibold text-primary">
-                    {THEME_COLORS.find(c => c.value === activeColor)?.label || 'Tech Dark'}
+                  <span className="font-semibold text-blue-400">
+                    {currentTheme.label} ({currentTheme.subLabel})
                   </span>
                 </div>
               </div>

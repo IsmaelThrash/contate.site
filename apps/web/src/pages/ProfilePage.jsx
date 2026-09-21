@@ -10,7 +10,8 @@ import VideoEmbed from '@/components/VideoEmbed.jsx';
 import DOMPurify from 'dompurify';
 import { logger } from '@/lib/logger.js';
 import { isVip, renderVip } from '@/vips/registry.jsx';
-import { sanitizeColor, getSafeUrl } from '@/lib/utils.js';
+import { sanitizeColor, getSafeUrl, getAvatarUrl } from '@/lib/utils.js';
+import { getThemePreset } from '@/lib/themePresets.js';
 import { GoogleAdSlot } from '@/components/common/GoogleAdSlot.jsx';
 
 // Sanitiza para texto puro — sem HTML, sem XSS
@@ -110,8 +111,11 @@ const ProfilePage = () => {
         </Helmet>
 
         <div
-          className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-          style={{ backgroundColor: sanitizeColor(user.cor_fundo, '#ffffff') }}
+          className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-500"
+          style={{ 
+            backgroundColor: sanitizeColor(user.cor_fundo, '#0B0D13'),
+            backgroundImage: `radial-gradient(at 10% 10%, ${getThemePreset(user.cor_fundo).glowColor} 0px, transparent 55%), radial-gradient(at 90% 90%, ${getThemePreset(user.cor_fundo).secondaryGlow} 0px, transparent 55%)`
+          }}
         >
           {/* Subtle overlay to ensure contrast */}
           <div className="absolute inset-0 bg-black/5 dark:bg-black/20 backdrop-blur-[2px]"></div>
@@ -164,10 +168,13 @@ const ProfilePage = () => {
       "name": user.nome_exibicao || user.slug,
       "description": user.bio || `Perfil de ${user.slug} no contate.site`,
       "url": `${window.location.origin}/${user.slug}`,
-      "image": user.avatar ? `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/avatars/${user.id}/${user.avatar}` : undefined,
+      "image": getAvatarUrl(user) || undefined,
       "sameAs": links.map(l => l.url)
     }
   };
+  const activeTheme = getThemePreset(user.cor_fundo);
+  const avatarUrl = getAvatarUrl(user);
+
   return (
     <>
       <Helmet>
@@ -179,10 +186,10 @@ const ProfilePage = () => {
       </Helmet>
 
       <div
-        className="min-h-screen py-20 px-4 relative overflow-hidden"
+        className={`min-h-screen py-20 px-4 relative overflow-hidden transition-colors duration-500 ${activeTheme.isLight ? 'light text-slate-900' : 'dark text-white'}`}
         style={{ 
-          backgroundColor: sanitizeColor(user.cor_fundo, '#080A0F'),
-          backgroundImage: `radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.08) 0px, transparent 50%)`
+          backgroundColor: sanitizeColor(user.cor_fundo, activeTheme.value),
+          backgroundImage: `radial-gradient(at 15% 15%, ${activeTheme.glowColor} 0px, transparent 55%), radial-gradient(at 85% 85%, ${activeTheme.secondaryGlow} 0px, transparent 55%)`
         }}
       >
 
@@ -193,14 +200,22 @@ const ProfilePage = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-center mb-16 relative"
           >
-            {/* Glossy Avatar Container */}
+            {/* Glossy Avatar Container com Glow Temático */}
             <div className="relative inline-block">
-              <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"></div>
-              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-xl p-3 rounded-full w-36 h-36 mx-auto mb-8 shadow-2xl border border-white/20 relative z-10">
-                <div className="bg-gradient-to-br from-primary via-accent to-secondary w-full h-full rounded-full flex items-center justify-center shadow-inner overflow-hidden border border-white/10">
-                  {user.avatar ? (
+              <div 
+                className="absolute inset-0 blur-3xl rounded-full transition-all duration-500"
+                style={{ backgroundColor: activeTheme.glowColor }}
+              />
+              <div className="bg-white/10 dark:bg-black/30 backdrop-blur-xl p-3 rounded-full w-36 h-36 mx-auto mb-8 shadow-2xl border border-white/20 relative z-10">
+                <div 
+                  className="w-full h-full rounded-full flex items-center justify-center shadow-inner overflow-hidden border border-white/15"
+                  style={{
+                    background: `linear-gradient(135deg, ${activeTheme.border} 0%, #0F172A 100%)`
+                  }}
+                >
+                  {avatarUrl ? (
                     <img 
-                      src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/avatars/${user.id}/${user.avatar}`} 
+                      src={avatarUrl} 
                       alt={user.nome_exibicao || user.slug} 
                       className="w-full h-full object-cover"
                     />
@@ -213,10 +228,16 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-heading font-black mb-4 text-foreground tracking-tight">
+            <h1 
+              className="text-5xl md:text-6xl font-heading font-black mb-4 tracking-tight drop-shadow-sm"
+              style={{ color: activeTheme.textColor || (activeTheme.isLight ? '#0F172A' : '#FFFFFF') }}
+            >
               {safe(user.nome_exibicao) || `@${safe(user.slug)}`}
             </h1>
-            <p className="text-foreground/70 text-xl font-medium max-w-lg mx-auto leading-relaxed">
+            <p 
+              className="text-xl font-medium max-w-lg mx-auto leading-relaxed"
+              style={{ color: activeTheme.bioColor || (activeTheme.isLight ? '#475569' : 'rgba(255, 255, 255, 0.80)') }}
+            >
               {safe(user.bio) || "Explore meu ecossistema de links e redes sociais."}
             </p>
           </motion.div>
@@ -228,8 +249,8 @@ const ProfilePage = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-center py-16"
             >
-              <div className="bg-white/10 dark:bg-black/20 backdrop-blur-2xl rounded-[2rem] shadow-2xl border border-white/10 p-12">
-                <p className="text-foreground/50 text-xl font-semibold">
+              <div className={`backdrop-blur-2xl rounded-[2rem] shadow-2xl border p-12 ${activeTheme.isLight ? 'bg-white/80 border-slate-200 text-slate-700' : 'bg-white/10 dark:bg-black/20 border-white/10 text-white/70'}`}>
+                <p className="text-xl font-semibold">
                   Nenhum link disponível no momento
                 </p>
               </div>
@@ -237,9 +258,22 @@ const ProfilePage = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {links.map((link, index) => {
-                const isWide = index % 3 === 0;
+                const isVideo = link.tipo === 'video' || link.tipo === 'video_compacto';
                 
-                if (link.tipo === 'video') {
+                // Formato e largura do card:
+                // - Destaque ou Vídeo padrão: SEMPRE largura total (2 colunas)
+                // - Compacto ou Vídeo compacto: Meia coluna (1 coluna)
+                // - Padrão / Auto: Segue a dinâmica inteligente do Bento Grid (índice 0 de cada trio é expandido)
+                let isWide = false;
+                if (link.tipo === 'destaque' || link.tipo === 'link_destaque' || link.tipo === 'video') {
+                  isWide = true;
+                } else if (link.tipo === 'compacto' || link.tipo === 'link_compacto' || link.tipo === 'video_compacto') {
+                  isWide = false;
+                } else {
+                  isWide = index % 3 === 0;
+                }
+                
+                if (isVideo) {
                   return (
                     <motion.div
                       key={link.id}
@@ -268,16 +302,46 @@ const ProfilePage = () => {
                     }}
                     className={`block group ${isWide ? 'md:col-span-2' : ''}`}
                   >
-                    <div className="h-full flex items-center justify-between py-8 px-10 bg-white/10 dark:bg-black/30 backdrop-blur-xl border border-white/20 dark:border-white/5 text-foreground rounded-[1.5rem] shadow-xl hover:shadow-primary/20 hover:scale-[1.02] hover:bg-white/20 dark:hover:bg-white/5 transition-all duration-300 relative overflow-hidden">
-                      {/* Subtle hover splash */}
-                      <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                    <div 
+                      className={`h-full flex items-center justify-between py-8 px-10 backdrop-blur-xl rounded-[1.5rem] shadow-xl hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group ${
+                        activeTheme.isLight 
+                          ? 'bg-white/80 border border-slate-200/80 hover:bg-white hover:shadow-2xl hover:border-blue-400/50' 
+                          : 'bg-white/10 dark:bg-black/35 border border-white/15 dark:border-white/10 hover:bg-white/20 dark:hover:bg-white/15'
+                      }`}
+                      style={{
+                        borderColor: activeTheme.isLight ? undefined : `${activeTheme.border}30`
+                      }}
+                    >
+                      {/* Ambient Hover Splash com o tom do tema */}
+                      <div 
+                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                        style={{
+                          background: `radial-gradient(circle at center, ${activeTheme.glowColor} 0%, transparent 70%)`
+                        }}
+                      />
 
                       <div className="flex flex-col relative z-10">
-                        <span className="text-2xl font-bold tracking-tight group-hover:text-primary transition-colors">{link.titulo}</span>
-                        <span className="text-sm opacity-50 font-medium truncate max-w-[200px] mt-1">{link.url ? link.url.replace(/^https?:\/\/(www\.)?/, '') : ''}</span>
+                        <span 
+                          className="text-2xl font-bold tracking-tight transition-colors drop-shadow-sm"
+                          style={{ color: activeTheme.textColor || (activeTheme.isLight ? '#0F172A' : '#FFFFFF') }}
+                        >
+                          {link.titulo}
+                        </span>
+                        <span 
+                          className="text-sm font-medium truncate max-w-[200px] mt-1"
+                          style={{ color: activeTheme.bioColor || (activeTheme.isLight ? '#64748B' : 'rgba(255, 255, 255, 0.65)') }}
+                        >
+                          {link.url ? link.url.replace(/^https?:\/\/(www\.)?/, '') : ''}
+                        </span>
                       </div>
 
-                      <div className="bg-white/10 p-3 rounded-xl group-hover:bg-primary group-hover:text-white transition-all duration-300 relative z-10 shadow-lg">
+                      <div 
+                        className={`p-3 rounded-xl transition-all duration-300 relative z-10 shadow-lg ${activeTheme.isLight ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white' : ''}`}
+                        style={activeTheme.isLight ? undefined : {
+                          backgroundColor: `${activeTheme.border}25`,
+                          color: activeTheme.accent
+                        }}
+                      >
                         {getSocialIcon(link.url)}
                       </div>
                     </div>

@@ -34,29 +34,33 @@ Inspirada no padrão visual dos maiores SaaS globais (Stripe, Linear, Supabase),
 
 ### 🌟 Gradientes de Marca (Brand Gradients)
 - **Primary Brand Gradient**: `linear-gradient(135deg, #6366F1 0%, #3B82F6 50%, #38BDF8 100%)`
-  - Utilizado em: Ícone do logotipo, badges especiais, botões CTA de destaque, realce `.site`.
-- **Subtle Surface Glow**: `radial-gradient(ellipse at top, rgba(99, 102, 241, 0.15), transparent 70%)`
+  - Utilizado exclusivamente em: Ícone oficial do logotipo (Versão 1A) e no sufixo `.site`.
+- **Subtle Surface Glow**: `radial-gradient(ellipse at top, rgba(37, 99, 235, 0.12), transparent 70%)`
 
-### 🔵 Cores Primárias e Ação (Primary & Actions)
+### 🔵 Cores Primárias e Ação (Padrão Supabase / Linear - Anti-AI Slop)
 | Token | Hex | Tailwind | Aplicação |
 | :--- | :--- | :--- | :--- |
-| `primary-electric` | `#6366F1` | `indigo-500` | Início do gradiente, foco em inputs, bordas ativas |
-| `primary-cobalt` | `#3B82F6` | `blue-500` | Botões primários, links em hover, elementos tech |
-| `primary-sky` | `#38BDF8` | `sky-400` | Fim do gradiente, pontos de brilho, badges de sucesso |
-| `primary-hover` | `#4F46E5` | `indigo-600` | Estado hover de botões primários |
-| `primary-active` | `#4338CA` | `indigo-700` | Estado pressionado/ativo |
+| `primary-cobalt-solid` | `#2563EB` | `blue-600` | Botões primários com bevel tátil de 1px (`shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]`) |
+| `primary-cobalt-hover` | `#1D4ED8` | `blue-700` | Estado hover de botões primários |
+| `primary-cobalt-active` | `#1E40AF` | `blue-800` | Estado pressionado/ativo (`active:scale-[0.98]`) |
+| `primary-sky` | `#38BDF8` | `sky-400` | Realces pontuais, status e badges de destaque |
 
 ### 🌌 Neutros Escuros (Tema Tech Dark Nativo)
 | Token | Hex | Tailwind | Aplicação |
 | :--- | :--- | :--- | :--- |
-| `bg-canvas` | `#080A0F` | — | Fundo principal da aplicação (Deep Black/Navy) |
-| `bg-surface` | `#0E121A` | — | Cards, containers, modais, painéis secundários |
+| `bg-canvas` | `#080A0F` / `#0B0D13` | — | Fundo principal da aplicação (Deep Black/Navy) |
+| `bg-surface` | `#0E121A` / `#131826` | — | Cards, containers, modais, painéis secundários |
 | `bg-surface-hover` | `#151B26` | — | Hover em linhas de tabela, cards interativos |
 | `border-subtle` | `#1E2638` | `slate-800/80` | Divisores, bordas de cards e inputs inativos |
 | `border-highlight` | `#2D3A54` | `slate-700` | Bordas com destaque leve |
 
 ### ☀️ Neutros Claros (Light Mode)
 | Token | Hex | Tailwind | Aplicação |
+| :--- | :--- | :--- | :--- |
+| `bg-canvas-light` | `#F8FAFC` | `slate-50` | Fundo principal no modo claro e perfil Claro Minimal |
+| `bg-card-light` | `#FFFFFF` | `white` | Cards brancos puros com sombra e borda sutis |
+| `text-primary-light` | `#0F172A` | `slate-900` | Tipografia de alto contraste para leitura perfeita |
+| `border-light` | `#E2E8F0` | `slate-200` | Bordas e divisores discretos |
 | :--- | :--- | :--- | :--- |
 | `light-canvas` | `#F8FAFC` | `slate-50` | Fundo no modo claro |
 | `light-surface` | `#FFFFFF` | `white` | Cards e containers brancos |

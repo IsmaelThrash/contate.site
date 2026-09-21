@@ -7,26 +7,26 @@
 
 @layer base {
   :root {
-    --background: 222 47% 4%;       /* #080A0F - Deep Tech Canvas */
-    --foreground: 210 40% 98%;       /* #F8FAFC - Texto principal */
-    --primary: 239 84% 67%;          /* #6366F1 - Índigo Elétrico Oficial */
+    --background: 210 40% 98%;       /* #F8FAFC - Claro Slate */
+    --foreground: 222 47% 11%;       /* #0F172A - Texto escuro nítido */
+    --primary: 221 83% 53%;          /* #2563EB - Cobalto Tech Oficial */
     --primary-foreground: 0 0% 100%;
-    --secondary: 217 91% 60%;        /* #3B82F6 - Cobalto Tech */
-    --secondary-foreground: 0 0% 100%;
-    --accent: 199 89% 48%;           /* #38BDF8 - Sky Highlight */
+    --secondary: 210 40% 96.1%;      /* #F1F5F9 */
+    --secondary-foreground: 222 47% 11%;
+    --accent: 217 91% 60%;           /* #3B82F6 */
     --accent-foreground: 0 0% 100%;
-    --card: 222 30% 8%;              /* #0E121A - Superfície de Card */
-    --card-foreground: 210 40% 98%;
-    --border: 222 25% 17%;           /* #1E2638 - Borda sutil */
-    --input: 222 25% 17%;
-    --muted: 222 25% 12%;            /* #151B26 */
-    --muted-foreground: 215 20% 65%; /* #94A3B8 */
+    --card: 0 0% 100%;               /* #FFFFFF - Card branco puro */
+    --card-foreground: 222 47% 11%;
+    --border: 214.3 31.8% 91.4%;     /* #E2E8F0 */
+    --input: 214.3 31.8% 91.4%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
     --destructive: 0 84.2% 60.2%;    /* #EF4444 */
     --destructive-foreground: 0 0% 98%;
-    --ring: 239 84% 67%;             /* #6366F1 */
+    --ring: 221 83% 53%;             /* #2563EB */
     --radius: 0.75rem;
-    --popover: 222 30% 8%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
   }
   .dark {
     --background: 222 47% 4%;       /* #080A0F - Deep Tech Canvas */
@@ -35,7 +35,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 222 30% 8%;
     --popover-foreground: 210 40% 98%;
-    --primary: 239 84% 67%;          /* #6366F1 - Índigo Elétrico Oficial */
+    --primary: 221 83% 53%;          /* #2563EB - Cobalto Tech Oficial */
     --primary-foreground: 0 0% 100%;
     --secondary: 217 91% 60%;        /* #3B82F6 - Cobalto Tech */
     --secondary-foreground: 0 0% 100%;
@@ -47,7 +47,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 222 25% 17%;           /* #1E2638 - Divisores e bordas */
     --input: 222 25% 17%;
-    --ring: 239 84% 67%;             /* #6366F1 */
+    --ring: 221 83% 53%;             /* #2563EB */
   }
 }
 

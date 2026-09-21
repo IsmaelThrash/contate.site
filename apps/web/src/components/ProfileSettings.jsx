@@ -1,12 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { User, AlignLeft, Search, Check, Loader2, Trash2, AlertTriangle } from 'lucide-react';
+import { 
+  User, 
+  AlignLeft, 
+  Search, 
+  Check, 
+  Loader2, 
+  Trash2, 
+  AlertTriangle,
+  Upload,
+  Download,
+  Camera,
+  Sparkles
+} from 'lucide-react';
 import { motion } from 'framer-motion';
+import { supabase } from '@/lib/supabaseClient.js';
+import { getAvatarUrl } from '@/lib/utils.js';
 import { 
   Dialog, 
   DialogContent, 
@@ -17,11 +31,15 @@ import {
   DialogClose 
 } from '@/components/ui/dialog';
 
-// 1. Componente de Identidade Básica do Perfil (Nome + Bio)
+// 1. Componente de Identidade Básica do Perfil (Foto de Perfil + Nome + Bio)
 export const ProfileIdentity = () => {
   const { currentUser, updateProfile } = useAuth();
   const { toast } = useToast();
+  const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [removing, setRemoving] = useState(false);
   const [formData, setFormData] = useState({
     nome_exibicao: '',
     bio: ''
@@ -35,6 +53,13 @@ export const ProfileIdentity = () => {
       });
     }
   }, [currentUser]);
+
+  const currentAvatarUrl = getAvatarUrl(currentUser);
+
+  // Foto disponível da conta logada (Google OAuth / provedor social ou gravatar)
+  const oauthAvatar = currentUser?.user_metadata?.avatar_url || currentUser?.user_metadata?.picture;
+  const emailGravatar = currentUser?.email ? `https://unavatar.io/${encodeURIComponent(currentUser.email)}` : null;
+  const accountAvatar = oauthAvatar || emailGravatar;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -65,6 +90,154 @@ export const ProfileIdentity = () => {
     setLoading(false);
   };
 
+  // Importar foto da conta logada
+  const handleImportFromAccount = async () => {
+    if (!accountAvatar) {
+      toast({
+        title: 'Nenhuma foto encontrada',
+        description: 'Não encontramos nenhuma foto vinculada à sua conta de login.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setImporting(true);
+    try {
+      const res = await updateProfile({ avatar: accountAvatar });
+      if (res.success) {
+        toast({
+          title: 'Foto importada com sucesso!',
+          description: 'A foto da sua conta agora é seu avatar oficial.'
+        });
+      } else {
+        throw new Error(res.error || 'Falha ao importar foto.');
+      }
+    } catch (err) {
+      toast({
+        title: 'Erro ao importar',
+        description: err.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  // Redimensiona a imagem no navegador para um quadrado otimizado WebP
+  const processImageToBlob = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 400;
+          const minSide = Math.min(img.width, img.height);
+          const startX = (img.width - minSide) / 2;
+          const startY = (img.height - minSide) / 2;
+
+          canvas.width = Math.min(minSide, maxDim);
+          canvas.height = Math.min(minSide, maxDim);
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, startX, startY, minSide, minSide, 0, 0, canvas.width, canvas.height);
+
+          canvas.toBlob((blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error('Falha ao processar arquivo de imagem.'));
+          }, 'image/webp', 0.85);
+        };
+        img.onerror = () => reject(new Error('Arquivo de imagem inválido.'));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error('Falha ao ler arquivo.'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Upload de arquivo
+  const handleFileSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Arquivo inválido',
+        description: 'Por favor, selecione uma imagem válida (PNG, JPG ou WebP).',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'Arquivo muito grande',
+        description: 'A imagem deve ter no máximo 5MB.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const blob = await processImageToBlob(file);
+      const fileName = `avatar-${Date.now()}.webp`;
+      const filePath = `${currentUser.id}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, blob, {
+          contentType: 'image/webp',
+          upsert: true
+        });
+
+      if (uploadError) throw uploadError;
+
+      const res = await updateProfile({ avatar: fileName });
+      if (res.success) {
+        toast({
+          title: 'Foto enviada!',
+          description: 'Sua foto de perfil foi atualizada com sucesso.'
+        });
+      } else {
+        throw new Error(res.error || 'Falha ao salvar avatar no perfil.');
+      }
+    } catch (err) {
+      toast({
+        title: 'Erro no upload',
+        description: err.message || 'Não foi possível enviar a foto.',
+        variant: 'destructive'
+      });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  // Remover foto de perfil
+  const handleRemoveAvatar = async () => {
+    setRemoving(true);
+    try {
+      const res = await updateProfile({ avatar: null });
+      if (res.success) {
+        toast({
+          title: 'Foto removida',
+          description: 'Seu perfil voltou a exibir suas iniciais estilizadas.'
+        });
+      } else {
+        throw new Error(res.error || 'Falha ao remover foto.');
+      }
+    } catch (err) {
+      toast({
+        title: 'Erro ao remover',
+        description: err.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setRemoving(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -79,7 +252,109 @@ export const ProfileIdentity = () => {
         </div>
         <div>
           <h2 className="text-2xl font-heading font-bold">Identidade do Perfil</h2>
-          <p className="text-sm text-muted-foreground">Personalize como seu público verá seu perfil</p>
+          <p className="text-sm text-muted-foreground">Personalize sua foto, nome e bio oficial</p>
+        </div>
+      </div>
+
+      {/* Seção de Foto de Perfil */}
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 p-4 rounded-2xl bg-background/50 border border-white/[0.06] mb-6">
+        {/* Avatar Preview */}
+        <div className="relative group shrink-0">
+          <div className="w-20 h-20 rounded-full p-0.5 bg-gradient-to-tr from-[#4F46E5] via-[#2563EB] to-[#38BDF8] shadow-md shadow-indigo-500/20 flex items-center justify-center overflow-hidden">
+            <div className="w-full h-full rounded-full bg-[#0E121A] flex items-center justify-center overflow-hidden">
+              {currentAvatarUrl ? (
+                <img 
+                  src={currentAvatarUrl} 
+                  alt="Foto de perfil" 
+                  className="w-full h-full object-cover" 
+                />
+              ) : (
+                <span className="text-2xl font-bold text-white">
+                  {(formData.nome_exibicao || currentUser?.slug || 'U').charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+          </div>
+          
+          {uploading && (
+            <div className="absolute inset-0 bg-black/70 rounded-full flex items-center justify-center">
+              <Loader2 className="h-6 w-6 text-blue-400 animate-spin" />
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex-1 space-y-2 text-center sm:text-left">
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">Foto de Perfil</h3>
+            <p className="text-xs text-muted-foreground">
+              Aparece no topo da sua página pública e nos cartões de compartilhamento.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+            {/* Botão Upload */}
+            <Button
+              type="button"
+              size="sm"
+              disabled={uploading || importing || removing}
+              onClick={() => fileInputRef.current?.click()}
+              className="rounded-xl h-9 text-xs font-semibold gap-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-sm"
+            >
+              <Upload className="h-3.5 w-3.5" />
+              {uploading ? 'Enviando...' : 'Fazer Upload'}
+            </Button>
+
+            {/* Botão Importar da Conta Logada */}
+            {accountAvatar && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={uploading || importing || removing || currentUser?.avatar === accountAvatar}
+                onClick={handleImportFromAccount}
+                className="rounded-xl h-9 text-xs font-semibold gap-1.5 border-white/[0.1] bg-card/60 hover:bg-white/5"
+                title="Importar foto da conta com a qual você fez login"
+              >
+                {importing ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Download className="h-3.5 w-3.5 text-blue-400" />
+                )}
+                Importar da Conta
+              </Button>
+            )}
+
+            {/* Botão Remover */}
+            {currentAvatarUrl && (
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                disabled={uploading || importing || removing}
+                onClick={handleRemoveAvatar}
+                className="rounded-xl h-9 text-xs font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 gap-1.5"
+              >
+                {removing ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Trash2 className="h-3.5 w-3.5" />
+                )}
+                Remover Foto
+              </Button>
+            )}
+
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileSelect} 
+              accept="image/png,image/jpeg,image/webp,image/gif" 
+              className="hidden" 
+            />
+          </div>
+          <span className="text-[10px] text-muted-foreground block">
+            Formatos aceitos: PNG, JPG ou WebP (máx. 5MB). Otimização e corte quadrado automáticos.
+          </span>
         </div>
       </div>
 
@@ -124,7 +399,7 @@ export const ProfileIdentity = () => {
           <Button
             type="submit"
             disabled={loading}
-            className="rounded-xl h-10 px-6 gap-2 bg-gradient-to-r from-[#6366F1] to-[#3B82F6] hover:from-[#4F46E5] hover:to-[#2563EB] text-white shadow-md shadow-indigo-500/20 font-semibold"
+            className="rounded-xl h-10 px-6 gap-2 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white shadow-sm shadow-blue-500/20 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] font-semibold transition-all"
           >
             {loading ? (
               <><Loader2 className="h-4 w-4 animate-spin" /> Salvando...</>
@@ -242,7 +517,7 @@ export const ProfileSEO = () => {
             type="submit"
             disabled={loading}
             variant="outline"
-            className="rounded-xl h-10 px-6 gap-2 border-sky-500/30 text-sky-400 hover:bg-sky-500/10 font-semibold"
+            className="rounded-xl h-10 px-6 gap-2 border-blue-500/30 text-blue-400 hover:bg-blue-500/10 font-semibold transition-all"
           >
             {loading ? (
               <><Loader2 className="h-4 w-4 animate-spin" /> Salvando...</>

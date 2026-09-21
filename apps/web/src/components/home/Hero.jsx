@@ -47,8 +47,8 @@ export const Hero = () => {
       aria-labelledby="hero-heading"
       className="relative pt-32 pb-16 md:pt-40 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-visible z-10"
     >
-      {/* Luz Ambiente de Fundo */}
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[600px] h-[380px] bg-gradient-to-tr from-indigo-600/15 via-blue-600/10 to-sky-400/15 rounded-full blur-[110px] pointer-events-none -z-10" />
+      {/* Luz Ambiente de Fundo Calibrada */}
+      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[550px] h-[320px] bg-blue-600/[0.08] dark:bg-blue-500/[0.12] rounded-full blur-[120px] pointer-events-none -z-10" />
 
       <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-8 xl:gap-10">
         {/* Coluna Esquerda: Headline Imutável (Opção 1) & Reserva de Slug */}
@@ -59,9 +59,9 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="inline-flex items-center gap-2 bg-indigo-50/80 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 rounded-full px-4 py-1.5 text-xs sm:text-sm font-semibold tracking-wide shadow-sm mb-6 backdrop-blur-sm"
+            className="inline-flex items-center gap-2 bg-blue-50/80 dark:bg-blue-950/50 border border-blue-200/80 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 rounded-full px-4 py-1.5 text-xs sm:text-sm font-semibold tracking-wide shadow-sm mb-6 backdrop-blur-sm"
           >
-            <Sparkles size={15} className="text-indigo-600 dark:text-indigo-400" />
+            <Sparkles size={15} className="text-blue-600 dark:text-blue-400" />
             <span>{homeContent.hero.badge}</span>
           </motion.div>
 
@@ -97,7 +97,7 @@ export const Hero = () => {
             className="w-full bg-white dark:bg-slate-900/95 p-3.5 sm:p-4 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-indigo-950/20 backdrop-blur-sm"
           >
             <form onSubmit={handleReservationSubmit} className="flex flex-col sm:flex-row gap-3">
-              <div className="flex-1 min-w-0 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center px-4 py-3.5 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+              <div className="flex-1 min-w-0 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center px-4 py-3.5 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
                 <span className="text-slate-400 dark:text-slate-500 font-semibold text-sm sm:text-base select-none shrink-0">
                   {homeContent.hero.reservationPrefix}
                 </span>
@@ -110,13 +110,11 @@ export const Hero = () => {
                 />
               </div>
               
-              {/* Botão com Efeito Shimmer Metálico e Feedback Háptico */}
+              {/* Botão de Alta Autoridade Cobalto Tech */}
               <button
                 type="submit"
-                className="shrink-0 relative overflow-hidden bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 hover:from-indigo-500 hover:to-blue-500 text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md shadow-indigo-600/25 hover:shadow-indigo-600/35 flex items-center justify-center gap-2 whitespace-nowrap text-sm sm:text-base hover:scale-[1.02] active:scale-[0.98] group"
+                className="shrink-0 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md shadow-blue-600/20 hover:shadow-blue-600/35 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 whitespace-nowrap text-sm sm:text-base hover:scale-[1.02] active:scale-[0.98] group"
               >
-                {/* Linha de Brilho Metálico Passante */}
-                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
                 <span>{homeContent.hero.ctaButton}</span>
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>

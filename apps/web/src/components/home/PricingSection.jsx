@@ -41,10 +41,10 @@ export const PricingSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.4 }}
           whileHover={{ y: -4, transition: { duration: 0.2 } }}
-          className="relative bg-white dark:bg-slate-900/95 border-2 border-indigo-500/80 rounded-3xl p-8 shadow-2xl shadow-indigo-500/10 flex flex-col justify-between backdrop-blur-sm"
+          className="relative bg-white dark:bg-slate-900/95 border-2 border-blue-500/80 rounded-3xl p-8 shadow-2xl shadow-blue-500/10 flex flex-col justify-between backdrop-blur-sm"
         >
           {/* Badge Superior */}
-          <div className="absolute -top-3.5 left-8 bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-xs font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-md flex items-center gap-1">
+          <div className="absolute -top-3.5 left-8 bg-blue-600 text-white text-xs font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-sm flex items-center gap-1 border border-blue-400/30">
             <Sparkles size={12} />
             <span>{pricing.freeCard.badge}</span>
           </div>
@@ -83,7 +83,7 @@ export const PricingSection = () => {
 
           <button
             onClick={() => navigate('/login')}
-            className="w-full relative overflow-hidden bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 group text-base"
+            className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-md shadow-blue-600/20 hover:shadow-blue-600/35 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 group text-base hover:scale-[1.01] active:scale-[0.99]"
           >
             <span>{pricing.freeCard.ctaText}</span>
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />

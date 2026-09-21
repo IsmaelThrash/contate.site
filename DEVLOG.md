@@ -167,3 +167,20 @@ MÃºltiplas camadas de problemas foram identificadas e resolvidas em sequÃªnc
 - **Fluxo Integrado de Conteúdo**: O bloco **Meus Links** foi posicionado imediatamente abaixo de **Nome de Exibição & Bio**, permitindo acesso e reordenação instantânea sem rolagem.
 - **SEO & Segurança Modular**: Módulo de SEO alocado abaixo dos links; Zona de Segurança com exclusão de conta alocada de forma minimalista e discreta no rodapé.
 - **Aparência Básica Corrigida**: Cores refatoradas para paleta HEX de alta fidelidade (`#080A0F`, `#0B132B`, `#0F172A`, `#062016`, `#1C0B14`, `#140B24`), com feedback por toast em tempo real e renderização fiel na página pública `ProfilePage.jsx`.
+
+---
+
+### 🚀 Atualização de Design System & Sistema de Cores (v2.2)
+- **Eliminação da Estética 'Cara de IA'**:
+  - Banimento definitivo de degradês roxos e feixes metálicos passantes (`shimmer`) nos botões de conversão e cabeçalhos.
+  - Adoção de **Cobalto Tech Sólido** (`#2563EB`) com bevel tátil de 1px (`shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]`) no padrão de alta autoridade Supabase/Linear.
+  - O gradiente oficial da marca (`#6366F1` a `#38BDF8`) foi preservado exclusivamente no logotipo (Versão 1A) e no sufixo `.site`.
+- **Correção da Reordenação de Links (Drag & Drop)**:
+  - Substituição da operação de `upsert` por `update` individual filtrado por `id` e `usuario_id`, garantindo total conformidade com as regras de RLS do Supabase e eliminando o erro ao reordenar.
+- **Correção do Modo Escuro/Claro (ThemeToggle)**:
+  - Corrigido o `ThemeProvider.jsx` e o `index.css` para permitir a alternância real entre os temas `dark` (Tech Dark padrão) e `light` (Claro Slate).
+  - Adicionado o componente `ThemeToggle` na barra de navegação da página inicial (`Navbar.jsx`).
+- **Novo Sistema de Temas com Perfil Claro Minimal & Mini Live Preview**:
+  - Implementada coleção de 9 temas no módulo `themePresets.js` com presença de cor perceptível e ambient glows dinâmicos.
+  - Adicionado o preset **Claro Minimal** (`#F8FAFC`) com tipografia escura de alto contraste AAA.
+  - Adicionado o **Mini Live Preview Interativo em Tempo Real** no card de Aparência do Dashboard, permitindo visualização instantânea no mockup de smartphone.

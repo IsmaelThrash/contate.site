@@ -14,6 +14,7 @@ import AdminPage from '@/pages/AdminPage.jsx';
 import TermsPage from '@/pages/TermsPage.jsx';
 import PrivacyPage from '@/pages/PrivacyPage.jsx';
 import { Toaster } from '@/components/ui/toaster';
+import { CookieConsent } from '@/components/common/CookieConsent.jsx';
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
             <Route path="/:slug" element={<ProfilePage />} />
           </Routes>
           <Toaster />
+          <CookieConsent />
         </div>
         </AuthProvider>
       </ThemeProvider>

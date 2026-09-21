@@ -44,3 +44,14 @@ export function getSafeUrl(url, fallback = '#') {
   return isSafeUrl(url) ? url.trim() : fallback;
 }
 
+export function getAvatarUrl(user) {
+  if (!user?.avatar) return null;
+  const avatar = typeof user.avatar === 'string' ? user.avatar.trim() : '';
+  if (!avatar) return null;
+  if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+    return avatar;
+  }
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+  return `${supabaseUrl}/storage/v1/object/public/avatars/${user.id}/${avatar}`;
+}
+
