@@ -42,34 +42,52 @@ export const FeaturesGrid = () => {
         </p>
       </div>
 
-      {/* Grade de Recursos Reais e Ativos com Efeito Hover Suave */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+      {/* Grade de Recursos Reais e Ativos em Bento Grid Equilibrado */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
         {homeContent.features.real.map((item, idx) => {
           const IconComponent = iconMap[item.icon] || Link2;
+          const isWide = idx === 0; // O primeiro card (Links Ilimitados) tem span 2 em desktop
+          const isQr = item.icon === 'QrCode';
+
           return (
             <motion.div
               key={idx}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.1 }}
+              transition={{ duration: 0.4, delay: idx * 0.08 }}
               whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all hover:border-indigo-400 dark:hover:border-indigo-600 flex flex-col justify-between group backdrop-blur-sm"
+              className={`bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all hover:border-indigo-400 dark:hover:border-indigo-600 flex flex-col justify-between group backdrop-blur-sm ${
+                isWide ? 'lg:col-span-2' : 'lg:col-span-1'
+              } ${isQr ? 'border-blue-500/30 dark:border-blue-500/40 relative overflow-hidden' : ''}`}
             >
+              {isQr && (
+                <div className="absolute -top-12 -right-12 w-28 h-28 bg-blue-500/10 dark:bg-blue-500/15 rounded-full blur-2xl pointer-events-none" />
+              )}
+
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
+                    isQr 
+                      ? 'bg-blue-50 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-800/80 text-blue-600 dark:text-blue-400 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white shadow-sm shadow-blue-500/20'
+                      : 'bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white'
+                  }`}>
                     <IconComponent size={24} />
                   </div>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/80">
+
+                  <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${
+                    isQr 
+                      ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/70 border-blue-200 dark:border-blue-800/80'
+                      : 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800/80'
+                  }`}>
                     <Check size={12} /> {item.badge}
                   </span>
                 </div>
 
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2 font-['Sora']">
                   {item.title}
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed max-w-xl">
                   {item.description}
                 </p>
               </div>
@@ -93,7 +111,7 @@ export const FeaturesGrid = () => {
           </h3>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {homeContent.features.upcoming.map((item, idx) => {
             const IconComponent = iconMap[item.icon] || Sparkles;
             return (

@@ -1,11 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Sparkles, CheckCircle2, LayoutDashboard } from 'lucide-react';
 import { homeContent } from '@/lib/homeContent.js';
+import { useAuth } from '@/contexts/AuthContext.jsx';
 
 export const FinalCta = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, currentUser } = useAuth();
 
   return (
     <section 
@@ -27,7 +29,11 @@ export const FinalCta = () => {
         <div className="relative z-10 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-blue-500/10 backdrop-blur-md border border-blue-400/20 text-blue-200 rounded-full px-4 py-1.5 text-xs sm:text-sm font-semibold mb-6">
             <Sparkles size={14} className="text-sky-300" />
-            <span>Comece hoje sem nenhum custo</span>
+            <span>
+              {isAuthenticated
+                ? `Conectado como ${currentUser?.nome?.split(' ')[0] || currentUser?.slug || 'você'}`
+                : 'Comece hoje sem nenhum custo'}
+            </span>
           </div>
 
           <h2 
@@ -38,22 +44,39 @@ export const FinalCta = () => {
           </h2>
 
           <p className="text-slate-200 text-base sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed font-normal">
-            {homeContent.finalCta.subtitle}
+            {isAuthenticated
+              ? 'Seu link já está ativo e pronto para receber clientes. Acesse seu painel para atualizar serviços, links e redes sociais.'
+              : homeContent.finalCta.subtitle}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-            <button
-              onClick={() => navigate('/login')}
-              className="relative overflow-hidden w-full sm:w-auto bg-white text-slate-950 hover:bg-slate-100 font-extrabold py-4 px-9 rounded-2xl shadow-2xl transition-all hover:scale-105 active:scale-95 text-base flex items-center justify-center gap-2 group"
-            >
-              <span>{homeContent.finalCta.ctaButton}</span>
-              <ArrowRight size={18} className="group-hover:translate-x-1.5 transition-transform" />
-            </button>
+            {isAuthenticated ? (
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="relative overflow-hidden w-full sm:w-auto bg-white text-slate-950 hover:bg-slate-100 font-extrabold py-4 px-9 rounded-2xl shadow-2xl transition-all hover:scale-105 active:scale-95 text-base flex items-center justify-center gap-2 group cursor-pointer"
+              >
+                <LayoutDashboard size={18} />
+                <span>Acessar Meu Painel</span>
+                <ArrowRight size={18} className="group-hover:translate-x-1.5 transition-transform" />
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="relative overflow-hidden w-full sm:w-auto bg-white text-slate-950 hover:bg-slate-100 font-extrabold py-4 px-9 rounded-2xl shadow-2xl transition-all hover:scale-105 active:scale-95 text-base flex items-center justify-center gap-2 group cursor-pointer"
+              >
+                <span>{homeContent.finalCta.ctaButton}</span>
+                <ArrowRight size={18} className="group-hover:translate-x-1.5 transition-transform" />
+              </button>
+            )}
           </div>
 
           <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-300 font-medium">
             <CheckCircle2 size={15} className="text-emerald-400" />
-            <span>{homeContent.finalCta.guaranteeText}</span>
+            <span>
+              {isAuthenticated
+                ? 'Painel de controle em tempo real'
+                : homeContent.finalCta.guaranteeText}
+            </span>
           </div>
         </div>
       </motion.div>

@@ -170,6 +170,12 @@ export const homeContent = {
         badge: 'Disponível'
       },
       {
+        title: 'QR Code Inteligente para Balcão',
+        description: 'Gere display de balcão e cartões em alta definição (1200x1450 px) pronto para gráfica e impressão direta.',
+        icon: 'QrCode',
+        badge: 'Disponível'
+      },
+      {
         title: 'Vídeos do YouTube Embutidos',
         description: 'Mostre seu trabalho, procedimentos, depoimentos ou apresentação em vídeo sem o visitante sair da sua página.',
         icon: 'PlayCircle',
@@ -193,7 +199,7 @@ export const homeContent = {
       {
         title: 'Chave Pix Copia e Cola',
         description: 'Receba pagamentos e sinais de agendamento instantaneamente com 1 toque.',
-        icon: 'QrCode'
+        icon: 'Sparkles'
       },
       {
         title: 'Agendamento Direto Integrado',
@@ -209,11 +215,6 @@ export const homeContent = {
         title: 'Domínio Personalizado .com.br',
         description: 'Conecte seu próprio site profissional diretamente ao seu perfil.',
         icon: 'Globe'
-      },
-      {
-        title: 'QR Code Inteligente para Balcão',
-        description: 'Gere display de balcão e cartão de visita em alta resolução para impressão.',
-        icon: 'Sparkles'
       }
     ]
   },
@@ -243,6 +244,13 @@ export const homeContent = {
         contateCheck: true,
         competitor1: 'De 9% a 12%',
         competitor2: 'Cobranças em dólar'
+      },
+      {
+        feature: 'QR Code de Balcão em Alta Resolução (PNG)',
+        contate: 'Grátis e pronto para gráfica',
+        contateCheck: true,
+        competitor1: 'Pago / Bloqueado',
+        competitor2: 'Apenas no plano pago'
       },
       {
         feature: 'Recursos Essenciais 100% Liberados',
@@ -279,6 +287,7 @@ export const homeContent = {
       description: 'Tudo o que seu negócio precisa para atrair e converter clientes pela bio.',
       features: [
         'Links ilimitados com ordenação arrastar e soltar',
+        'QR Code inteligente em alta resolução (PNG) para balcão',
         'Vídeos do YouTube embutidos diretamente na página',
         'Temas e paletas profissionais homologadas',
         'Painel simples e responsivo para celular',
@@ -308,6 +317,10 @@ export const homeContent = {
     title: 'Dúvidas Frequentes sobre o contate.site',
     subtitle: 'Tudo o que você precisa saber para reunir seus links e profissionalizar sua presença digital hoje mesmo.',
     items: [
+      {
+        q: 'Como funciona o QR Code para estabelecimentos físicos e balcão?',
+        a: 'No seu painel você tem acesso instantâneo ao seu QR Code exclusivo. Com 1 clique você baixa uma arte profissional em alta resolução (1200x1450 px) já formatada com a marca e o link, pronta para imprimir em displays de acrílico, mesas, vitrines ou cartões de visita.'
+      },
       {
         q: 'Como colocar o link do contate.site na bio do Instagram ou TikTok?',
         a: 'É muito simples: você cria sua conta grátis em menos de 2 minutos, adiciona seus links, redes sociais, formas de contato ou catálogo. Depois, basta copiar o endereço contate.site/seu-nome e colar no campo "Links" da bio do seu Instagram, TikTok ou onde desejar.'

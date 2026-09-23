@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Clock, Loader2, Instagram, Youtube, Twitter, Linkedin, Facebook, Github, MessageCircle, Music, Twitch } from 'lucide-react';
+import { ExternalLink, Clock, Loader2, Instagram, Youtube, Twitter, Linkedin, Facebook, Github, MessageCircle, Music, Twitch, QrCode, Tv, Smartphone, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabaseClient.js';
 import VideoEmbed from '@/components/VideoEmbed.jsx';
@@ -13,6 +13,9 @@ import { isVip, renderVip } from '@/vips/registry.jsx';
 import { sanitizeColor, getSafeUrl, getAvatarUrl } from '@/lib/utils.js';
 import { getThemePreset } from '@/lib/themePresets.js';
 import { GoogleAdSlot } from '@/components/common/GoogleAdSlot.jsx';
+import { QrCodeCard } from '@/components/common/QrCodeCard.jsx';
+import { QrCodeModal } from '@/components/common/QrCodeModal.jsx';
+import { ShareMenu } from '@/components/common/ShareMenu.jsx';
 
 // Sanitiza para texto puro — sem HTML, sem XSS
 const safe = (str) => DOMPurify.sanitize(str || '', { ALLOWED_TAGS: [] });
@@ -23,6 +26,13 @@ const ProfilePage = () => {
   const [links, setLinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState(() => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+      return 'tv';
+    }
+    return 'mobile';
+  });
 
   useEffect(() => {
     if (isVip(slug)) {
@@ -175,6 +185,201 @@ const ProfilePage = () => {
   const activeTheme = getThemePreset(user.cor_fundo);
   const avatarUrl = getAvatarUrl(user);
 
+  // Helper para identificar links de vídeo
+  const checkIsVideo = (l) => {
+    if (!l) return false;
+    if (l.tipo === 'video' || l.tipo === 'video_compacto') return true;
+    const u = l.url || '';
+    return /youtube\.com|youtu\.be|vimeo\.com|tiktok\.com/i.test(u);
+  };
+
+  const isFirstCardVideo = links.length > 0 && checkIsVideo(links[0]);
+
+  // Renderiza um card de link individual
+  const renderLinkCard = (link, index) => {
+    const isVideo = checkIsVideo(link);
+    
+    let isWide = false;
+    if (link.tipo === 'destaque' || link.tipo === 'link_destaque' || link.tipo === 'video') {
+      isWide = true;
+    } else if (link.tipo === 'compacto' || link.tipo === 'link_compacto' || link.tipo === 'video_compacto') {
+      isWide = false;
+    } else {
+      isWide = index % 3 === 0;
+    }
+    
+    if (isVideo) {
+      return (
+        <motion.div
+          key={link.id}
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.5, delay: index * 0.1, ease: [0.23, 1, 0.32, 1] }}
+          className={`block w-full ${isWide ? 'md:col-span-2' : ''}`}
+        >
+          <VideoEmbed url={link.url} title={link.titulo} />
+        </motion.div>
+      );
+    }
+
+    return (
+      <motion.a
+        key={link.id}
+        href={getSafeUrl(link.url)}
+        target="_blank"
+        rel="noopener noreferrer"
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{
+          duration: 0.5,
+          delay: index * 0.1,
+          ease: [0.23, 1, 0.32, 1]
+        }}
+        className={`block group ${isWide ? 'md:col-span-2' : ''}`}
+      >
+        <div 
+          className={`h-full flex items-center justify-between py-8 px-10 backdrop-blur-xl rounded-[1.5rem] shadow-xl hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group ${
+            activeTheme.isLight 
+              ? 'bg-white/80 border border-slate-200/80 hover:bg-white hover:shadow-2xl hover:border-blue-400/50' 
+              : 'bg-white/10 dark:bg-black/35 border border-white/15 dark:border-white/10 hover:bg-white/20 dark:hover:bg-white/15'
+          }`}
+          style={{
+            borderColor: activeTheme.isLight ? undefined : `${activeTheme.border}30`
+          }}
+        >
+          {/* Ambient Hover Splash com o tom do tema */}
+          <div 
+            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+            style={{
+              background: `radial-gradient(circle at center, ${activeTheme.glowColor} 0%, transparent 70%)`
+            }}
+          />
+
+          <div className="flex flex-col relative z-10">
+            <span 
+              className="text-2xl font-bold tracking-tight transition-colors drop-shadow-sm"
+              style={{ color: activeTheme.textColor || (activeTheme.isLight ? '#0F172A' : '#FFFFFF') }}
+            >
+              {link.titulo}
+            </span>
+            <span 
+              className="text-sm font-medium truncate max-w-[200px] mt-1"
+              style={{ color: activeTheme.bioColor || (activeTheme.isLight ? '#64748B' : 'rgba(255, 255, 255, 0.65)') }}
+            >
+              {link.url ? link.url.replace(/^https?:\/\/(www\.)?/, '') : ''}
+            </span>
+          </div>
+
+          <div 
+            className={`p-3 rounded-xl transition-all duration-300 relative z-10 shadow-lg ${activeTheme.isLight ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white' : ''}`}
+            style={activeTheme.isLight ? undefined : {
+              backgroundColor: `${activeTheme.border}25`,
+              color: activeTheme.accent
+            }}
+          >
+            {getSocialIcon(link.url)}
+          </div>
+        </div>
+      </motion.a>
+    );
+  };
+
+  const renderProfileContent = () => (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="text-center mb-16 relative"
+      >
+        {/* Glossy Avatar Container com Glow Temático */}
+        <div className="relative inline-block">
+          <div 
+            className="absolute inset-0 blur-3xl rounded-full transition-all duration-500"
+            style={{ backgroundColor: activeTheme.glowColor }}
+          />
+          <div className="bg-white/10 dark:bg-black/30 backdrop-blur-xl p-3 rounded-full w-36 h-36 mx-auto mb-8 shadow-2xl border border-white/20 relative z-10">
+            <div 
+              className="w-full h-full rounded-full flex items-center justify-center shadow-inner overflow-hidden border border-white/15"
+              style={{
+                background: `linear-gradient(135deg, ${activeTheme.border} 0%, #0F172A 100%)`
+              }}
+            >
+              {avatarUrl ? (
+                <img 
+                  src={avatarUrl} 
+                  alt={user.nome_exibicao || user.slug} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-5xl font-heading font-black text-white drop-shadow-md">
+                  {(user.nome_exibicao || user.slug).charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <h1 
+          className="text-5xl md:text-6xl font-heading font-black mb-4 tracking-tight drop-shadow-sm"
+          style={{ color: activeTheme.textColor || (activeTheme.isLight ? '#0F172A' : '#FFFFFF') }}
+        >
+          {safe(user.nome_exibicao) || `@${safe(user.slug)}`}
+        </h1>
+        <p 
+          className="text-xl font-medium max-w-lg mx-auto leading-relaxed"
+          style={{ color: activeTheme.bioColor || (activeTheme.isLight ? '#475569' : 'rgba(255, 255, 255, 0.80)') }}
+        >
+          {safe(user.bio) || "Explore meu ecossistema de links e redes sociais."}
+        </p>
+      </motion.div>
+
+      {links.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-center py-16"
+        >
+          <div className={`backdrop-blur-2xl rounded-[2rem] shadow-2xl border p-12 ${activeTheme.isLight ? 'bg-white/80 border-slate-200 text-slate-700' : 'bg-white/10 dark:bg-black/20 border-white/10 text-white/70'}`}>
+            <p className="text-xl font-semibold">
+              Nenhum link disponível no momento
+            </p>
+          </div>
+        </motion.div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {links.map((link, index) => renderLinkCard(link, index))}
+        </div>
+      )}
+
+      {/* Espaço Google Ads (Exibido para contas gratuitas - Monetização Freemium) */}
+      {user.plano !== 'pro' && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <GoogleAdSlot variant="profile" />
+        </motion.div>
+      )}
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+        className="text-center mt-12"
+      >
+        <a
+          href="/"
+          className="inline-flex items-center gap-2 text-sm font-medium text-foreground/60 hover:text-foreground bg-white/20 dark:bg-black/20 backdrop-blur-md px-4 py-2 rounded-full transition-colors"
+        >
+          Powered by <span className="font-bold">contate.site</span>
+        </a>
+      </motion.div>
+    </>
+  );
+
   return (
     <>
       <Helmet>
@@ -186,196 +391,254 @@ const ProfilePage = () => {
       </Helmet>
 
       <div
-        className={`min-h-screen py-20 px-4 relative overflow-hidden transition-colors duration-500 ${activeTheme.isLight ? 'light text-slate-900' : 'dark text-white'}`}
+        className={`min-h-screen ${viewMode === 'tv' ? 'pt-6 pb-12 sm:pt-8 sm:pb-16' : 'py-16 sm:py-20'} px-4 relative overflow-hidden transition-colors duration-500 ${activeTheme.isLight ? 'light text-slate-900' : 'dark text-white'}`}
         style={{ 
           backgroundColor: sanitizeColor(user.cor_fundo, activeTheme.value),
           backgroundImage: `radial-gradient(at 15% 15%, ${activeTheme.glowColor} 0px, transparent 55%), radial-gradient(at 85% 85%, ${activeTheme.secondaryGlow} 0px, transparent 55%)`
         }}
       >
-
-        <div className="max-w-2xl mx-auto relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-center mb-16 relative"
-          >
-            {/* Glossy Avatar Container com Glow Temático */}
-            <div className="relative inline-block">
-              <div 
-                className="absolute inset-0 blur-3xl rounded-full transition-all duration-500"
-                style={{ backgroundColor: activeTheme.glowColor }}
-              />
-              <div className="bg-white/10 dark:bg-black/30 backdrop-blur-xl p-3 rounded-full w-36 h-36 mx-auto mb-8 shadow-2xl border border-white/20 relative z-10">
-                <div 
-                  className="w-full h-full rounded-full flex items-center justify-center shadow-inner overflow-hidden border border-white/15"
-                  style={{
-                    background: `linear-gradient(135deg, ${activeTheme.border} 0%, #0F172A 100%)`
-                  }}
-                >
-                  {avatarUrl ? (
-                    <img 
-                      src={avatarUrl} 
-                      alt={user.nome_exibicao || user.slug} 
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-5xl font-heading font-black text-white drop-shadow-md">
-                      {(user.nome_exibicao || user.slug).charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <h1 
-              className="text-5xl md:text-6xl font-heading font-black mb-4 tracking-tight drop-shadow-sm"
-              style={{ color: activeTheme.textColor || (activeTheme.isLight ? '#0F172A' : '#FFFFFF') }}
+        {/* Barra Flutuante de Ações e Alternância de Modo */}
+        <div className="fixed top-4 right-4 z-40 flex items-center gap-2">
+          {/* Toggle Modo TV / Celular visível apenas em telas grandes (desktop / TV) */}
+          <div className="hidden lg:flex items-center p-1 rounded-2xl bg-white/80 dark:bg-black/60 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-lg">
+            <button
+              onClick={() => setViewMode('tv')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                viewMode === 'tv'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-blue-500'
+              }`}
+              title="Modo Totem / TV Horizontal (QR Code ampliado ao lado)"
             >
-              {safe(user.nome_exibicao) || `@${safe(user.slug)}`}
-            </h1>
-            <p 
-              className="text-xl font-medium max-w-lg mx-auto leading-relaxed"
-              style={{ color: activeTheme.bioColor || (activeTheme.isLight ? '#475569' : 'rgba(255, 255, 255, 0.80)') }}
+              <Tv size={14} />
+              <span>Modo TV</span>
+            </button>
+            <button
+              onClick={() => setViewMode('mobile')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                viewMode === 'mobile'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-blue-500'
+              }`}
+              title="Modo Celular Clássico (Coluna Vertical Centralizada)"
             >
-              {safe(user.bio) || "Explore meu ecossistema de links e redes sociais."}
-            </p>
-          </motion.div>
+              <Smartphone size={14} />
+              <span>Modo Celular</span>
+            </button>
+          </div>
 
-          {links.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-center py-16"
-            >
-              <div className={`backdrop-blur-2xl rounded-[2rem] shadow-2xl border p-12 ${activeTheme.isLight ? 'bg-white/80 border-slate-200 text-slate-700' : 'bg-white/10 dark:bg-black/20 border-white/10 text-white/70'}`}>
-                <p className="text-xl font-semibold">
-                  Nenhum link disponível no momento
-                </p>
-              </div>
-            </motion.div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {links.map((link, index) => {
-                const isVideo = link.tipo === 'video' || link.tipo === 'video_compacto';
-                
-                // Formato e largura do card:
-                // - Destaque ou Vídeo padrão: SEMPRE largura total (2 colunas)
-                // - Compacto ou Vídeo compacto: Meia coluna (1 coluna)
-                // - Padrão / Auto: Segue a dinâmica inteligente do Bento Grid (índice 0 de cada trio é expandido)
-                let isWide = false;
-                if (link.tipo === 'destaque' || link.tipo === 'link_destaque' || link.tipo === 'video') {
-                  isWide = true;
-                } else if (link.tipo === 'compacto' || link.tipo === 'link_compacto' || link.tipo === 'video_compacto') {
-                  isWide = false;
-                } else {
-                  isWide = index % 3 === 0;
-                }
-                
-                if (isVideo) {
-                  return (
-                    <motion.div
-                      key={link.id}
-                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ duration: 0.5, delay: index * 0.1, ease: [0.23, 1, 0.32, 1] }}
-                      className={`block w-full ${isWide ? 'md:col-span-2' : ''}`}
-                    >
-                      <VideoEmbed url={link.url} title={link.titulo} />
-                    </motion.div>
-                  );
-                }
+          {/* Botão de Compartilhar estilo Reddit com Menu Flutuante */}
+          <ShareMenu
+            url={typeof window !== 'undefined' ? `${window.location.origin}/${user.slug}` : `https://contate.site/${user.slug}`}
+            title={user.nome_exibicao || user.slug}
+            onOpenQrCode={() => setQrModalOpen(true)}
+            align="right"
+          />
+        </div>
 
-                return (
-                  <motion.a
-                    key={link.id}
-                    href={getSafeUrl(link.url)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{
-                      duration: 0.5,
-                      delay: index * 0.1,
-                      ease: [0.23, 1, 0.32, 1]
-                    }}
-                    className={`block group ${isWide ? 'md:col-span-2' : ''}`}
+        {viewMode === 'tv' ? (
+          <div className="max-w-6xl mx-auto relative z-10 pt-2 lg:pt-4">
+            {isFirstCardVideo ? (
+              /* MODO TV COM 1º CARD VÍDEO: ENQUADRADO COM O TOTEM */
+              <div className="space-y-12">
+                {/* Bloco Enquadrado (Totem + Vídeo perfeitamente alinhados na mesma altura) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
+                  {/* Coluna Esquerda: Totem TV com QR Code Gigante */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -25 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="lg:col-span-5 hidden lg:flex flex-col"
                   >
-                    <div 
-                      className={`h-full flex items-center justify-between py-8 px-10 backdrop-blur-xl rounded-[1.5rem] shadow-xl hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group ${
-                        activeTheme.isLight 
-                          ? 'bg-white/80 border border-slate-200/80 hover:bg-white hover:shadow-2xl hover:border-blue-400/50' 
-                          : 'bg-white/10 dark:bg-black/35 border border-white/15 dark:border-white/10 hover:bg-white/20 dark:hover:bg-white/15'
-                      }`}
-                      style={{
-                        borderColor: activeTheme.isLight ? undefined : `${activeTheme.border}30`
-                      }}
-                    >
-                      {/* Ambient Hover Splash com o tom do tema */}
+                    <div className={`p-8 rounded-[2rem] backdrop-blur-2xl border shadow-2xl relative overflow-hidden text-center h-full flex flex-col justify-between ${
+                      activeTheme.isLight 
+                        ? 'bg-white/85 border-slate-200/90 text-slate-900 shadow-slate-200/60' 
+                        : 'bg-white/10 dark:bg-black/40 border-white/15 text-white shadow-black/40'
+                    }`}>
+                      {/* Glow decorativo de fundo */}
                       <div 
-                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                        style={{
-                          background: `radial-gradient(circle at center, ${activeTheme.glowColor} 0%, transparent 70%)`
-                        }}
+                        className="absolute -top-20 -left-20 w-48 h-48 rounded-full blur-3xl pointer-events-none opacity-40"
+                        style={{ backgroundColor: activeTheme.glowColor }}
                       />
 
-                      <div className="flex flex-col relative z-10">
-                        <span 
-                          className="text-2xl font-bold tracking-tight transition-colors drop-shadow-sm"
-                          style={{ color: activeTheme.textColor || (activeTheme.isLight ? '#0F172A' : '#FFFFFF') }}
-                        >
-                          {link.titulo}
-                        </span>
-                        <span 
-                          className="text-sm font-medium truncate max-w-[200px] mt-1"
-                          style={{ color: activeTheme.bioColor || (activeTheme.isLight ? '#64748B' : 'rgba(255, 255, 255, 0.65)') }}
-                        >
-                          {link.url ? link.url.replace(/^https?:\/\/(www\.)?/, '') : ''}
-                        </span>
-                      </div>
+                      <div className="relative z-10 flex flex-col h-full justify-between">
+                        <div>
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-4 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                            <Sparkles size={13} />
+                            <span>Totem Interativo</span>
+                          </div>
 
-                      <div 
-                        className={`p-3 rounded-xl transition-all duration-300 relative z-10 shadow-lg ${activeTheme.isLight ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white' : ''}`}
-                        style={activeTheme.isLight ? undefined : {
-                          backgroundColor: `${activeTheme.border}25`,
-                          color: activeTheme.accent
-                        }}
-                      >
-                        {getSocialIcon(link.url)}
+                          <h2 className="text-2xl font-sora font-extrabold tracking-tight mb-4">
+                            Aponte a câmera do seu celular
+                          </h2>
+
+                          <QrCodeCard 
+                            slug={user.slug} 
+                            title={user.nome_exibicao || user.slug}
+                            variant="tv"
+                            showActions={true}
+                          />
+                        </div>
+
+                        <p className="mt-4 text-[11px] opacity-60">
+                          Compatível com todas as câmeras de smartphone sem precisar de aplicativo
+                        </p>
                       </div>
                     </div>
-                  </motion.a>
-                );
-              })}
-            </div>
-          )}
+                  </motion.div>
 
-          {/* Espaço Google Ads (Exibido para contas gratuitas - Monetização Freemium) */}
-          {user.plano !== 'pro' && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <GoogleAdSlot variant="profile" />
-            </motion.div>
-          )}
+                  {/* Coluna Direita: Header Enquadrado + Primeiro Vídeo Alinhado */}
+                  <motion.div
+                    initial={{ opacity: 0, x: 25 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+                    className="lg:col-span-7 flex flex-col justify-between"
+                  >
+                    {/* Header Compacto Proporcional ao Modo TV */}
+                    <div className="text-center pt-1 pb-2">
+                      {/* Avatar com Glow Temático */}
+                      <div className="relative inline-block mb-3">
+                        <div 
+                          className="absolute inset-0 blur-2xl rounded-full transition-all duration-500"
+                          style={{ backgroundColor: activeTheme.glowColor }}
+                        />
+                        <div className="bg-white/10 dark:bg-black/30 backdrop-blur-xl p-2 rounded-full w-20 h-20 sm:w-24 sm:h-24 mx-auto shadow-2xl border border-white/20 relative z-10">
+                          <div 
+                            className="w-full h-full rounded-full flex items-center justify-center shadow-inner overflow-hidden border border-white/15"
+                            style={{
+                              background: `linear-gradient(135deg, ${activeTheme.border} 0%, #0F172A 100%)`
+                            }}
+                          >
+                            {avatarUrl ? (
+                              <img 
+                                src={avatarUrl} 
+                                alt={user.nome_exibicao || user.slug} 
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-3xl font-heading font-black text-white drop-shadow-md">
+                                {(user.nome_exibicao || user.slug).charAt(0).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="text-center mt-12"
-          >
-            <a
-              href="/"
-              className="inline-flex items-center gap-2 text-sm font-medium text-foreground/60 hover:text-foreground bg-white/20 dark:bg-black/20 backdrop-blur-md px-4 py-2 rounded-full transition-colors"
-            >
-              Powered by <span className="font-bold">contate.site</span>
-            </a>
-          </motion.div>
-        </div>
+                      {/* Nome */}
+                      <h1 
+                        className="text-3xl sm:text-4xl lg:text-[2.6rem] font-heading font-black mb-1.5 tracking-tight drop-shadow-sm leading-tight"
+                        style={{ color: activeTheme.textColor || (activeTheme.isLight ? '#0F172A' : '#FFFFFF') }}
+                      >
+                        {safe(user.nome_exibicao) || `@${safe(user.slug)}`}
+                      </h1>
+
+                      {/* Bio */}
+                      <p 
+                        className="text-sm sm:text-base font-medium max-w-xl mx-auto leading-snug line-clamp-2"
+                        style={{ color: activeTheme.bioColor || (activeTheme.isLight ? '#475569' : 'rgba(255, 255, 255, 0.85)') }}
+                      >
+                        {safe(user.bio) || "Explore meu ecossistema de links e redes sociais."}
+                      </p>
+                    </div>
+
+                    {/* Vídeo Enquadrado Perfeitamente Alinhado na Base do Totem */}
+                    <div className="w-full flex-1 min-h-0 flex items-end justify-center pt-2">
+                      <div className="w-full">
+                        <VideoEmbed url={links[0].url} title={links[0].titulo} />
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Demais links abaixo do bloco enquadrado (se houver links adicionais) */}
+                {links.length > 1 && (
+                  <div className="pt-8 border-t border-white/10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {links.slice(1).map((link, index) => renderLinkCard(link, index + 1))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Espaço Google Ads (Exibido para contas gratuitas) */}
+                {user.plano !== 'pro' && (
+                  <GoogleAdSlot variant="profile" />
+                )}
+
+                {/* Powered by */}
+                <div className="text-center pt-4">
+                  <a
+                    href="/"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-foreground/60 hover:text-foreground bg-white/20 dark:bg-black/20 backdrop-blur-md px-4 py-2 rounded-full transition-colors"
+                  >
+                    Powered by <span className="font-bold">contate.site</span>
+                  </a>
+                </div>
+              </div>
+            ) : (
+              /* Modo TV Padrão quando o 1º card NÃO é vídeo */
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                {/* Coluna Esquerda: Totem TV com QR Code Gigante */}
+                <motion.div
+                  initial={{ opacity: 0, x: -25 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="lg:col-span-5 lg:sticky lg:top-8 hidden lg:block"
+                >
+                  <div className={`p-8 rounded-[2rem] backdrop-blur-2xl border shadow-2xl relative overflow-hidden text-center ${
+                    activeTheme.isLight 
+                      ? 'bg-white/85 border-slate-200/90 text-slate-900 shadow-slate-200/60' 
+                      : 'bg-white/10 dark:bg-black/40 border-white/15 text-white shadow-black/40'
+                  }`}>
+                    {/* Glow decorativo de fundo */}
+                    <div 
+                      className="absolute -top-20 -left-20 w-48 h-48 rounded-full blur-3xl pointer-events-none opacity-40"
+                      style={{ backgroundColor: activeTheme.glowColor }}
+                    />
+
+                    <div className="relative z-10">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-4 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                        <Sparkles size={13} />
+                        <span>Totem Interativo</span>
+                      </div>
+
+                      <h2 className="text-2xl font-sora font-extrabold tracking-tight mb-4">
+                        Aponte a câmera do seu celular
+                      </h2>
+
+                      <QrCodeCard 
+                        slug={user.slug} 
+                        title={user.nome_exibicao || user.slug}
+                        variant="tv"
+                        showActions={true}
+                      />
+
+                      <p className="mt-4 text-[11px] opacity-60">
+                        Compatível com todas as câmeras de smartphone sem precisar de aplicativo
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Coluna Direita: Conteúdo e Links */}
+                <div className="lg:col-span-7">
+                  {renderProfileContent()}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="max-w-2xl mx-auto relative z-10 pt-4">
+            {renderProfileContent()}
+          </div>
+        )}
+
+        {/* Modal de QR Code para Mobile e Desktop */}
+        <QrCodeModal 
+          open={qrModalOpen} 
+          onOpenChange={setQrModalOpen} 
+          slug={user.slug} 
+          title={user.nome_exibicao || user.slug} 
+        />
       </div>
     </>
   );

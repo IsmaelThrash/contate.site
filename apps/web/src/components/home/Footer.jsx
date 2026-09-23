@@ -1,8 +1,10 @@
 /* global __COMMIT_HASH__ */
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext.jsx';
 
 export const Footer = () => {
+  const { isAuthenticated } = useAuth();
   const commitHash = typeof __COMMIT_HASH__ !== 'undefined' ? __COMMIT_HASH__ : 'latest';
 
   return (
@@ -29,7 +31,7 @@ export const Footer = () => {
           <Link to="/privacidade" className="hover:text-violet-600 dark:hover:text-white transition-colors">
             Política de Privacidade
           </Link>
-          <Link to="/login" className="hover:text-violet-600 dark:hover:text-white transition-colors">
+          <Link to={isAuthenticated ? "/dashboard" : "/login"} className="hover:text-violet-600 dark:hover:text-white transition-colors">
             Acessar Painel
           </Link>
         </div>

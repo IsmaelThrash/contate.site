@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   CheckCircle2, ArrowRight, MessageCircle, Play, 
-  MapPin, Scissors, ShieldCheck, AlertTriangle, ExternalLink 
+  MapPin, Scissors, ShieldCheck, AlertTriangle, ExternalLink,
+  LayoutDashboard
 } from 'lucide-react';
 import { homeContent } from '@/lib/homeContent.js';
+import { useAuth } from '@/contexts/AuthContext.jsx';
 
 export const ShowcaseTabs = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [selectedKey, setSelectedKey] = useState('beleza');
   const profileKeys = ['beleza', 'pet', 'saude', 'criador'];
   const profile = homeContent.profiles[selectedKey];
@@ -91,13 +94,24 @@ export const ShowcaseTabs = () => {
               </div>
 
               <div className="pt-4">
-                <button
-                  onClick={() => navigate('/login')}
-                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold px-6 py-3.5 rounded-2xl shadow-sm shadow-blue-600/20 hover:shadow-blue-600/35 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <span>Criar página para {profile.tabLabel}</span>
-                  <ArrowRight size={18} />
-                </button>
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => navigate('/dashboard')}
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold px-6 py-3.5 rounded-2xl shadow-sm shadow-blue-600/20 hover:shadow-blue-600/35 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                  >
+                    <LayoutDashboard size={18} />
+                    <span>Acessar Meu Painel</span>
+                    <ArrowRight size={18} />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold px-6 py-3.5 rounded-2xl shadow-sm shadow-blue-600/20 hover:shadow-blue-600/35 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                  >
+                    <span>Criar página para {profile.tabLabel}</span>
+                    <ArrowRight size={18} />
+                  </button>
+                )}
               </div>
             </div>
 

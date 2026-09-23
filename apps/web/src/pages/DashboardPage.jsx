@@ -12,7 +12,8 @@ import {
   Loader2, 
   Shield, 
   ShieldAlert,
-  Sparkles 
+  Sparkles,
+  QrCode 
 } from 'lucide-react';
 import LinkForm from '@/components/LinkForm.jsx';
 import { ProfileIdentity, ProfileSEO, SecuritySection } from '@/components/ProfileSettings.jsx';
@@ -21,6 +22,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabaseClient.js';
 import { logger } from '@/lib/logger.js';
 import { SortableLink } from '@/components/SortableLink.jsx';
+import { QrCodeModal } from '@/components/common/QrCodeModal.jsx';
 
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -37,6 +39,7 @@ const DashboardPage = () => {
   const [editingLink, setEditingLink] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [savingOrder, setSavingOrder] = useState(false);
   const [changingColor, setChangingColor] = useState(false);
   const { toast } = useToast();
@@ -234,6 +237,15 @@ const DashboardPage = () => {
               </Button>
             )}
             <ThemeToggle />
+            <Button 
+              variant="outline" 
+              className="rounded-xl gap-2 font-medium border-white/[0.1] bg-card/60 backdrop-blur-sm hover:border-blue-500/40 hover:bg-blue-500/10 transition-all cursor-pointer"
+              onClick={() => setIsQrModalOpen(true)}
+              title="Visualizar e baixar QR Code da sua página"
+            >
+              <QrCode className="h-4 w-4 text-blue-400" />
+              <span className="hidden sm:inline">Meu QR Code</span>
+            </Button>
             <Button 
               variant="outline" 
               className="hidden sm:flex rounded-xl gap-2 font-medium border-white/[0.1] bg-card/60 backdrop-blur-sm hover:border-primary/40 hover:bg-primary/5 transition-all"
@@ -516,6 +528,16 @@ const DashboardPage = () => {
                     </span>
                   </div>
                 </div>
+
+                {/* Botão Acesso Rápido QR Code */}
+                <button
+                  type="button"
+                  onClick={() => setIsQrModalOpen(true)}
+                  className="w-full mt-3 flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-slate-900/60 hover:bg-slate-800 border border-white/[0.08] hover:border-blue-500/40 text-slate-200 hover:text-white font-semibold text-xs transition-all shadow-sm cursor-pointer"
+                >
+                  <QrCode size={14} className="text-blue-400" />
+                  <span>Ver & Baixar QR Code (PNG)</span>
+                </button>
               </div>
 
               {/* Grade de Seletor de Cores & Estilo de Tipografia */}
@@ -586,6 +608,13 @@ const DashboardPage = () => {
         onOpenChange={setIsFormOpen}
         link={editingLink}
         onSuccess={fetchLinks}
+      />
+
+      <QrCodeModal 
+        open={isQrModalOpen}
+        onOpenChange={setIsQrModalOpen}
+        slug={currentUser?.slug}
+        title={currentUser?.nome_exibicao || currentUser?.slug}
       />
     </div>
   );

@@ -1,11 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, Sparkles, ArrowRight } from 'lucide-react';
+import { Check, Sparkles, ArrowRight, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { homeContent } from '@/lib/homeContent.js';
+import { useAuth } from '@/contexts/AuthContext.jsx';
 
 export const PricingSection = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { pricing } = homeContent;
 
   return (
@@ -81,13 +83,24 @@ export const PricingSection = () => {
             </ul>
           </div>
 
-          <button
-            onClick={() => navigate('/login')}
-            className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-md shadow-blue-600/20 hover:shadow-blue-600/35 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 group text-base hover:scale-[1.01] active:scale-[0.99]"
-          >
-            <span>{pricing.freeCard.ctaText}</span>
-            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-          </button>
+          {isAuthenticated ? (
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-md shadow-blue-600/20 hover:shadow-blue-600/35 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 group text-base hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+            >
+              <LayoutDashboard size={18} />
+              <span>Acessar Meu Painel</span>
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate('/login')}
+              className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-md shadow-blue-600/20 hover:shadow-blue-600/35 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] flex items-center justify-center gap-2 group text-base hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+            >
+              <span>{pricing.freeCard.ctaText}</span>
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          )}
         </motion.div>
 
         {/* Card Pro (Em Breve) */}
