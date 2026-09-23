@@ -26,7 +26,7 @@ export const QrCodeCard = ({
       setGenerating(true);
 
       const canvas = canvasRef.current;
-      const size = variant === 'tv' ? 360 : 280;
+      const size = variant === 'tv' ? 300 : 260;
 
       try {
         // 1. Renderiza o QR Code com Error Correction Level H (30% de redundância)
@@ -213,10 +213,10 @@ export const QrCodeCard = ({
   return (
     <div className={`flex flex-col items-center text-center ${className}`}>
       {/* Moldura de Alto Contraste do QR Code */}
-      <div className="relative p-3.5 sm:p-4 bg-white rounded-3xl shadow-xl border border-slate-200/90 flex items-center justify-center transition-transform hover:scale-[1.01]">
+      <div className="relative p-3.5 bg-white rounded-3xl shadow-xl border border-slate-200/90 inline-flex items-center justify-center shrink-0">
         <canvas 
           ref={canvasRef} 
-          className="rounded-2xl max-w-full h-auto block"
+          className="rounded-2xl block aspect-square shrink-0"
         />
         {generating && (
           <div className="absolute inset-0 bg-white/90 rounded-2xl flex items-center justify-center">

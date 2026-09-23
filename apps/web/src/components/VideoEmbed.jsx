@@ -1,7 +1,7 @@
 import React from 'react';
 import { Play } from 'lucide-react';
 
-const VideoEmbed = ({ url, title }) => {
+const VideoEmbed = ({ url, title, loop = false }) => {
   // Helper functions to parse URLs
   const getYoutubeId = (url) => {
     if (!url) return null;
@@ -30,10 +30,11 @@ const VideoEmbed = ({ url, title }) => {
   const tiktokId = getTiktokId(url);
 
   if (youtubeId) {
+    const loopParam = loop ? `&loop=1&playlist=${youtubeId}` : '';
     return (
       <div className="w-full aspect-video rounded-[1.5rem] overflow-hidden shadow-xl border border-white/20 dark:border-white/5 bg-black">
         <iframe
-          src={`https://www.youtube.com/embed/${youtubeId}?autoplay=0`}
+          src={`https://www.youtube.com/embed/${youtubeId}?autoplay=0${loopParam}`}
           title={title || "YouTube video player"}
           frameBorder="0"
           sandbox="allow-scripts allow-same-origin allow-presentation"
@@ -47,10 +48,11 @@ const VideoEmbed = ({ url, title }) => {
   }
 
   if (vimeoId) {
+    const loopParam = loop ? `?loop=1` : '';
     return (
       <div className="w-full aspect-video rounded-[1.5rem] overflow-hidden shadow-xl border border-white/20 dark:border-white/5 bg-black">
         <iframe
-          src={`https://player.vimeo.com/video/${vimeoId}`}
+          src={`https://player.vimeo.com/video/${vimeoId}${loopParam}`}
           title={title || "Vimeo video player"}
           frameBorder="0"
           sandbox="allow-scripts allow-same-origin allow-presentation"
