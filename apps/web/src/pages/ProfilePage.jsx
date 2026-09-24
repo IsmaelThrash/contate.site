@@ -81,7 +81,7 @@ const ProfilePage = () => {
       setLoading(true);
       setError(null);
       const { data: userRecord, error: userError } = await supabase
-        .from('usuarios')
+        .from('perfis_publicos')
         .select('*')
         .eq('slug', slug)
         .single();
