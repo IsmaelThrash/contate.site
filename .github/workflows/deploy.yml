@@ -19,17 +19,12 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
-      - name: Install root dependencies
+      - name: Install dependencies
         run: npm ci
-
-      - name: Install web dependencies
-        run: npm ci
-        working-directory: apps/web
 
       # SEC-M01: Audit de segurança bloqueante (apenas deps de produção)
       - name: Security audit (production deps)
-        run: npm audit --omit=dev --audit-level=high
-        working-directory: apps/web
+        run: npm audit --omit=dev --audit-level=high --workspace=web
 
       - name: Build
         run: npm run build
