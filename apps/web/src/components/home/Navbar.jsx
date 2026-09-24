@@ -44,15 +44,15 @@ export const Navbar = () => {
           : 'bg-white/60 dark:bg-[#121212]/60 backdrop-blur-sm border-b border-transparent'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6 xl:px-8 h-20 flex items-center justify-between">
         {/* Brand Logo */}
         <div
-          className="flex items-center gap-3 cursor-pointer group select-none"
+          className="flex items-center gap-3 cursor-pointer group select-none shrink-0"
           onClick={() => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#4F46E5] via-[#2563EB] to-[#38BDF8] p-0.5 shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#4F46E5] via-[#2563EB] to-[#38BDF8] p-0.5 shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300 shrink-0">
             <div className="w-full h-full bg-white dark:bg-slate-950 rounded-[10px] flex items-center justify-center p-1.5">
               <img src="/favicon.svg" alt="contate.site" className="w-full h-full" />
             </div>
@@ -63,13 +63,13 @@ export const Navbar = () => {
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-600 dark:text-slate-300">
+        <nav className="hidden lg:flex items-center gap-3.5 xl:gap-6 2xl:gap-7 text-xs lg:text-[13px] xl:text-sm font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">
           {homeContent.nav.links.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={(e) => handleNavClick(e, link.href)}
-              className="hover:text-indigo-500 dark:hover:text-white transition-colors py-1"
+              className="hover:text-indigo-500 dark:hover:text-white transition-colors py-1 whitespace-nowrap shrink-0"
             >
               {link.label}
             </a>
@@ -77,14 +77,14 @@ export const Navbar = () => {
         </nav>
 
         {/* Action Buttons */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-2.5 xl:gap-3 shrink-0">
           <ThemeToggle />
           {isAuthenticated ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               {currentUser?.slug && (
                 <button
                   onClick={() => navigate(`/${currentUser.slug}`)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200/80 dark:border-slate-700/60 rounded-xl transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 xl:px-3.5 py-2 text-xs xl:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200/80 dark:border-slate-700/60 rounded-xl transition-all cursor-pointer whitespace-nowrap shrink-0"
                   title={`Ver página contate.site/${currentUser.slug}`}
                 >
                   <ExternalLink size={14} className="text-slate-500 dark:text-slate-400" />
@@ -94,7 +94,7 @@ export const Navbar = () => {
 
               <button
                 onClick={() => navigate('/dashboard')}
-                className="inline-flex items-center justify-center gap-2.5 pl-2 pr-4 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl shadow-sm shadow-blue-500/20 hover:shadow-blue-500/30 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 xl:gap-2.5 pl-2 pr-3.5 xl:pr-4 py-2 text-xs xl:text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl shadow-sm shadow-blue-500/20 hover:shadow-blue-500/30 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer whitespace-nowrap shrink-0"
                 title="Acessar o Painel de Controle"
               >
                 <div className="w-6 h-6 rounded-md overflow-hidden bg-white/20 flex items-center justify-center text-white text-[11px] font-bold shrink-0">
@@ -112,23 +112,23 @@ export const Navbar = () => {
             <>
               <button
                 onClick={() => navigate('/login')}
-                className="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-blue-500 dark:hover:text-white px-4 py-2 rounded-xl transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-800 cursor-pointer"
+                className="text-xs xl:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-blue-500 dark:hover:text-white px-3 xl:px-4 py-2 rounded-xl transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-800 cursor-pointer whitespace-nowrap shrink-0"
               >
                 {homeContent.nav.loginText}
               </button>
               <button
                 onClick={() => navigate('/login')}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl shadow-sm shadow-blue-500/20 hover:shadow-blue-500/30 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-4 xl:px-5 py-2 xl:py-2.5 text-xs xl:text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl shadow-sm shadow-blue-500/20 hover:shadow-blue-500/30 border border-blue-400/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer whitespace-nowrap shrink-0"
               >
                 <span>{homeContent.nav.ctaText}</span>
-                <ArrowRight size={16} />
+                <ArrowRight size={15} />
               </button>
             </>
           )}
         </div>
 
         {/* Mobile Toggle Button */}
-        <div className="md:hidden flex items-center gap-2">
+        <div className="lg:hidden flex items-center gap-2">
           <ThemeToggle />
           <button
             aria-label="Abrir menu de navegação"
@@ -148,7 +148,7 @@ export const Navbar = () => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-6 flex flex-col gap-4 shadow-xl overflow-hidden"
+            className="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-6 flex flex-col gap-4 shadow-xl overflow-hidden"
           >
             <nav className="flex flex-col gap-1">
               {homeContent.nav.links.map((link) => (
