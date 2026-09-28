@@ -13,6 +13,8 @@ import OnboardingPage from '@/pages/OnboardingPage.jsx';
 import AdminPage from '@/pages/AdminPage.jsx';
 import TermsPage from '@/pages/TermsPage.jsx';
 import PrivacyPage from '@/pages/PrivacyPage.jsx';
+import TvPlayerPage from '@/pages/TvPlayerPage.jsx';
+import TvPairingPage from '@/pages/TvPairingPage.jsx';
 import { Toaster } from '@/components/ui/toaster';
 import { CookieConsent } from '@/components/common/CookieConsent.jsx';
 
@@ -38,6 +40,23 @@ function App() {
               }
             />
             <Route
+              path="/dashboard/tv/vincular"
+              element={
+                <ProtectedRoute>
+                  <TvPairingPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tv/vincular"
+              element={
+                <ProtectedRoute>
+                  <TvPairingPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/tv" element={<TvPlayerPage />} />
+            <Route
               path="/onboarding"
               element={
                 <ProtectedRoute requireSlug={false}>
@@ -53,6 +72,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/:slug/tv" element={<TvPlayerPage />} />
             <Route path="/:slug" element={<ProfilePage />} />
           </Routes>
           <Toaster />

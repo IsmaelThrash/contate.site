@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle.jsx';
@@ -13,10 +13,13 @@ import {
   Shield, 
   ShieldAlert,
   Sparkles,
-  QrCode 
+  QrCode,
+  Tv,
+  Globe
 } from 'lucide-react';
 import LinkForm from '@/components/LinkForm.jsx';
 import { ProfileIdentity, ProfileSEO, SecuritySection } from '@/components/ProfileSettings.jsx';
+import TvManagerSection from '@/components/dashboard/TvManagerSection.jsx';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabaseClient.js';
@@ -34,6 +37,10 @@ import { getAvatarUrl } from '@/lib/utils.js';
 const DashboardPage = () => {
   const { currentUser, logout, updateUserColor } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeMainTab, setActiveMainTab] = useState(() => {
+    return searchParams.get('tab') === 'tv' ? 'tv' : 'bio';
+  });
   const [links, setLinks] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingLink, setEditingLink] = useState(null);
@@ -266,9 +273,48 @@ const DashboardPage = () => {
       </header>
 
       <main className="container max-w-5xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-[1fr_350px] gap-8">
-          {/* Coluna Principal: Fluxo integrado (Identidade -> Meus Links -> SEO -> Segurança) */}
-          <div className="space-y-8">
+        {/* Seletor de Abas Principais: Bio & Links vs Contate TV */}
+        <div className="flex items-center gap-2 sm:gap-3 mb-8 p-1.5 rounded-2xl bg-black/40 border border-white/10 w-fit backdrop-blur-md">
+          <button
+            onClick={() => {
+              setActiveMainTab('bio');
+              setSearchParams({});
+            }}
+            className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-sora text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              activeMainTab === 'bio'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Globe className="h-4 w-4" />
+            <span>Página & Links na Bio</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveMainTab('tv');
+              setSearchParams({ tab: 'tv' });
+            }}
+            className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-sora text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              activeMainTab === 'tv'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Tv className="h-4 w-4" />
+            <span>Painéis de TV</span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              Beta Grátis
+            </span>
+          </button>
+        </div>
+
+        {activeMainTab === 'tv' ? (
+          <TvManagerSection currentUser={currentUser} />
+        ) : (
+          <div className="grid lg:grid-cols-[1fr_350px] gap-8">
+            {/* Coluna Principal: Fluxo integrado (Identidade -> Meus Links -> SEO -> Segurança) */}
+            <div className="space-y-8">
             {/* 1. Identidade do Perfil (Nome de Exibição & Bio) */}
             <ProfileIdentity />
 
@@ -601,7 +647,8 @@ const DashboardPage = () => {
             </div>
           </div>
         </div>
-      </main>
+      )}
+    </main>
 
       <LinkForm 
         open={isFormOpen} 

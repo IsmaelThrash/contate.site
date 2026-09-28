@@ -71,3 +71,75 @@ AS $$
   );
 $$;
 ```
+
+---
+
+## 5. Módulo Contate TV (Vitrine Digital & Menu Boards)
+
+Gerencia painéis digitais, lojas/unidades, playlists e pareamento dinâmico via Smart TV.
+
+### 5.1. Tabela: `tv_unidades`
+Lojas físicas ou unidades de franquia.
+- `id` (`uuid`, PK)
+- `usuario_id` (`uuid`, FK -> `usuarios.id`)
+- `nome` (`text`)
+- `endereco` (`text`)
+- `created_at` (`timestamptz`)
+
+### 5.2. Tabela: `tv_playlists`
+Coleções de slides / carrosséis temáticos.
+- `id` (`uuid`, PK)
+- `usuario_id` (`uuid`, FK -> `usuarios.id`)
+- `nome` (`text`)
+- `descricao` (`text`)
+- `duracao_padrao_segundos` (`integer`, default 8)
+- `ativo` (`boolean`, default true)
+
+### 5.3. Tabela: `tv_slides`
+Slides individuais de cada playlist (banners prontos ou cartazes de oferta).
+- `id` (`uuid`, PK)
+- `playlist_id` (`uuid`, FK -> `tv_playlists.id` com `CASCADE`)
+- `tipo` (`text`, `'banner'` ou `'produto'`)
+- `imagem_url` (`text`)
+- `titulo` (`text`)
+- `descricao` (`text`)
+- `preco` (`text`)
+- `badge_promocional` (`text`)
+- `duracao_segundos` (`integer`)
+- `ordem` (`integer`)
+- `ativo` (`boolean`, default true)
+
+### 5.4. Tabela: `telas_tv`
+Aparelhos físicos pareados (Smart TVs, totens, monitores).
+- `id` (`uuid`, PK)
+- `usuario_id` (`uuid`, FK -> `usuarios.id`)
+- `unidade_id` (`uuid`, FK -> `tv_unidades.id`)
+- `nome` (`text`)
+- `setor` (`text`, ex: "Sobremesas", "Bar", "Balcão")
+- `device_token` (`text`, UNIQUE)
+- `orientacao` (`text`, `'horizontal'` ou `'vertical'`)
+- `ticker_texto` (`text`)
+- `versao_conteudo` (`integer`)
+- `ultima_atividade` (`timestamptz`)
+
+### 5.5. Tabela: `tela_tv_playlists`
+Associação N:N entre telas e múltiplas playlists combinadas.
+- `tela_id` (`uuid`, FK -> `telas_tv.id`)
+- `playlist_id` (`uuid`, FK -> `tv_playlists.id`)
+- `ordem` (`integer`)
+
+### 5.6. Tabela: `tv_sessoes_pareamento`
+Sessões de pareamento temporárias (TTL de 15 minutos).
+- `id` (`uuid`, PK)
+- `codigo_pin` (`text`, UNIQUE)
+- `device_token` (`text`)
+- `status` (`text`, `'aguardando'` | `'conectado'` | `'expirado'`)
+- `tela_id` (`uuid`)
+- `expires_at` (`timestamptz`)
+
+### 5.7. Funções RPC
+- `public.tv_gerar_sessao_pareamento()`: Gera PIN de 6 caracteres e device token para a TV.
+- `public.tv_confirmar_pareamento(...)`: Valida o PIN e conecta a TV à conta do lojista.
+- `public.tv_obter_slides_tela(p_device_token)`: Entrega a playlist compilada para a Smart TV.
+- `public.tv_disparar_atualizacao(p_tela_id, ...)`: Envia sinal de sincronização instantânea em lote.
+
