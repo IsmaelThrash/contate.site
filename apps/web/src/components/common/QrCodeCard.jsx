@@ -6,7 +6,8 @@ import { useToast } from '@/hooks/use-toast';
 export const QrCodeCard = ({ 
   slug, 
   title, 
-  variant = 'compact', // 'compact' | 'tv' | 'modal'
+  variant = 'compact', // 'compact' | 'modal'
+  size = 260,
   showActions = true,
   className = ''
 }) => {
@@ -26,7 +27,6 @@ export const QrCodeCard = ({
       setGenerating(true);
 
       const canvas = canvasRef.current;
-      const size = variant === 'tv' ? 300 : 260;
 
       try {
         // 1. Renderiza o QR Code com Error Correction Level H (30% de redundância)
@@ -89,7 +89,7 @@ export const QrCodeCard = ({
 
     generateQr();
     return () => { isMounted = false; };
-  }, [slug, publicUrl, variant]);
+  }, [slug, publicUrl, size]);
 
   // Copiar link para o clipboard
   const handleCopyLink = async () => {
