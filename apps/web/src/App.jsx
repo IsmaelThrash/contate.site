@@ -42,7 +42,7 @@ function App() {
             <Route
               path="/dashboard/tv/vincular"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute requireSlug={false}>
                   <TvPairingPage />
                 </ProtectedRoute>
               }
@@ -50,7 +50,7 @@ function App() {
             <Route
               path="/tv/vincular"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute requireSlug={false}>
                   <TvPairingPage />
                 </ProtectedRoute>
               }

@@ -41,6 +41,16 @@ const DashboardPage = () => {
   const [activeMainTab, setActiveMainTab] = useState(() => {
     return searchParams.get('tab') === 'tv' ? 'tv' : 'bio';
   });
+
+  // Sincroniza aba quando a URL contiver ?tab=tv
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'tv') {
+      setActiveMainTab('tv');
+    } else if (tabParam === 'bio') {
+      setActiveMainTab('bio');
+    }
+  }, [searchParams]);
   const [links, setLinks] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingLink, setEditingLink] = useState(null);
@@ -211,60 +221,65 @@ const DashboardPage = () => {
 
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/[0.08]">
-        <div className="container max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="container max-w-5xl mx-auto px-3 sm:px-4 h-16 flex items-center justify-between gap-2 overflow-hidden">
           <div 
-            className="flex items-center gap-3 cursor-pointer group select-none"
+            className="flex items-center gap-2 sm:gap-3 cursor-pointer group select-none shrink-0"
             onClick={() => navigate('/')}
             title="Ir para a página inicial"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#4F46E5] via-[#2563EB] to-[#38BDF8] p-0.5 shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-[#4F46E5] via-[#2563EB] to-[#38BDF8] p-0.5 shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300">
               <div className="w-full h-full bg-[#0E121A] rounded-[10px] flex items-center justify-center p-1">
                 <img src="/favicon.svg" alt="contate.site" className="w-full h-full" />
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="font-sora font-extrabold text-xl tracking-tight text-white">
+            <div className="flex items-center gap-1.5">
+              <span className="font-sora font-extrabold text-lg sm:text-xl tracking-tight text-white">
                 contate<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366F1] to-[#38BDF8]">.site</span>
               </span>
-              <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/25 text-primary tracking-wide">
+              <span className="hidden sm:inline-flex text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 border border-primary/25 text-primary tracking-wide">
                 Painel
               </span>
             </div>
           </div>
           
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {currentUser?.is_admin && (
               <Button 
                 variant="outline" 
-                className="rounded-xl gap-2 font-semibold border-primary/30 text-primary hover:bg-primary/10 transition-colors"
+                size="sm"
+                className="rounded-xl px-2 sm:px-3 h-9 gap-1.5 font-semibold border-primary/30 text-primary hover:bg-primary/10 transition-colors"
                 onClick={() => navigate('/admin')}
+                title="Admin Console"
               >
                 <Shield className="h-4 w-4" />
-                <span className="hidden sm:inline">Admin Console</span>
+                <span className="hidden md:inline text-xs">Admin</span>
               </Button>
             )}
             <ThemeToggle />
             <Button 
               variant="outline" 
-              className="rounded-xl gap-2 font-medium border-white/[0.1] bg-card/60 backdrop-blur-sm hover:border-blue-500/40 hover:bg-blue-500/10 transition-all cursor-pointer"
+              size="sm"
+              className="rounded-xl px-2 sm:px-3 h-9 gap-1.5 font-medium border-white/[0.1] bg-card/60 backdrop-blur-sm hover:border-blue-500/40 hover:bg-blue-500/10 transition-all cursor-pointer"
               onClick={() => setIsQrModalOpen(true)}
               title="Visualizar e baixar QR Code da sua página"
             >
               <QrCode className="h-4 w-4 text-blue-400" />
-              <span className="hidden sm:inline">Meu QR Code</span>
+              <span className="hidden sm:inline text-xs">QR Code</span>
             </Button>
             <Button 
               variant="outline" 
-              className="hidden sm:flex rounded-xl gap-2 font-medium border-white/[0.1] bg-card/60 backdrop-blur-sm hover:border-primary/40 hover:bg-primary/5 transition-all"
+              size="sm"
+              className="hidden md:flex rounded-xl px-3 h-9 gap-1.5 font-medium border-white/[0.1] bg-card/60 backdrop-blur-sm hover:border-primary/40 hover:bg-primary/5 transition-all text-xs"
               onClick={handleCopyLink}
             >
               {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
-              {copied ? 'Copiado!' : 'Copiar Link'}
+              <span>{copied ? 'Copiado!' : 'Copiar Link'}</span>
             </Button>
             <Button 
               variant="ghost" 
+              size="sm"
               onClick={logout}
-              className="rounded-xl hover:bg-destructive/10 hover:text-destructive transition-colors"
+              className="rounded-xl px-2.5 h-9 text-xs text-slate-400 hover:text-destructive hover:bg-destructive/10 transition-colors"
             >
               Sair
             </Button>
@@ -272,22 +287,22 @@ const DashboardPage = () => {
         </div>
       </header>
 
-      <main className="container max-w-5xl mx-auto px-4 py-8">
-        {/* Seletor de Abas Principais: Bio & Links vs Contate TV */}
-        <div className="flex items-center gap-2 sm:gap-3 mb-8 p-1.5 rounded-2xl bg-black/40 border border-white/10 w-fit backdrop-blur-md">
+      <main className="container max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 max-w-full overflow-x-hidden">
+        {/* Seletor de Abas Principais: Bio & Links vs Contate TV (Mobile Friendly 50%/50%) */}
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-1.5 sm:gap-3 mb-6 sm:mb-8 p-1 sm:p-1.5 rounded-2xl bg-black/40 border border-white/10 w-full sm:w-fit backdrop-blur-md">
           <button
             onClick={() => {
               setActiveMainTab('bio');
               setSearchParams({});
             }}
-            className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-sora text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 rounded-xl font-sora text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeMainTab === 'bio'
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <Globe className="h-4 w-4" />
-            <span>Página & Links na Bio</span>
+            <Globe className="h-4 w-4 shrink-0" />
+            <span className="truncate">Links na Bio</span>
           </button>
 
           <button
@@ -295,15 +310,15 @@ const DashboardPage = () => {
               setActiveMainTab('tv');
               setSearchParams({ tab: 'tv' });
             }}
-            className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-sora text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 rounded-xl font-sora text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeMainTab === 'tv'
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <Tv className="h-4 w-4" />
-            <span>Painéis de TV</span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            <Tv className="h-4 w-4 shrink-0" />
+            <span className="truncate">Painéis de TV</span>
+            <span className="hidden sm:inline-block px-1.5 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
               Beta Grátis
             </span>
           </button>

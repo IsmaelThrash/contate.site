@@ -22,7 +22,9 @@ import {
   Eye,
   Sliders,
   DollarSign,
-  Tag
+  Tag,
+  Loader2,
+  X
 } from 'lucide-react';
 
 export default function TvManagerSection({ currentUser }) {
@@ -69,9 +71,109 @@ export default function TvManagerSection({ currentUser }) {
     endereco: ''
   });
 
-  // Modal de PIN manual
-  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
-  const [manualPin, setManualPin] = useState('');
+  // Modal de Conexão / Pareamento de Nova TV (Inline no Dashboard)
+  const [isPairingModalOpen, setIsPairingModalOpen] = useState(false);
+  const [pairingPin, setPairingPin] = useState('');
+  const [pairingNome, setPairingNome] = useState('TV Balcão');
+  const [pairingSetor, setPairingSetor] = useState('Geral');
+  const [pairingOrientacao, setPairingOrientacao] = useState('horizontal');
+  const [pairingTicker, setPairingTicker] = useState('');
+  const [pairingUnidadeId, setPairingUnidadeId] = useState('');
+  const [pairingPlaylistIds, setPairingPlaylistIds] = useState([]);
+  const [pairingSubmitting, setPairingSubmitting] = useState(false);
+  const [isAddingUnidadeInline, setIsAddingUnidadeInline] = useState(false);
+  const [newUnidadeInlineNome, setNewUnidadeInlineNome] = useState('');
+
+  const handleOpenPairingModal = () => {
+    setPairingPin('');
+    setPairingNome(`TV ${telas.length > 0 ? `0${telas.length + 1}` : 'Balcão'}`);
+    setPairingSetor('Geral');
+    setPairingOrientacao('horizontal');
+    setPairingTicker('');
+    setPairingUnidadeId(unidades.length > 0 ? unidades[0].id : '');
+    setPairingPlaylistIds(playlists.length > 0 ? [playlists[0].id] : []);
+    setIsAddingUnidadeInline(false);
+    setNewUnidadeInlineNome('');
+    setIsPairingModalOpen(true);
+  };
+
+  const handleConfirmPairing = async (e) => {
+    e.preventDefault();
+    const cleanPin = pairingPin.trim().toUpperCase();
+
+    if (!cleanPin || cleanPin.length < 4) {
+      toast({
+        title: 'Código Inválido',
+        description: 'Digite o código PIN exibido na tela da sua Smart TV.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      setPairingSubmitting(true);
+      const { data, error } = await supabase.rpc('tv_confirmar_pareamento', {
+        p_pin: cleanPin,
+        p_nome: pairingNome.trim() || 'TV',
+        p_unidade_id: pairingUnidadeId || null,
+        p_setor: pairingSetor.trim() || 'Geral',
+        p_orientacao: pairingOrientacao,
+        p_ticker: pairingTicker.trim() || null,
+        p_playlist_ids: pairingPlaylistIds
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: '🎉 TV Conectada com Sucesso!',
+        description: 'A tela da sua Smart TV já iniciou a transmissão em tempo real.'
+      });
+
+      setIsPairingModalOpen(false);
+      await loadAllTvData();
+      setActiveSubTab('telas');
+    } catch (err) {
+      logger.error('Erro ao conectar TV via modal:', err);
+      toast({
+        title: 'Erro ao conectar TV',
+        description: err.message || 'Verifique se o código PIN está correto e ainda não expirou.',
+        variant: 'destructive'
+      });
+    } finally {
+      setPairingSubmitting(false);
+    }
+  };
+
+  const handleCreateUnidadeInline = async () => {
+    if (!newUnidadeInlineNome.trim() || !currentUser?.id) return;
+    try {
+      const { data, error } = await supabase
+        .from('tv_unidades')
+        .insert({
+          usuario_id: currentUser.id,
+          nome: newUnidadeInlineNome.trim()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setUnidades(prev => [...prev, data]);
+      setPairingUnidadeId(data.id);
+      setNewUnidadeInlineNome('');
+      setIsAddingUnidadeInline(false);
+      toast({ title: 'Loja cadastrada com sucesso!' });
+    } catch (err) {
+      logger.error('Erro ao criar unidade inline:', err);
+      toast({ title: 'Erro', description: 'Não foi possível cadastrar a loja.', variant: 'destructive' });
+    }
+  };
+
+  const togglePairingPlaylist = (id) => {
+    setPairingPlaylistIds(prev =>
+      prev.includes(id) ? prev.filter(pId => pId !== id) : [...prev, id]
+    );
+  };
 
   // Carrega todos os dados de TV do usuário
   const loadAllTvData = useCallback(async () => {
@@ -391,85 +493,86 @@ export default function TvManagerSection({ currentUser }) {
   };
 
   return (
-    <div className="space-y-8">
-      {/* HEADER DA SEÇÃO DE TVS */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-[#0E121A] border border-white/10 shadow-xl">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
-            <Tv size={28} />
+    <div className="space-y-6 sm:space-y-8 max-w-full overflow-hidden">
+      {/* HEADER DA SEÇÃO DE TVS (Mobile Friendly) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-6 rounded-3xl bg-[#0E121A] border border-white/10 shadow-xl max-w-full overflow-hidden">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+            <Tv size={24} className="sm:w-7 sm:h-7" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="font-sora font-extrabold text-2xl text-white tracking-tight">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="font-sora font-extrabold text-xl sm:text-2xl text-white tracking-tight">
                 Contate TV
               </h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                 Beta Aberta • Grátis
               </span>
             </div>
-            <p className="text-sm text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-400 line-clamp-2">
               Controle vitrines digitais, menu boards e promoções em Smart TVs de todas as suas lojas.
             </p>
           </div>
         </div>
 
         {/* Ações Globais */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="grid grid-cols-1 sm:flex sm:items-center gap-2.5 w-full sm:w-auto">
           <button
             onClick={handleRefreshAllTelas}
             disabled={refreshingAll || telas.length === 0}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-200 transition-all cursor-pointer disabled:opacity-40"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-200 transition-all cursor-pointer disabled:opacity-40 w-full sm:w-auto"
             title="Atualizar todas as TVs conectadas simultaneamente"
           >
             <RefreshCw size={14} className={refreshingAll ? 'animate-spin text-blue-400' : ''} />
             <span>Atualizar Todas as TVs ⚡</span>
           </button>
 
-          <a
-            href="/dashboard/tv/vincular"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-sora font-extrabold shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] shadow-blue-500/30 transition-all cursor-pointer"
+          <button
+            type="button"
+            onClick={handleOpenPairingModal}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-sora font-extrabold shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] shadow-blue-500/30 transition-all cursor-pointer w-full sm:w-auto"
           >
             <Plus size={16} />
             <span>Conectar Nova TV</span>
-          </a>
+          </button>
         </div>
       </div>
 
       {/* TABS INTERNAS (Telas Conectadas | Playlists & Slides | Lojas & Unidades) */}
-      <div className="flex items-center gap-2 border-b border-white/10 pb-4 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-white/10 pb-3 sm:pb-4 overflow-x-auto max-w-full no-scrollbar">
         <button
           onClick={() => setActiveSubTab('telas')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+          className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
             activeSubTab === 'telas'
               ? 'bg-blue-600 text-white shadow-sm'
               : 'text-slate-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          <Tv size={16} />
+          <Tv size={15} />
           <span>Telas Conectadas ({telas.length})</span>
         </button>
 
         <button
           onClick={() => setActiveSubTab('playlists')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+          className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
             activeSubTab === 'playlists'
               ? 'bg-blue-600 text-white shadow-sm'
               : 'text-slate-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          <Layers size={16} />
+          <Layers size={15} />
           <span>Playlists & Slides ({playlists.length})</span>
         </button>
 
         <button
           onClick={() => setActiveSubTab('unidades')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+          className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
             activeSubTab === 'unidades'
               ? 'bg-blue-600 text-white shadow-sm'
               : 'text-slate-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          <Store size={16} />
+          <Store size={15} />
           <span>Lojas & Unidades ({unidades.length})</span>
         </button>
       </div>
@@ -480,21 +583,22 @@ export default function TvManagerSection({ currentUser }) {
       {activeSubTab === 'telas' && (
         <div className="space-y-6">
           {telas.length === 0 ? (
-            <div className="p-12 text-center rounded-3xl bg-[#0E121A] border border-white/10">
-              <Tv size={48} className="text-slate-600 mx-auto mb-4" />
-              <h3 className="font-sora font-bold text-lg text-white mb-1">
+            <div className="p-8 sm:p-12 text-center rounded-3xl bg-[#0E121A] border border-white/10">
+              <Tv size={44} className="text-slate-600 mx-auto mb-4" />
+              <h3 className="font-sora font-bold text-base sm:text-lg text-white mb-1">
                 Nenhuma Smart TV conectada ainda
               </h3>
-              <p className="text-sm text-slate-400 max-w-md mx-auto mb-6">
-                Abra <strong className="text-white">contate.site/tv</strong> no navegador de qualquer Smart TV ou monitor e aponte a câmera do seu celular para o QR Code.
+              <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto mb-6">
+                Abra <strong className="text-white">contate.site/tv</strong> no navegador de qualquer Smart TV ou monitor e digite o PIN aqui.
               </p>
               <div className="flex justify-center gap-3">
-                <a
-                  href="/dashboard/tv/vincular"
-                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer"
+                <button
+                  type="button"
+                  onClick={handleOpenPairingModal}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer"
                 >
                   Conectar TV com Código PIN
-                </a>
+                </button>
               </div>
             </div>
           ) : (
@@ -1096,6 +1200,282 @@ export default function TvManagerSection({ currentUser }) {
                   className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
                 >
                   Salvar Loja
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* -------------------------------------------------------- */}
+      {/* MODAL: CONECTAR NOVA SMART TV (INLINE NO DASHBOARD) */}
+      {/* -------------------------------------------------------- */}
+      {isPairingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+          <div className="w-full max-w-lg rounded-3xl bg-[#0E121A] border border-white/15 p-5 sm:p-6 shadow-2xl space-y-5 my-auto max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                  <Tv size={18} />
+                </div>
+                <div>
+                  <h4 className="font-sora font-extrabold text-base sm:text-lg text-white">
+                    Conectar Smart TV
+                  </h4>
+                  <p className="text-[11px] text-slate-400">
+                    Digite o PIN de 6 dígitos exibido na sua TV
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsPairingModalOpen(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmPairing} className="space-y-4 text-left">
+              {/* Campo 1: PIN da TV */}
+              <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+                <label className="block text-xs uppercase tracking-wider font-bold text-slate-300 mb-1.5">
+                  Código PIN da TV
+                </label>
+                <input
+                  type="text"
+                  value={pairingPin}
+                  onChange={(e) => setPairingPin(e.target.value.toUpperCase())}
+                  placeholder="Ex: 8F3K9M"
+                  maxLength={8}
+                  required
+                  autoFocus
+                  className="w-full h-12 px-3 rounded-xl bg-black/60 border border-white/20 text-center font-mono font-extrabold text-2xl text-blue-400 tracking-widest focus:outline-none focus:border-blue-500 uppercase"
+                />
+                <p className="text-[11px] text-slate-400 mt-1.5 text-center">
+                  Abra <strong className="text-white">contate.site/tv</strong> na sua TV para ver o PIN
+                </p>
+              </div>
+
+              {/* Campo 2: Identificação da TV */}
+              <div className="space-y-3 p-4 rounded-2xl bg-black/40 border border-white/10">
+                <div>
+                  <label className="block text-xs uppercase tracking-wider font-bold text-slate-300 mb-1">
+                    Nome da Tela
+                  </label>
+                  <input
+                    type="text"
+                    value={pairingNome}
+                    onChange={(e) => setPairingNome(e.target.value)}
+                    placeholder="Ex: TV Balcão, TV Entrada"
+                    required
+                    className="w-full h-11 px-3 rounded-xl bg-black/50 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-wider font-bold text-slate-300 mb-1">
+                    Setor / Função
+                  </label>
+                  <input
+                    type="text"
+                    value={pairingSetor}
+                    onChange={(e) => setPairingSetor(e.target.value)}
+                    placeholder="Ex: Balcão, Salão, Drinks"
+                    required
+                    className="w-full h-11 px-3 rounded-xl bg-black/50 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500"
+                  />
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {['Geral', 'Balcão', 'Sobremesas', 'Drinks', 'Salão', 'Vitrine'].map(s => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setPairingSetor(s)}
+                        className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-colors cursor-pointer ${
+                          pairingSetor === s
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-white/5 text-slate-400 hover:text-white border border-white/5'
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Orientação */}
+                <div>
+                  <label className="block text-xs uppercase tracking-wider font-bold text-slate-300 mb-1.5">
+                    Orientação
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPairingOrientacao('horizontal')}
+                      className={`flex items-center justify-center gap-1.5 p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                        pairingOrientacao === 'horizontal'
+                          ? 'bg-blue-600/20 border-blue-500 text-blue-400'
+                          : 'bg-black/30 border-white/10 text-slate-400'
+                      }`}
+                    >
+                      <Monitor size={15} />
+                      <span>Horizontal (16:9)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPairingOrientacao('vertical')}
+                      className={`flex items-center justify-center gap-1.5 p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                        pairingOrientacao === 'vertical'
+                          ? 'bg-blue-600/20 border-blue-500 text-blue-400'
+                          : 'bg-black/30 border-white/10 text-slate-400'
+                      }`}
+                    >
+                      <Smartphone size={15} />
+                      <span>Vertical / Totem</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Campo 3: Loja / Unidade */}
+              <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs uppercase tracking-wider font-bold text-slate-300 flex items-center gap-1">
+                    <Store size={13} className="text-blue-400" />
+                    <span>Loja / Unidade</span>
+                  </label>
+                  {!isAddingUnidadeInline && (
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingUnidadeInline(true)}
+                      className="text-[11px] font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-0.5 cursor-pointer"
+                    >
+                      <Plus size={12} />
+                      <span>Nova Loja</span>
+                    </button>
+                  )}
+                </div>
+
+                {isAddingUnidadeInline ? (
+                  <div className="flex gap-1.5">
+                    <input
+                      type="text"
+                      value={newUnidadeInlineNome}
+                      onChange={(e) => setNewUnidadeInlineNome(e.target.value)}
+                      placeholder="Nome da filial/loja"
+                      className="flex-1 h-10 px-2.5 rounded-xl bg-black/60 border border-white/20 text-xs text-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCreateUnidadeInline}
+                      className="px-3 h-10 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 cursor-pointer"
+                    >
+                      Salvar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingUnidadeInline(false)}
+                      className="px-2.5 h-10 rounded-xl bg-white/5 text-slate-400 text-xs hover:bg-white/10 cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <select
+                    value={pairingUnidadeId}
+                    onChange={(e) => setPairingUnidadeId(e.target.value)}
+                    className="w-full h-11 px-3 rounded-xl bg-black/50 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="">Nenhuma unidade específica (Geral)</option>
+                    {unidades.map(u => (
+                      <option key={u.id} value={u.id}>
+                        {u.nome}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Campo 4: Playlists */}
+              <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+                <label className="block text-xs uppercase tracking-wider font-bold text-slate-300 mb-1.5">
+                  Playlists para Rodar na TV
+                </label>
+                {playlists.length === 0 ? (
+                  <p className="text-xs text-slate-400">
+                    Nenhuma playlist criada. Crie uma na aba "Playlists & Slides".
+                  </p>
+                ) : (
+                  <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                    {playlists.map(p => {
+                      const isChecked = pairingPlaylistIds.includes(p.id);
+                      return (
+                        <div
+                          key={p.id}
+                          onClick={() => togglePairingPlaylist(p.id)}
+                          className={`flex items-center justify-between p-2.5 rounded-xl border text-xs transition-all cursor-pointer ${
+                            isChecked
+                              ? 'bg-blue-600/20 border-blue-500 text-white'
+                              : 'bg-black/30 border-white/5 text-slate-400 hover:border-white/15'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className={`w-4 h-4 rounded flex items-center justify-center border ${
+                              isChecked ? 'bg-blue-600 border-blue-500 text-white' : 'border-slate-600'
+                            }`}>
+                              {isChecked && <Check size={11} />}
+                            </div>
+                            <span className="font-semibold">{p.nome}</span>
+                          </div>
+                          <span className="text-[10px] text-slate-400">
+                            {p.duracao_padrao_segundos || 8}s/slide
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Campo 5: Letreiro de Avisos no Rodapé */}
+              <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+                <label className="block text-xs uppercase tracking-wider font-bold text-slate-300 mb-1">
+                  Letreiro Ticker de Rodapé (Opcional)
+                </label>
+                <input
+                  type="text"
+                  value={pairingTicker}
+                  onChange={(e) => setPairingTicker(e.target.value)}
+                  placeholder="Ex: Peça pelo WhatsApp • Wi-Fi da loja: SushiGuest"
+                  className="w-full h-11 px-3 rounded-xl bg-black/50 border border-white/15 text-xs text-white focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {/* Botões de Ação */}
+              <div className="pt-2 flex flex-col sm:flex-row items-center gap-2">
+                <button
+                  type="submit"
+                  disabled={pairingSubmitting}
+                  className="w-full h-12 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-sora font-extrabold text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] shadow-blue-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {pairingSubmitting ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Conectando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={16} />
+                      <span>Conectar e Transmitir 🚀</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsPairingModalOpen(false)}
+                  className="w-full sm:w-auto px-4 h-12 rounded-xl bg-white/5 text-slate-300 text-xs font-semibold hover:bg-white/10 cursor-pointer text-center"
+                >
+                  Cancelar
                 </button>
               </div>
             </form>
