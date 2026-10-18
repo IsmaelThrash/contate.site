@@ -234,6 +234,8 @@ export default function TvPlayerPage() {
         setScreenData(data);
         const list = data.slides || [];
         setSlides(list);
+        // Reset imediato para o slide 0 para priorizar a nova playlist
+        setCurrentSlideIndex(0);
 
         // Salva token nas 3 camadas persistentes (Cookie 14 dias + LocalStorage + URL)
         persistDeviceToken(token);
@@ -370,32 +372,56 @@ export default function TvPlayerPage() {
   useEffect(() => {
     if (!deviceToken || !screenData?.tela_id) return;
 
+    const telaId = screenData.tela_id;
+    let localVersao = screenData.versao_conteudo || 1;
+
+    // 1. Canal Realtime Supabase (Postgres changes + Broadcast direto)
     const channel = supabase
-      .channel(`tela_tv_${screenData.tela_id}`)
+      .channel(`tela_tv_${telaId}`)
       .on(
         'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'public',
           table: 'telas_tv',
-          filter: `id=eq.${screenData.tela_id}`
+          filter: `id=eq.${telaId}`
         },
-        () => {
-          fetchScreenContent(deviceToken);
+        (payload) => {
+          if (payload.new && payload.new.versao_conteudo !== localVersao) {
+            localVersao = payload.new.versao_conteudo;
+            fetchScreenContent(deviceToken);
+          }
         }
       )
+      .on('broadcast', { event: 'force_refresh' }, () => {
+        fetchScreenContent(deviceToken);
+      })
       .subscribe();
 
-    // Heartbeat suave a cada 60s
-    const heartbeat = setInterval(() => {
-      fetchScreenContent(deviceToken);
-    }, 60000);
+    // 2. Verificação ultra-leve de versão a cada 5s (apenas 200 bytes, zero download de mídias)
+    // Garante que mesmo se o WebSocket da TV LG/Samsung dormir, a TV sincronize em no máximo 5s
+    const checkInterval = setInterval(async () => {
+      try {
+        const { data, error } = await supabase
+          .from('telas_tv')
+          .select('versao_conteudo')
+          .eq('id', telaId)
+          .maybeSingle();
+
+        if (!error && data && data.versao_conteudo > localVersao) {
+          localVersao = data.versao_conteudo;
+          fetchScreenContent(deviceToken);
+        }
+      } catch (e) {
+        // Silencioso em caso de oscilação momentânea de rede
+      }
+    }, 5000);
 
     return () => {
       supabase.removeChannel(channel);
-      clearInterval(heartbeat);
+      clearInterval(checkInterval);
     };
-  }, [deviceToken, screenData?.tela_id, fetchScreenContent]);
+  }, [deviceToken, screenData?.tela_id, screenData?.versao_conteudo, fetchScreenContent]);
 
   // Timer de Rotação do Carrossel (Looping Contínuo)
   useEffect(() => {

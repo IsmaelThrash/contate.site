@@ -242,6 +242,12 @@ export default function TvManagerSection({ currentUser }) {
       // 3. Dispara sincronização em tempo real para a TV atualizar imediatamente
       try {
         await supabase.rpc('tv_disparar_atualizacao', { p_tela_id: editingTela.id });
+        // Dispara sinal imediato via broadcast no canal exclusivo da TV
+        supabase.channel(`tela_tv_${editingTela.id}`).send({
+          type: 'broadcast',
+          event: 'force_refresh',
+          payload: { timestamp: Date.now() }
+        });
       } catch (rpcErr) {
         logger.warn('Não foi possível disparar RPC de atualização imediata:', rpcErr);
       }
@@ -400,6 +406,17 @@ export default function TvManagerSection({ currentUser }) {
       const { data, error } = await supabase.rpc('tv_disparar_atualizacao');
       if (error) throw error;
 
+      // Dispara broadcast em massa para cada tela ativa
+      telas.forEach(t => {
+        try {
+          supabase.channel(`tela_tv_${t.id}`).send({
+            type: 'broadcast',
+            event: 'force_refresh',
+            payload: { timestamp: Date.now() }
+          });
+        } catch (e) {}
+      });
+
       toast({
         title: '⚡ Sinal Enviado!',
         description: `${data?.telas_atualizadas || telas.length} TVs receberam o comando de sincronização imediata.`
@@ -422,6 +439,16 @@ export default function TvManagerSection({ currentUser }) {
     try {
       const { error } = await supabase.rpc('tv_disparar_atualizacao', { p_tela_id: telaId });
       if (error) throw error;
+
+      // Envia broadcast de alta prioridade para a tela específica
+      try {
+        supabase.channel(`tela_tv_${telaId}`).send({
+          type: 'broadcast',
+          event: 'force_refresh',
+          payload: { timestamp: Date.now() }
+        });
+      } catch (e) {}
+
       toast({
         title: 'Tela Atualizada',
         description: 'O sinal foi enviado para o dispositivo.'
