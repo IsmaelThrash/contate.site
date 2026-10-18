@@ -86,7 +86,7 @@ export default function TvPairingPage() {
     loadData();
   }, [loadData]);
 
-  // Criar nova Unidade / Loja inline
+  // Criar nova Unidade inline
   const handleCreateUnidade = async () => {
     if (!newUnidadeNome.trim()) return;
     try {
@@ -105,7 +105,7 @@ export default function TvPairingPage() {
       setSelectedUnidadeId(data.id);
       setNewUnidadeNome('');
       setIsAddingUnidade(false);
-      toast({ title: 'Loja cadastrada com sucesso!' });
+      toast({ title: 'Unidade cadastrada com sucesso!' });
     } catch (err) {
       logger.error('Erro ao criar unidade:', err);
       toast({ title: 'Erro', description: 'Não foi possível criar a unidade.', variant: 'destructive' });
@@ -339,12 +339,12 @@ export default function TvPairingPage() {
             </div>
           </div>
 
-          {/* Campo 3: Unidade / Loja Física */}
+          {/* Campo 3: Unidade Física */}
           <div className="p-5 rounded-2xl bg-[#0E121A] border border-white/10 shadow-lg">
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs uppercase tracking-wider font-bold text-slate-300 flex items-center gap-1.5">
                 <Store size={14} className="text-blue-400" />
-                <span>Loja / Unidade Física</span>
+                <span>Unidade Física</span>
               </label>
               {!isAddingUnidade && (
                 <button
@@ -353,7 +353,7 @@ export default function TvPairingPage() {
                   className="text-xs font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1 cursor-pointer"
                 >
                   <Plus size={13} />
-                  <span>Nova Loja</span>
+                  <span>Nova Unidade</span>
                 </button>
               )}
             </div>
@@ -364,7 +364,7 @@ export default function TvPairingPage() {
                   type="text"
                   value={newUnidadeNome}
                   onChange={(e) => setNewUnidadeNome(e.target.value)}
-                  placeholder="Nome da Loja (ex: Matriz Centro)"
+                  placeholder="Nome da Unidade (ex: Matriz Centro, Filial Shopping)"
                   className="flex-1 h-11 px-3 rounded-xl bg-black/50 border border-white/20 text-sm text-white focus:outline-none focus:border-blue-500"
                 />
                 <button
@@ -488,7 +488,7 @@ export default function TvPairingPage() {
               type="text"
               value={ticker}
               onChange={(e) => setTicker(e.target.value)}
-              placeholder="Ex: Peça pelo WhatsApp • Wi-Fi da loja: SushiGuest (Senha: salmao123)"
+              placeholder="Ex: Peça pelo WhatsApp • Wi-Fi da unidade: Visitante123"
               className="w-full h-12 px-4 rounded-xl bg-black/40 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm font-medium"
             />
             <p className="text-xs text-slate-400 mt-2">

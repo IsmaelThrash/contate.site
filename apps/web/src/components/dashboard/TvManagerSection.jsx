@@ -71,6 +71,19 @@ export default function TvManagerSection({ currentUser }) {
     endereco: ''
   });
 
+  // Modal para Editar TV existente
+  const [isEditTelaModalOpen, setIsEditTelaModalOpen] = useState(false);
+  const [editingTela, setEditingTela] = useState(null);
+  const [editTelaForm, setEditTelaForm] = useState({
+    nome: '',
+    setor: '',
+    orientacao: 'horizontal',
+    unidade_id: '',
+    ticker_texto: '',
+    playlist_ids: []
+  });
+  const [editTelaSubmitting, setEditTelaSubmitting] = useState(false);
+
   // Modal de Conexão / Pareamento de Nova TV (Inline no Dashboard)
   const [isPairingModalOpen, setIsPairingModalOpen] = useState(false);
   const [pairingPin, setPairingPin] = useState('');
@@ -95,6 +108,30 @@ export default function TvManagerSection({ currentUser }) {
     setIsAddingUnidadeInline(false);
     setNewUnidadeInlineNome('');
     setIsPairingModalOpen(true);
+  };
+
+  const handleOpenEditTelaModal = (tela) => {
+    setEditingTela(tela);
+    setEditTelaForm({
+      nome: tela.nome || '',
+      setor: tela.setor || 'Geral',
+      orientacao: tela.orientacao || 'horizontal',
+      unidade_id: tela.unidade_id || '',
+      ticker_texto: tela.ticker_texto || '',
+      playlist_ids: (tela.playlists || []).map(p => p.id)
+    });
+    setIsAddingUnidadeInline(false);
+    setNewUnidadeInlineNome('');
+    setIsEditTelaModalOpen(true);
+  };
+
+  const toggleEditTelaPlaylist = (playlistId) => {
+    setEditTelaForm(prev => ({
+      ...prev,
+      playlist_ids: prev.playlist_ids.includes(playlistId)
+        ? prev.playlist_ids.filter(id => id !== playlistId)
+        : [...prev.playlist_ids, playlistId]
+    }));
   };
 
   const handleConfirmPairing = async (e) => {
@@ -144,7 +181,80 @@ export default function TvManagerSection({ currentUser }) {
     }
   };
 
-  const handleCreateUnidadeInline = async () => {
+  const handleSaveEditTela = async (e) => {
+    e.preventDefault();
+    if (!editingTela?.id) return;
+
+    try {
+      setEditTelaSubmitting(true);
+
+      // 1. Atualiza dados da tela na tabela telas_tv e incrementa a versao_conteudo para sincronizar
+      const { error: updateTelaErr } = await supabase
+        .from('telas_tv')
+        .update({
+          nome: editTelaForm.nome.trim() || 'TV',
+          setor: editTelaForm.setor.trim() || 'Geral',
+          orientacao: editTelaForm.orientacao,
+          unidade_id: editTelaForm.unidade_id || null,
+          ticker_texto: editTelaForm.ticker_texto?.trim() || null,
+          versao_conteudo: (editingTela.versao_conteudo || 1) + 1,
+          ultima_atividade: new Date().toISOString()
+        })
+        .eq('id', editingTela.id);
+
+      if (updateTelaErr) throw updateTelaErr;
+
+      // 2. Atualiza vínculos com playlists na tabela tela_tv_playlists
+      // Remove vínculos anteriores
+      const { error: delLinkErr } = await supabase
+        .from('tela_tv_playlists')
+        .delete()
+        .eq('tela_id', editingTela.id);
+
+      if (delLinkErr) throw delLinkErr;
+
+      // Adiciona novos vínculos
+      if (editTelaForm.playlist_ids?.length > 0) {
+        const rowsToInsert = editTelaForm.playlist_ids.map((playlistId, idx) => ({
+          tela_id: editingTela.id,
+          playlist_id: playlistId,
+          ordem: idx
+        }));
+        const { error: insertLinkErr } = await supabase
+          .from('tela_tv_playlists')
+          .insert(rowsToInsert);
+
+        if (insertLinkErr) throw insertLinkErr;
+      }
+
+      // 3. Dispara sincronização em tempo real para a TV atualizar imediatamente
+      try {
+        await supabase.rpc('tv_disparar_atualizacao', { p_tela_id: editingTela.id });
+      } catch (rpcErr) {
+        logger.warn('Não foi possível disparar RPC de atualização imediata:', rpcErr);
+      }
+
+      toast({
+        title: 'TV atualizada com sucesso!',
+        description: 'As alterações foram salvas e enviadas para a tela.'
+      });
+
+      setIsEditTelaModalOpen(false);
+      setEditingTela(null);
+      await loadAllTvData();
+    } catch (err) {
+      logger.error('Erro ao salvar alterações da TV:', err);
+      toast({
+        title: 'Erro ao salvar alterações',
+        description: err.message || 'Não foi possível atualizar a tela.',
+        variant: 'destructive'
+      });
+    } finally {
+      setEditTelaSubmitting(false);
+    }
+  };
+
+  const handleCreateUnidadeInline = async (forEditing = false) => {
     if (!newUnidadeInlineNome.trim() || !currentUser?.id) return;
     try {
       const { data, error } = await supabase
@@ -159,13 +269,17 @@ export default function TvManagerSection({ currentUser }) {
       if (error) throw error;
 
       setUnidades(prev => [...prev, data]);
-      setPairingUnidadeId(data.id);
+      if (forEditing) {
+        setEditTelaForm(prev => ({ ...prev, unidade_id: data.id }));
+      } else {
+        setPairingUnidadeId(data.id);
+      }
       setNewUnidadeInlineNome('');
       setIsAddingUnidadeInline(false);
-      toast({ title: 'Loja cadastrada com sucesso!' });
+      toast({ title: 'Unidade cadastrada com sucesso!' });
     } catch (err) {
       logger.error('Erro ao criar unidade inline:', err);
-      toast({ title: 'Erro', description: 'Não foi possível cadastrar a loja.', variant: 'destructive' });
+      toast({ title: 'Erro', description: 'Não foi possível cadastrar a unidade.', variant: 'destructive' });
     }
   };
 
@@ -510,7 +624,7 @@ export default function TvManagerSection({ currentUser }) {
               </span>
             </div>
             <p className="text-xs sm:text-sm text-slate-400 line-clamp-2">
-              Controle vitrines digitais, menu boards e promoções em Smart TVs de todas as suas lojas.
+              Controle vitrines digitais, menu boards e promoções em Smart TVs de todas as suas unidades.
             </p>
           </div>
         </div>
@@ -538,7 +652,7 @@ export default function TvManagerSection({ currentUser }) {
         </div>
       </div>
 
-      {/* TABS INTERNAS (Telas Conectadas | Playlists & Slides | Lojas & Unidades) */}
+      {/* TABS INTERNAS (Telas Conectadas | Playlists & Slides | Unidades) */}
       <div className="flex items-center gap-2 border-b border-white/10 pb-3 sm:pb-4 overflow-x-auto max-w-full no-scrollbar">
         <button
           onClick={() => setActiveSubTab('telas')}
@@ -573,7 +687,7 @@ export default function TvManagerSection({ currentUser }) {
           }`}
         >
           <Store size={15} />
-          <span>Lojas & Unidades ({unidades.length})</span>
+          <span>Unidades ({unidades.length})</span>
         </button>
       </div>
 
@@ -620,9 +734,18 @@ export default function TvManagerSection({ currentUser }) {
                           </span>
                         </div>
 
-                        <span className="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white/5 text-slate-300 border border-white/10">
-                          {tela.orientacao === 'vertical' ? 'Vertical 9:16' : 'Horizontal 16:9'}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white/5 text-slate-300 border border-white/10">
+                            {tela.orientacao === 'vertical' ? 'Vertical 9:16' : 'Horizontal 16:9'}
+                          </span>
+                          <button
+                            onClick={() => handleOpenEditTelaModal(tela)}
+                            className="p-1.5 rounded-lg bg-blue-600/15 hover:bg-blue-600/25 border border-blue-500/30 text-blue-400 transition-colors cursor-pointer"
+                            title="Editar Configurações da TV"
+                          >
+                            <Edit3 size={13} />
+                          </button>
+                        </div>
                       </div>
 
                       <h4 className="font-sora font-extrabold text-lg text-white mb-1">
@@ -669,6 +792,14 @@ export default function TvManagerSection({ currentUser }) {
                     {/* Ações da Tela */}
                     <div className="pt-4 border-t border-white/10 flex items-center justify-between">
                       <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleOpenEditTelaModal(tela)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/15 hover:bg-blue-600/25 border border-blue-500/30 text-blue-400 text-xs font-bold transition-colors cursor-pointer"
+                          title="Editar TV, Playlist e Unidade"
+                        >
+                          <Edit3 size={13} />
+                          <span>Editar TV</span>
+                        </button>
                         <button
                           onClick={() => handleRefreshSingleTela(tela.id)}
                           className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer"
@@ -856,13 +987,13 @@ export default function TvManagerSection({ currentUser }) {
       )}
 
       {/* -------------------------------------------------------- */}
-      {/* ABA 3: LOJAS & UNIDADES */}
+      {/* ABA 3: UNIDADES */}
       {/* -------------------------------------------------------- */}
       {activeSubTab === 'unidades' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="font-sora font-bold text-lg text-white">
-              Lojas e Unidades Físicas
+              Unidades Físicas
             </h3>
             <button
               onClick={() => {
@@ -872,13 +1003,13 @@ export default function TvManagerSection({ currentUser }) {
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
             >
               <Plus size={14} />
-              <span>Nova Loja</span>
+              <span>Nova Unidade</span>
             </button>
           </div>
 
           {unidades.length === 0 ? (
             <div className="p-10 text-center rounded-2xl bg-[#0E121A] border border-white/10 text-slate-400 text-sm">
-              Nenhuma loja cadastrada. Cadastre suas filiais ou matriz para organizar suas TVs.
+              Nenhuma unidade cadastrada. Cadastre suas filiais ou matriz para organizar suas TVs.
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -904,13 +1035,13 @@ export default function TvManagerSection({ currentUser }) {
 
                     <button
                       onClick={async () => {
-                        if (window.confirm(`Deseja remover a loja "${u.nome}"?`)) {
+                        if (window.confirm(`Deseja remover a unidade "${u.nome}"?`)) {
                           await supabase.from('tv_unidades').delete().eq('id', u.id);
                           loadAllTvData();
                         }
                       }}
                       className="p-2 text-slate-400 hover:text-rose-400 cursor-pointer"
-                      title="Excluir Loja"
+                      title="Excluir Unidade"
                     >
                       <Trash2 size={15} />
                     </button>
@@ -1150,19 +1281,19 @@ export default function TvManagerSection({ currentUser }) {
       )}
 
       {/* -------------------------------------------------------- */}
-      {/* MODAL: CRIAR UNIDADE / LOJA */}
+      {/* MODAL: CRIAR UNIDADE */}
       {/* -------------------------------------------------------- */}
       {isUnidadeModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
           <div className="w-full max-w-md rounded-3xl bg-[#0E121A] border border-white/15 p-6 shadow-2xl space-y-4">
             <h4 className="font-sora font-extrabold text-lg text-white">
-              Nova Loja / Unidade Física
+              Nova Unidade Física
             </h4>
 
             <form onSubmit={handleSaveUnidade} className="space-y-4">
               <div>
                 <label className="block text-xs uppercase tracking-wider font-bold text-slate-300 mb-1">
-                  Nome da Loja
+                  Nome da Unidade
                 </label>
                 <input
                   type="text"
@@ -1199,7 +1330,269 @@ export default function TvManagerSection({ currentUser }) {
                   type="submit"
                   className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
                 >
-                  Salvar Loja
+                  Salvar Unidade
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* -------------------------------------------------------- */}
+      {/* MODAL: EDITAR SMART TV (ALTERAR PLAYLIST, UNIDADE, SETOR) */}
+      {/* -------------------------------------------------------- */}
+      {isEditTelaModalOpen && editingTela && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+          <div className="w-full max-w-lg rounded-3xl bg-[#0E121A] border border-white/15 p-5 sm:p-6 shadow-2xl space-y-5 my-auto max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                  <Edit3 size={18} />
+                </div>
+                <div>
+                  <h4 className="font-sora font-extrabold text-base sm:text-lg text-white">
+                    Editar TV Conectada
+                  </h4>
+                  <p className="text-[11px] text-slate-400">
+                    Altere a unidade física, playlists ativas e orientação
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditTelaModalOpen(false);
+                  setEditingTela(null);
+                }}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditTela} className="space-y-4 text-left">
+              {/* Campo 1: Identificação da TV */}
+              <div className="space-y-3 p-4 rounded-2xl bg-black/40 border border-white/10">
+                <div>
+                  <label className="block text-xs uppercase tracking-wider font-bold text-slate-300 mb-1">
+                    Nome da Tela
+                  </label>
+                  <input
+                    type="text"
+                    value={editTelaForm.nome}
+                    onChange={(e) => setEditTelaForm(prev => ({ ...prev, nome: e.target.value }))}
+                    placeholder="Ex: TV Balcão, TV Entrada"
+                    required
+                    className="w-full h-11 px-3 rounded-xl bg-black/50 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-wider font-bold text-slate-300 mb-1">
+                    Setor / Função
+                  </label>
+                  <input
+                    type="text"
+                    value={editTelaForm.setor}
+                    onChange={(e) => setEditTelaForm(prev => ({ ...prev, setor: e.target.value }))}
+                    placeholder="Ex: Balcão, Salão, Drinks"
+                    required
+                    className="w-full h-11 px-3 rounded-xl bg-black/50 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500"
+                  />
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {['Geral', 'Balcão', 'Sobremesas', 'Drinks', 'Salão', 'Vitrine'].map(s => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setEditTelaForm(prev => ({ ...prev, setor: s }))}
+                        className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-colors cursor-pointer ${
+                          editTelaForm.setor === s
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-white/5 text-slate-400 hover:text-white border border-white/5'
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Orientação */}
+                <div>
+                  <label className="block text-xs uppercase tracking-wider font-bold text-slate-300 mb-1.5">
+                    Orientação da Tela
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditTelaForm(prev => ({ ...prev, orientacao: 'horizontal' }))}
+                      className={`flex items-center justify-center gap-1.5 p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                        editTelaForm.orientacao === 'horizontal'
+                          ? 'bg-blue-600/20 border-blue-500 text-blue-400'
+                          : 'bg-black/30 border-white/10 text-slate-400'
+                      }`}
+                    >
+                      <Monitor size={15} />
+                      <span>Horizontal (16:9)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditTelaForm(prev => ({ ...prev, orientacao: 'vertical' }))}
+                      className={`flex items-center justify-center gap-1.5 p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                        editTelaForm.orientacao === 'vertical'
+                          ? 'bg-blue-600/20 border-blue-500 text-blue-400'
+                          : 'bg-black/30 border-white/10 text-slate-400'
+                      }`}
+                    >
+                      <Smartphone size={15} />
+                      <span>Vertical / Totem</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Campo 2: Associação com Unidade */}
+              <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs uppercase tracking-wider font-bold text-slate-300 flex items-center gap-1">
+                    <Store size={13} className="text-blue-400" />
+                    <span>Unidade Física</span>
+                  </label>
+                  {!isAddingUnidadeInline && (
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingUnidadeInline(true)}
+                      className="text-[11px] font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-0.5 cursor-pointer"
+                    >
+                      <Plus size={12} />
+                      <span>Nova Unidade</span>
+                    </button>
+                  )}
+                </div>
+
+                {isAddingUnidadeInline ? (
+                  <div className="flex gap-1.5">
+                    <input
+                      type="text"
+                      value={newUnidadeInlineNome}
+                      onChange={(e) => setNewUnidadeInlineNome(e.target.value)}
+                      placeholder="Nome da filial ou matriz"
+                      className="flex-1 h-10 px-2.5 rounded-xl bg-black/60 border border-white/20 text-xs text-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleCreateUnidadeInline(true)}
+                      className="px-3 h-10 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 cursor-pointer"
+                    >
+                      Salvar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingUnidadeInline(false)}
+                      className="px-2.5 h-10 rounded-xl bg-white/5 text-slate-400 text-xs hover:bg-white/10 cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <select
+                    value={editTelaForm.unidade_id}
+                    onChange={(e) => setEditTelaForm(prev => ({ ...prev, unidade_id: e.target.value }))}
+                    className="w-full h-11 px-3 rounded-xl bg-black/50 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="">Nenhuma unidade específica (Unidade Geral)</option>
+                    {unidades.map(u => (
+                      <option key={u.id} value={u.id}>
+                        {u.nome}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Campo 3: Associação com Playlists */}
+              <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+                <label className="block text-xs uppercase tracking-wider font-bold text-slate-300 mb-1.5">
+                  Playlists para Rodar na TV
+                </label>
+                {playlists.length === 0 ? (
+                  <p className="text-xs text-slate-400">
+                    Nenhuma playlist criada. Crie uma na aba "Playlists & Slides".
+                  </p>
+                ) : (
+                  <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                    {playlists.map(p => {
+                      const isChecked = editTelaForm.playlist_ids.includes(p.id);
+                      return (
+                        <div
+                          key={p.id}
+                          onClick={() => toggleEditTelaPlaylist(p.id)}
+                          className={`flex items-center justify-between p-2.5 rounded-xl border text-xs transition-all cursor-pointer ${
+                            isChecked
+                              ? 'bg-blue-600/20 border-blue-500 text-white'
+                              : 'bg-black/30 border-white/5 text-slate-400 hover:border-white/15'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className={`w-4 h-4 rounded flex items-center justify-center border ${
+                              isChecked ? 'bg-blue-600 border-blue-500 text-white' : 'border-slate-600'
+                            }`}>
+                              {isChecked && <Check size={11} />}
+                            </div>
+                            <span className="font-semibold">{p.nome}</span>
+                          </div>
+                          <span className="text-[10px] text-slate-400">
+                            {p.duracao_padrao_segundos || 8}s/slide
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Campo 4: Letreiro Ticker */}
+              <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
+                <label className="block text-xs uppercase tracking-wider font-bold text-slate-300 mb-1">
+                  Letreiro Ticker de Rodapé (Opcional)
+                </label>
+                <input
+                  type="text"
+                  value={editTelaForm.ticker_texto}
+                  onChange={(e) => setEditTelaForm(prev => ({ ...prev, ticker_texto: e.target.value }))}
+                  placeholder="Ex: Peça pelo WhatsApp • Wi-Fi da unidade: Visitante123"
+                  className="w-full h-11 px-3 rounded-xl bg-black/50 border border-white/15 text-xs text-white focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {/* Botões de Ação */}
+              <div className="pt-2 flex flex-col sm:flex-row items-center gap-2">
+                <button
+                  type="submit"
+                  disabled={editTelaSubmitting}
+                  className="w-full h-12 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-sora font-extrabold text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] shadow-blue-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {editTelaSubmitting ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Salvando e Sincronizando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check size={16} />
+                      <span>Salvar e Sincronizar TV ⚡</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditTelaModalOpen(false);
+                    setEditingTela(null);
+                  }}
+                  className="w-full sm:w-auto px-4 h-12 rounded-xl bg-white/5 text-slate-300 text-xs font-semibold hover:bg-white/10 cursor-pointer text-center"
+                >
+                  Cancelar
                 </button>
               </div>
             </form>
@@ -1337,12 +1730,12 @@ export default function TvManagerSection({ currentUser }) {
                 </div>
               </div>
 
-              {/* Campo 3: Loja / Unidade */}
+              {/* Campo 3: Unidade Física */}
               <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs uppercase tracking-wider font-bold text-slate-300 flex items-center gap-1">
                     <Store size={13} className="text-blue-400" />
-                    <span>Loja / Unidade</span>
+                    <span>Unidade Física</span>
                   </label>
                   {!isAddingUnidadeInline && (
                     <button
@@ -1351,7 +1744,7 @@ export default function TvManagerSection({ currentUser }) {
                       className="text-[11px] font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-0.5 cursor-pointer"
                     >
                       <Plus size={12} />
-                      <span>Nova Loja</span>
+                      <span>Nova Unidade</span>
                     </button>
                   )}
                 </div>
@@ -1362,12 +1755,12 @@ export default function TvManagerSection({ currentUser }) {
                       type="text"
                       value={newUnidadeInlineNome}
                       onChange={(e) => setNewUnidadeInlineNome(e.target.value)}
-                      placeholder="Nome da filial/loja"
+                      placeholder="Nome da filial ou matriz"
                       className="flex-1 h-10 px-2.5 rounded-xl bg-black/60 border border-white/20 text-xs text-white"
                     />
                     <button
                       type="button"
-                      onClick={handleCreateUnidadeInline}
+                      onClick={() => handleCreateUnidadeInline(false)}
                       className="px-3 h-10 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 cursor-pointer"
                     >
                       Salvar
@@ -1446,7 +1839,7 @@ export default function TvManagerSection({ currentUser }) {
                   type="text"
                   value={pairingTicker}
                   onChange={(e) => setPairingTicker(e.target.value)}
-                  placeholder="Ex: Peça pelo WhatsApp • Wi-Fi da loja: SushiGuest"
+                  placeholder="Ex: Peça pelo WhatsApp • Wi-Fi da unidade: Visitante123"
                   className="w-full h-11 px-3 rounded-xl bg-black/50 border border-white/15 text-xs text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
