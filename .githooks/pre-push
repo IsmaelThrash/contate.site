@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+echo "🛡️ Executando auditoria de seguranca (npm audit --omit=dev --audit-level=high --workspace=web)..."
+npm audit --omit=dev --audit-level=high --workspace=web
+
+RESULT=$?
+if [ $RESULT -ne 0 ]; then
+  echo "❌ Falha no teste de seguranca! Encontradas vulnerabilidades de nivel alto ou critico em producao."
+  echo "O git push foi cancelado para evitar falha no deploy do GitHub."
+  exit 1
+fi
+
+echo "✅ Auditoria de seguranca aprovada com sucesso! Prosseguindo com o push..."
+exit 0

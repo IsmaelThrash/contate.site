@@ -53,3 +53,5 @@ Este arquivo é lido automaticamente pela IA em todas as sessões de desenvolvim
    - Sempre que `npm run build` for executado, o script MUST copiar o resultado de `apps/web/dist` para a raiz do repositório (`.`), garantindo que o servidor da Hostinger entregue os assets mais recentes.
 2. **Preservação de Funções de Autenticação**:
    - Manter tratamento de erros silenciosos do Supabase (OAuth/Magic Link) e unificação automática de contas.
+3. **Auditoria de Segurança Obrigatória (SEC-M01)**:
+   - Antes de qualquer push para o repositório, o comando `npm run audit` (`npm audit --omit=dev --audit-level=high --workspace=web`) MUST ser executado e passar com 0 vulnerabilidades de nível high/critical, espelhando rigorosamente o teste do GitHub Actions (`deploy.yml`). Há um git hook configurado em `.githooks/pre-push` que bloqueia o envio caso haja falha.
