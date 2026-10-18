@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   RotateCw
 } from 'lucide-react';
+import { detectTvPlatform } from '@/lib/tvDeviceDetector.js';
 
 const STORAGE_KEY = 'contate_tv_device';
 const COOKIE_NAME = 'contate_tv_device_token';
@@ -85,6 +86,7 @@ export default function TvPlayerPage() {
   const [deviceToken, setDeviceToken] = useState(() => {
     return getPersistedDeviceToken(directToken);
   });
+  const [deviceInfo] = useState(() => detectTvPlatform());
   const [pairingSession, setPairingSession] = useState(null);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const [loading, setLoading] = useState(true);
@@ -545,9 +547,16 @@ export default function TvPlayerPage() {
           </div>
         </main>
 
-        {/* Rodapé da TV */}
-        <footer className="relative z-10 w-full max-w-5xl flex items-center justify-between border-t border-white/10 pt-4 text-xs text-slate-500">
-          <span>contate.site TV • Versão v2.1</span>
+        {/* Rodapé da TV com Diagnóstico do Aparelho */}
+        <footer className="relative z-10 w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10 pt-4 text-xs text-slate-500">
+          <div className="flex items-center gap-3">
+            <span>contate.site TV • v2.1</span>
+            <span className="hidden sm:inline text-white/20">•</span>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono text-slate-400">
+              <Tv size={12} className="text-blue-400" />
+              <span>{deviceInfo.fullLabel}</span>
+            </div>
+          </div>
           <div className="flex items-center gap-4">
             <button 
               onClick={startPairingFlow} 

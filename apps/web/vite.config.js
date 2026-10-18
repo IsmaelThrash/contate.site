@@ -26,6 +26,7 @@ export default defineConfig({
     },
   },
   build: {
+    target: ['chrome68', 'safari12', 'es2018'],
     rollupOptions: {
       external: [
         '@babel/parser',

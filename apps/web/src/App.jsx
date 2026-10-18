@@ -15,6 +15,7 @@ import TermsPage from '@/pages/TermsPage.jsx';
 import PrivacyPage from '@/pages/PrivacyPage.jsx';
 import TvPlayerPage from '@/pages/TvPlayerPage.jsx';
 import TvPairingPage from '@/pages/TvPairingPage.jsx';
+import { TvErrorBoundary } from '@/components/common/TvErrorBoundary.jsx';
 import { Toaster } from '@/components/ui/toaster';
 import { CookieConsent } from '@/components/common/CookieConsent.jsx';
 
@@ -55,7 +56,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/tv" element={<TvPlayerPage />} />
+            <Route 
+              path="/tv" 
+              element={
+                <TvErrorBoundary>
+                  <TvPlayerPage />
+                </TvErrorBoundary>
+              } 
+            />
             <Route
               path="/onboarding"
               element={
