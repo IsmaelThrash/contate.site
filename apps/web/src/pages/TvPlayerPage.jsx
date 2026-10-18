@@ -197,28 +197,33 @@ export default function TvPlayerPage() {
     };
   }, []);
 
-  // 2. Audio/Video Pinger Invisível (Mudo & 100% Local na memória)
-  // Smart TVs LG webOS e Samsung Tizen nunca fecham abas que possuem mídia ativa em reprodução
+  // 2. Elemento de Vídeo Real em Loop Mudo (1x1 pixel sintético em base64 local - Zero consumo de rede)
+  // Smart TVs LG webOS tratam a página como reprodução de vídeo contínua (como YouTube/Netflix),
+  // prevenindo o timeout de 4 horas do navegador e protetores de tela do webOS
+  const videoRef = useRef(null);
+
   useEffect(() => {
     let audioCtx = null;
     let oscillator = null;
     let gainNode = null;
 
+    // A) AudioContext oscilador local mudo
     try {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       if (AudioContextClass) {
         audioCtx = new AudioContextClass();
         oscillator = audioCtx.createOscillator();
         gainNode = audioCtx.createGain();
-
-        // Volume 0 (totalmente inaudível / mudo absoluto)
-        gainNode.gain.value = 0;
+        gainNode.gain.value = 0; // Volume 0 inaudível
         oscillator.connect(gainNode);
         gainNode.connect(audioCtx.destination);
         oscillator.start();
       }
-    } catch (e) {
-      // Ignora silenciosamente se o motor de áudio for bloqueado por política de autoplay
+    } catch (e) {}
+
+    // B) Play automático no micro-vídeo local mudo
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
     }
 
     return () => {
@@ -229,15 +234,19 @@ export default function TvPlayerPage() {
     };
   }, []);
 
-  // 3. Simulador de Atividade Sintética Periódica
-  // Evita o gatilho de inatividade que faz a TV comutar para HDMI após 15-20 minutos
+  // 3. Simulador de Presença Ativa (Micro-eventos a cada 45 segundos)
+  // Despacha micro-movimentos e micro-scroll imperceptível para simular interação física contínua
   useEffect(() => {
     const keepAliveInterval = setInterval(() => {
       try {
-        // Dispara um micro evento sintético na janela para resetar o idle timer do SO
         window.dispatchEvent(new Event('mousemove'));
+        window.dispatchEvent(new Event('touchstart'));
+        // Micro-scroll invisível de 0px para resetar timers de inatividade profunda
+        if (typeof window.scrollBy === 'function') {
+          window.scrollBy(0, 0);
+        }
       } catch (e) {}
-    }, 60000); // a cada 1 minuto
+    }, 45000); // a cada 45 segundos
 
     return () => clearInterval(keepAliveInterval);
   }, []);
@@ -563,6 +572,15 @@ export default function TvPlayerPage() {
   if (!deviceToken || !screenData) {
     return (
       <div className="relative min-h-screen w-full bg-[#080A0F] text-white flex flex-col items-center justify-between p-6 sm:p-10 select-none overflow-hidden font-sans">
+        {/* Micro-vídeo invisível para prevenção de standby do webOS */}
+        <video
+          ref={videoRef}
+          loop
+          muted
+          playsInline
+          className="absolute -top-10 -left-10 w-1 h-1 opacity-0 pointer-events-none"
+          src="data:video/mp4;base64,AAAAHGZ0eXBtcDQyAAAAAG1wNDJpc29tYXZjMQAAADd2ZXJ0AAAAAU1BVEUAAAAAMAAAABRwbGF0AAAAAGlwaW4AAAAAYXVkaQAAAAAHdHJhawAAABxkYXRhAAAAABhldmVuAAAA"
+        />
         {/* Glow de fundo */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
 
@@ -688,6 +706,15 @@ export default function TvPlayerPage() {
         activeOrientation === 'vertical' ? 'flex flex-col items-center justify-center' : ''
       }`}
     >
+      {/* Micro-vídeo invisível para prevenção de standby do webOS */}
+      <video
+        ref={videoRef}
+        loop
+        muted
+        playsInline
+        className="absolute -top-10 -left-10 w-1 h-1 opacity-0 pointer-events-none"
+        src="data:video/mp4;base64,AAAAHGZ0eXBtcDQyAAAAAG1wNDJpc29tYXZjMQAAADd2ZXJ0AAAAAU1BVEUAAAAAMAAAABRwbGF0AAAAAGlwaW4AAAAAYXVkaQAAAAAHdHJhawAAABxkYXRhAAAAABhldmVuAAAA"
+      />
       {/* Controles Flutuantes com Auto-Hide (Mouse / Remoto) */}
       <div 
         className={`fixed top-4 right-4 z-50 flex items-center gap-2 transition-opacity duration-300 ${
