@@ -39,18 +39,23 @@ const DashboardPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeMainTab, setActiveMainTab] = useState(() => {
-    return searchParams.get('tab') === 'tv' ? 'tv' : 'bio';
+    const urlTab = searchParams.get('tab');
+    if (urlTab === 'tv' || urlTab === 'bio') return urlTab;
+    const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('contate_dashboard_main_tab') : null;
+    return stored === 'tv' ? 'tv' : 'bio';
   });
 
-  // Sincroniza aba quando a URL contiver ?tab=tv
+  // Sincroniza aba quando a URL ou estado mudar e persiste no localStorage
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam === 'tv') {
+    if (tabParam === 'tv' && activeMainTab !== 'tv') {
       setActiveMainTab('tv');
-    } else if (tabParam === 'bio') {
+      localStorage.setItem('contate_dashboard_main_tab', 'tv');
+    } else if (tabParam === 'bio' && activeMainTab !== 'bio') {
       setActiveMainTab('bio');
+      localStorage.setItem('contate_dashboard_main_tab', 'bio');
     }
-  }, [searchParams]);
+  }, [searchParams, activeMainTab]);
   const [links, setLinks] = useState([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingLink, setEditingLink] = useState(null);

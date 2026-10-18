@@ -37,8 +37,20 @@ export default function TvManagerSection({ currentUser }) {
   const [loading, setLoading] = useState(true);
   const [refreshingAll, setRefreshingAll] = useState(false);
 
-  // Sub-aba ativa dentro da seção TV
-  const [activeSubTab, setActiveSubTab] = useState('telas'); // 'telas' | 'playlists' | 'unidades'
+  // Sub-aba ativa dentro da seção TV com persistência no localStorage
+  const [activeSubTab, setActiveSubTab] = useState(() => {
+    try {
+      return localStorage.getItem('contate_tv_active_subtab') || 'telas';
+    } catch {
+      return 'telas';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('contate_tv_active_subtab', activeSubTab);
+    } catch {}
+  }, [activeSubTab]);
 
   // Modais e formulários
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
@@ -345,7 +357,23 @@ export default function TvManagerSection({ currentUser }) {
         });
         setSlides(agrupados);
 
-        if (!selectedPlaylist && loadedPlaylists.length > 0) {
+        // Restaurar playlist selecionada persistida no localStorage ou fallback para a primeira
+        const savedPlaylistId = (() => {
+          try {
+            return localStorage.getItem('contate_tv_selected_playlist_id');
+          } catch {
+            return null;
+          }
+        })();
+
+        if (savedPlaylistId) {
+          const matched = loadedPlaylists.find(p => p.id === savedPlaylistId);
+          if (matched) {
+            setSelectedPlaylist(matched);
+          } else if (loadedPlaylists.length > 0) {
+            setSelectedPlaylist(loadedPlaylists[0]);
+          }
+        } else if (!selectedPlaylist && loadedPlaylists.length > 0) {
           setSelectedPlaylist(loadedPlaylists[0]);
         }
       }
@@ -869,7 +897,12 @@ export default function TvManagerSection({ currentUser }) {
                   return (
                     <div
                       key={p.id}
-                      onClick={() => setSelectedPlaylist(p)}
+                      onClick={() => {
+                        setSelectedPlaylist(p);
+                        try {
+                          localStorage.setItem('contate_tv_selected_playlist_id', p.id);
+                        } catch {}
+                      }}
                       className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
                         isSelected
                           ? 'bg-blue-600/15 border-blue-500 text-white shadow-lg'
