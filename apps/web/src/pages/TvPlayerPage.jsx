@@ -160,6 +160,88 @@ export default function TvPlayerPage() {
     };
   }, [handleUserActivity]);
 
+  // -------------------------------------------------------------
+  // PREVENÇÕES ANTI-SLEEP / ANTI-HDMI SWITCH (SMART TV LG & SAMSUNG)
+  // -------------------------------------------------------------
+
+  // 1. Screen Wake Lock API nativo (mantém display ativo sem hibernar)
+  useEffect(() => {
+    let wakeLockSentinel = null;
+
+    const requestWakeLock = async () => {
+      try {
+        if ('wakeLock' in navigator && typeof navigator.wakeLock.request === 'function') {
+          wakeLockSentinel = await navigator.wakeLock.request('screen');
+        }
+      } catch (err) {
+        // Fallback silencioso para navegadores que não suportam WakeLock
+      }
+    };
+
+    requestWakeLock();
+
+    // Se o usuário alternar abas ou a TV tentar suspender, reativa
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        requestWakeLock();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (wakeLockSentinel && typeof wakeLockSentinel.release === 'function') {
+        wakeLockSentinel.release().catch(() => {});
+      }
+    };
+  }, []);
+
+  // 2. Audio/Video Pinger Invisível (Mudo & 100% Local na memória)
+  // Smart TVs LG webOS e Samsung Tizen nunca fecham abas que possuem mídia ativa em reprodução
+  useEffect(() => {
+    let audioCtx = null;
+    let oscillator = null;
+    let gainNode = null;
+
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+        oscillator = audioCtx.createOscillator();
+        gainNode = audioCtx.createGain();
+
+        // Volume 0 (totalmente inaudível / mudo absoluto)
+        gainNode.gain.value = 0;
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.start();
+      }
+    } catch (e) {
+      // Ignora silenciosamente se o motor de áudio for bloqueado por política de autoplay
+    }
+
+    return () => {
+      try {
+        if (oscillator) oscillator.stop();
+        if (audioCtx && audioCtx.state !== 'closed') audioCtx.close();
+      } catch (e) {}
+    };
+  }, []);
+
+  // 3. Simulador de Atividade Sintética Periódica
+  // Evita o gatilho de inatividade que faz a TV comutar para HDMI após 15-20 minutos
+  useEffect(() => {
+    const keepAliveInterval = setInterval(() => {
+      try {
+        // Dispara um micro evento sintético na janela para resetar o idle timer do SO
+        window.dispatchEvent(new Event('mousemove'));
+      } catch (e) {}
+    }, 60000); // a cada 1 minuto
+
+    return () => clearInterval(keepAliveInterval);
+  }, []);
+
   // Limpeza de Blob URLs para evitar memory leaks em Smart TVs
   const cleanupBlobs = useCallback(() => {
     if (blobUrlsRef.current.length > 0) {
