@@ -19,15 +19,71 @@ import {
 } from 'lucide-react';
 
 const STORAGE_KEY = 'contate_tv_device';
+const COOKIE_NAME = 'contate_tv_device_token';
+const TOKEN_MAX_AGE_DAYS = 14; // Validade estendida de 2 semanas (14 dias)
+
+// Utilitários para manipular Cookies com SameSite=Lax e expiração de 14 dias
+function getTvCookie(name = COOKIE_NAME) {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+  return match ? decodeURIComponent(match[3]) : null;
+}
+
+function setTvCookie(value, days = TOKEN_MAX_AGE_DAYS) {
+  if (typeof document === 'undefined') return;
+  const maxAge = days * 24 * 60 * 60; // segundos
+  document.cookie = `${COOKIE_NAME}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+}
+
+function removeTvCookie() {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
+}
+
+// Resgata o token salvo nas 3 camadas: URL > Cookie > LocalStorage
+function getPersistedDeviceToken(directToken) {
+  if (directToken) return directToken;
+  const fromCookie = getTvCookie();
+  if (fromCookie) return fromCookie;
+  if (typeof localStorage !== 'undefined') {
+    return localStorage.getItem(STORAGE_KEY) || null;
+  }
+  return null;
+}
+
+// Salva o token nas camadas persistentes
+function persistDeviceToken(token) {
+  if (!token) return;
+  setTvCookie(token, TOKEN_MAX_AGE_DAYS);
+  if (typeof localStorage !== 'undefined') {
+    try {
+      localStorage.setItem(STORAGE_KEY, token);
+    } catch (e) {
+      // safe fallback se localStorage estiver desativado no navegador da TV
+    }
+  }
+}
+
+// Limpa token de todas as camadas (caso o dono remova ou desvincule)
+function clearPersistedDeviceToken() {
+  removeTvCookie();
+  if (typeof localStorage !== 'undefined') {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (e) {
+      // safe fallback
+    }
+  }
+}
 
 export default function TvPlayerPage() {
   const { slug } = useParams();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const directToken = searchParams.get('token');
 
-  // Estados principais
+  // Estados principais com recuperação inteligente de sessão
   const [deviceToken, setDeviceToken] = useState(() => {
-    return directToken || localStorage.getItem(STORAGE_KEY) || null;
+    return getPersistedDeviceToken(directToken);
   });
   const [pairingSession, setPairingSession] = useState(null);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
@@ -177,14 +233,17 @@ export default function TvPlayerPage() {
         const list = data.slides || [];
         setSlides(list);
 
-        // Salva cache offline local
+        // Salva token nas 3 camadas persistentes (Cookie 14 dias + LocalStorage + URL)
+        persistDeviceToken(token);
+
+        // Salva cache offline local de slides
         localStorage.setItem(`tv_cached_data_${token}`, JSON.stringify(data));
 
         // Pré-carrega todas as imagens de uma vez para zero consumo de rede
         preloadAllSlideImages(list);
       } else {
         // Token inválido ou revogado pelo dono
-        localStorage.removeItem(STORAGE_KEY);
+        clearPersistedDeviceToken();
         setDeviceToken(null);
         setScreenData(null);
       }
@@ -263,7 +322,7 @@ export default function TvPlayerPage() {
         (payload) => {
           if (payload.new && payload.new.status === 'conectado') {
             const token = pairingSession.device_token;
-            localStorage.setItem(STORAGE_KEY, token);
+            persistDeviceToken(token);
             setDeviceToken(token);
           }
         }
@@ -281,7 +340,7 @@ export default function TvPlayerPage() {
 
         if (!error && data && data.status === 'conectado') {
           const token = pairingSession.device_token;
-          localStorage.setItem(STORAGE_KEY, token);
+          persistDeviceToken(token);
           setDeviceToken(token);
           if (pollingInterval) clearInterval(pollingInterval);
         }
@@ -377,7 +436,7 @@ export default function TvPlayerPage() {
   // Desvincular tela (reset para re-pareamento)
   const handleUnpair = () => {
     if (window.confirm('Deseja desconectar esta TV? Ela voltará para a tela de pareamento.')) {
-      localStorage.removeItem(STORAGE_KEY);
+      clearPersistedDeviceToken();
       setDeviceToken(null);
       setScreenData(null);
       setSlides([]);
